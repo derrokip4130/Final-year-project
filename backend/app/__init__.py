@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from app.extensions import db, bcrypt, jwt, migrate
 from app.routes.auth_routes import auth_blueprint
 from app.routes.main_routes import main_blueprint
@@ -6,6 +7,7 @@ from app.config import Config
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     app.config.from_object(Config)
 
     # Initialize extensions
