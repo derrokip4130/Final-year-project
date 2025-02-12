@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Poultry Care System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e8f5e9; /* Light green background */
+            text-align: center;
+        }
+        .navbar {
+            width: 100%;
+            background-color: #2e7d32; /* Dark green */
+            padding: 15px 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            margin-top: 80px;
+        }
+        h1 {
+            color: #2e7d32; /* Dark green */
+        }
+        p {
+            font-size: 16px;
+            color: #444;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #43a047; /* Green */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .btn:hover {
+            background-color: #388e3c; /* Darker green */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="/home">Home</a>
+
+        {% if current_user.is_authenticated %}
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/register">Register</a>
+            <a href="/login">Login</a>
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <h1>Welcome to the Poultry Care System</h1>
+        <p>Your trusted assistant for diagnosing poultry diseases and managing breed care.</p>
+
+        {% if not current_user.is_authenticated %}
+            <a href="/register" class="btn">Get Started</a>
+        {% endif %}
+    </div>
+
+</body>
+</html>
