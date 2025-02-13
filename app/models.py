@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy.dialects.postgresql import JSONB
 
 class User(db.Model, UserMixin):
     ADMIN = "admin"
@@ -89,5 +90,32 @@ class Disease(db.Model):
             new_id = f"D-{last_id + 1:03d}"  # Increment and format as D-XXX
         else:
             new_id = "D-001"  # First entry
+        
+        return new_id
+
+class Breed(db.Model):
+
+    breed_id = db.Column(db.String(5), primary_key=True)
+    breed_name = db.Column(db.String(50))
+    breed_characteristics = db.Column(JSONB)
+    breed_purpose = db.Column(db.String(10))
+    breed_category = db.Column(db.String(10))
+    feeding_nutrition = db.Column(JSONB)
+    housing_environment = db.Column(JSONB)
+    disease_prevention_health = db.Column(JSONB)
+    breeding_reproduction = db.Column(JSONB)
+    productivity_economics = db.Column(JSONB)
+
+    def __repr__(self):
+        return self.breed_name
+
+    @staticmethod
+    def generate_breed_id():
+        last_breed = Breed.query.order_by(Breed.breed_id.desc()).first()
+        if last_breed:
+            last_id = int(last_breed.breed_id.split('-')[1])  # Extract numeric part
+            new_id = f"B-{last_id + 1:03d}"  # Increment and format as D-XXX
+        else:
+            new_id = "B-001"  # First entry
         
         return new_id

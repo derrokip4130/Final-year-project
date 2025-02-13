@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Breed - Poultry Care System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 400vh;
+            background-color: #e8f5e9;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h2 {
+            color: #2e7d32;
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            color: #2e7d32;
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea, select {
+            width: 90%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #a5d6a7;
+            border-radius: 4px;
+        }
+        input:focus, textarea:focus {
+            border-color: #66bb6a;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            background-color: #43a047;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #388e3c;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #1b5e20;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #a5d6a7;
+            border-radius: 5px;
+            background-color: #f1f8e9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Add Breed</h2>
+        <form action="{{ url_for('main.add_breeds') }}" method="POST">
+            
+            <label for="breed_name">Breed Name:</label>
+            <input type="text" id="breed_name" name="breed_name" required>
+
+            <label for="breed_category">Category:</label>
+            <input type="text" id="breed_category" name="breed_category">
+
+            <label for="breed_purpose">Purpose:</label>
+            <input type="text" id="breed_purpose" name="breed_purpose">
+
+            <div class="section">
+                <h3>Breed Characteristics</h3>
+                <label>Temperament:</label>
+                <input type="text" name="temperament" placeholder="Feed Type">
+
+                <label>Farming suitability:</label>
+                <input type="text" name="farming_suitability" placeholder="Farming suitability">
+
+                <label>Climate adaptability:</label>
+                <input type="text" name="climate_adaptability" placeholder="Climate adaptability">
+
+                <label>Special needs:</label>
+                <input type="text" name="special_needs" placeholder="Special needs">
+            </div>
+
+            <div class="section">
+                <h3>Breeding and Reproduction</h3>
+                <label>Best breeding age:</label>
+                <input type="text" name="best_breeding_age" placeholder="Best age for breeding">
+
+                <label>Egg production:</label>
+                <input type="text" name="egg_production" placeholder="Egg production rate">
+
+                <label>Brooding requirements:</label>
+                <input type="text" name="brooding_requirements" placeholder="Any special brooding requirements">
+
+                <label>Incubation method:</label>
+                <input type="text" name="incubation_period" placeholder="Recommended incubation period">
+            </div>
+
+            <div class="section">
+                <h3>Feeding & Nutrition</h3>
+                <label>Chick Feed:</label>
+                <input type="text" name="chick_feed_type" placeholder="Feed Type">
+                <input type="text" name="chick_daily_quantity" placeholder="Daily Quantity">
+                <input type="text" name="chick_schedule" placeholder="Schedule">
+
+                <label>Grower Feed:</label>
+                <input type="text" name="grower_feed_type" placeholder="Feed Type">
+                <input type="text" name="grower_daily_quantity" placeholder="Daily Quantity">
+                <input type="text" name="grower_schedule" placeholder="Schedule">
+            </div>
+
+            <div class="section">
+                <h3>Housing & Environment</h3>
+                <label>Space per Bird:</label>
+                <input type="text" name="space_per_bird">
+
+                <label>Ventilation:</label>
+                <input type="text" name="ventilation">
+
+                <label>Temperature:</label>
+                <input type="text" name="temperature">
+
+                <label>Humidity:</label>
+                <input type="text" name="humidity">
+            </div>
+
+            <div class="section">
+                <h3>Disease Prevention & Health</h3>
+                <label>Common Diseases:</label>
+                <input type="text" name="common_diseases" placeholder="Comma-separated values">
+
+                <label>Vaccination Schedule:</label>
+                <input type="text" name="vaccination_schedule" placeholder="Comma-separated values">
+
+            </div>
+
+            <div class="section">
+                <h3>Productivity and Economics</h3>
+                <label>Growth rate:</label>
+                <input type="text" name="growth_rate" placeholder="Growth rate">
+
+                <label>Egg Laying:</label>
+                <input type="text" name="egg_laying" placeholder="Egg laying period">
+
+                <label>Market Price:</label>
+                <input type="text" name="market_price" placeholder="Market price of meat or eggs">
+            </div>
+
+            <button type="submit">Add Breed</button>
+        </form>
+
+        <a href="{{ url_for('main.breeds_page') }}" class="back-link">Back to Breed List</a>
+    </div>
+
+</body>
+</html>

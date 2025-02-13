@@ -57,6 +57,23 @@
         .card h3 {
             color: #2e7d32;
         }
+        .no-data {
+            text-align: center;
+            font-size: 18px;
+            color: #777;
+            margin-top: 20px;
+        }
+        .btn {
+            background-color: #43a047;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #388e3c;
+        }
     </style>
 </head>
 <body>
@@ -67,20 +84,31 @@
         <div class="header">
             <h1>Welcome {{current_user.username}}</h1>
         </div>
-        <div class="cards">
-            <div class="card">
-                <h3>Total Users</h3>
-                <p>{{user_count}}</p>
-            </div>
-            <div class="card">
-                <h3>Disease Reports</h3>
-                <p>{{disease_count}}</p>
-            </div>
-            <div class="card">
-                <h3>Breeds Managed</h3>
-                <p>{{breed_count}}</p>
-            </div>
-        </div>
+        <h2>Breed List</h2>
+    {% if breeds %}
+        <table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px; background: #2e7d32; color: white;">Breed Name</th>
+                    <th style="padding: 10px; background: #2e7d32; color: white;">Category</th>
+                    <th style="padding: 10px; background: #2e7d32; color: white;">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for breed in breeds %}
+                <tr>
+                    <td style="padding: 10px;">{{ breed.breed_name }}</td>
+                    <td style="padding: 10px;">{{ breed.breed_category }}</td>
+                    <td style="padding: 10px;">{{ breed.breed_purpose }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="no-data">No diseases found.</p>
+    {% endif %}
+    <button class="btn" onclick="location.href='/add_breed'">Add Breed</button>
+
     </div>
 </body>
 </html>

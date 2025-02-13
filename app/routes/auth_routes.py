@@ -1,4 +1,4 @@
-from flask import request, render_template, redirect, url_for, flash, jsonify, Blueprint
+from flask import request, render_template, redirect, url_for, jsonify, Blueprint
 from app.models import User
 from app.extensions import db
 from datetime import datetime
@@ -19,7 +19,6 @@ def register():
         location = request.form.get('location')
 
         if user_role not in [User.ADMIN, User.FARMER]:  
-            flash('Invalid user role', 'danger')
             return redirect(url_for('auth.register'))  # Redirect back to form
 
         hashed_password = generate_password_hash(password)
@@ -35,7 +34,6 @@ def register():
 
         db.session.add(new_user)
         db.session.commit()
-        flash(f'User {username} registered successfully as {user_role}', 'success')
 
         return redirect(url_for('auth.login'))  # Redirect to login page after registration
 
@@ -55,14 +53,10 @@ def login():
 
             login_user(user)
 
-            flash('Login successful!', 'success')
-
             if user.user_role == "admin":
                 return redirect(url_for("main.admin_dashboard"))
             else:
                 return redirect(url_for('main.home'))  # Redirect to dashboard or home page
-
-        flash('Invalid username or password', 'danger')
 
     return render_template('auth/login.html')  # Render the login form for GET request
 
