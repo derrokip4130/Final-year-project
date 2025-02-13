@@ -40,6 +40,12 @@ class User(db.Model, UserMixin):
         """Check if the user is a farmer"""
         return self.user_role == self.FARMER
 
+disease_symptom = db.Table(
+    'disease_symptom',
+    db.Column('disease_id', db.String(10), db.ForeignKey('diseases.disease_id'), primary_key=True),
+    db.Column('symptom_id', db.String(10), db.ForeignKey('symptom.symptom_id'), primary_key=True)
+)
+
 class Symptom(db.Model):
     symptom_id = db.Column(db.String(10), primary_key=True)
     symptom_name = db.Column(db.String(50), nullable=False)
@@ -59,6 +65,29 @@ class Symptom(db.Model):
         
         return new_id
 
-    def __init__(self, name):
-        self.symptom_id = self.generate_symptom_id()
-        self.name = name
+
+class Disease(db.Model):
+    __tablename__ = 'diseases'
+
+    disease_id = db.Column(db.String(10), primary_key=True)
+    disease_name = db.Column(db.String(50), nullable=False)
+    disease_description = db.Column(db.String(100), nullable=True)
+    causes = db.Column(db.String(255), nullable=True)  # Causes of the disease
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    symptoms = db.relationship('Symptom', secondary=disease_symptom, backref=db.backref('diseases', lazy='dynamic'))
+
+    def __repr__(self):
+        return self.disease_name
+
+    @staticmethod
+    def generate_disease_id():
+        last_disease = Disease.query.order_by(Disease.disease_id.desc()).first()
+        if last_disease:
+            last_id = int(last_disease.disease_id.split('-')[1])  # Extract numeric part
+            new_id = f"D-{last_id + 1:03d}"  # Increment and format as D-XXX
+        else:
+            new_id = "D-001"  # First entry
+        
+        return new_id

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease List - Poultry Care System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            background: #e8f5e9;
+            height: 100vh;
+        }
+        .header {
+            background: white;
+            padding: 15px;
+            border-bottom: 2px solid #2e7d32;
+        }
+        .table-container {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #2e7d32;
+            color: white;
+        }
+        .no-data {
+            text-align: center;
+            font-size: 18px;
+            color: #777;
+            margin-top: 20px;
+        }
+        .btn {
+            background-color: #43a047;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    {% block navbar %}
+        {% include 'admin/admin_navbar.html' %}
+    {% endblock %}
+
+    <div class="content">
+        <div class="header">
+            <h1>Welcome {{ current_user.username }}</h1>
+            <h2>List of Diseases</h2>
+        </div>
+
+        <div class="table-container">
+            {% if diseases %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Disease ID</th>
+                            <th>Name</th>
+                            <!--<th>Description</th>-->
+                            <th>Causes</th>
+                            <th>Last Updated</th>
+                            <th>Added on</th>
+                            <th>Symptoms</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for disease in diseases %}
+                            <tr>
+                                <td>{{ disease.disease_id }}</td>
+                                <td>{{ disease.disease_name }}</td>
+                                <!--<td>{{ disease.disease_description or "N/A" }}</td>-->
+                                <td>{{ disease.causes or "N/A" }}</td>
+                                <td>{{ disease.last_updated.strftime('%Y-%m-%d %H:%M:%S') if disease.last_updated else "Never Updated" }}</td>
+                                <td>{{ disease.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    {% if disease.symptoms %}
+                                        {{ disease.symptoms | map(attribute='symptom_name') | join(', ') }}
+                                    {% else %}
+                                        <span>No symptoms associated</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>                    
+                </table>
+            {% else %}
+                <p class="no-data">No diseases found.</p>
+            {% endif %}
+            
+        </div>
+        <button class="btn" onclick="location.href='/add_disease'">Add Disease</button>
+    </div>
+</body>
+</html>

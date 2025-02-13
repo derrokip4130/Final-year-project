@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Disease - Poultry Care System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 200vh;
+            background-color: #e8f5e9;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        h2 {
+            color: #2e7d32;
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            color: #2e7d32;
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #a5d6a7;
+            border-radius: 4px;
+        }
+        input:focus, textarea:focus {
+            border-color: #66bb6a;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            background-color: #43a047;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #388e3c;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #1b5e20;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Add Disease</h2>
+        <form action="{{ url_for('main.add_disease') }}" method="POST">
+            <label for="disease_name">Disease Name:</label>
+            <input type="text" id="disease_name" name="disease_name" required>
+        
+            <label for="disease_description">Description:</label>
+            <textarea id="disease_description" name="disease_description" rows="3" required></textarea>
+        
+            <label for="causes">Causes:</label>
+            <textarea id="causes" name="causes" rows="3"></textarea>
+        
+            <label for="search_symptoms">Search Symptoms:</label>
+            <input type="text" id="search_symptoms" placeholder="Search for symptoms..." onkeyup="filterSymptoms()">
+        
+            <label for="available_symptoms">Available Symptoms:</label>
+            <select id="available_symptoms" size="5">
+                {% for symptom in symptoms %}
+                    <option value="{{ symptom.symptom_id }}">{{ symptom.symptom_name }}</option>
+                {% endfor %}
+            </select>
+        
+            <label for="selected_symptoms">Selected Symptoms:</label>
+            <select id="selected_symptoms" size="5" multiple></select>
+        
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <button type="button" onclick="openSymptomModal()" style="background-color: #ff9800; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: white;">Add Symptom</button>
+                <button type="submit" style="background-color: #43a047;">Add Disease</button>
+            </div>
+        </form>
+    
+        <a href="{{ url_for('main.diseases_page') }}" class="back-link">Back to Disease List</a>
+    </div>
+    <div id="symptomModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
+        <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; width: 300px; text-align: center;">
+            <h3 style="color: #2e7d32;">Add Symptom</h3>
+            <form id="symptomForm">
+                <input type="text" id="new_symptom_name" name="new_symptom_name" placeholder="Symptom Name" required style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                <textarea id="new_symptom_description" name="new_symptom_description" placeholder="Description" style="width: 100%; padding: 8px;"></textarea>
+                <button type="button" onclick="saveSymptom()" style="background-color: #43a047; color: white; padding: 8px; width: 100%; border: none; cursor: pointer; margin-top: 10px;">Save Symptom</button>
+            </form>
+            <button onclick="closeSymptomModal()" style="background-color: red; color: white; padding: 5px; width: 100%; border: none; cursor: pointer; margin-top: 10px;">Cancel</button>
+        </div>
+    </div>
+    
+    
+    <script>
+
+        function filterSymptoms() {
+            let searchInput = document.getElementById("search_symptoms").value.toLowerCase();
+            let symptoms = document.getElementById("available_symptoms"); // Corrected ID
+            let options = symptoms.getElementsByTagName("option");
+    
+            for (let i = 0; i < options.length; i++) {
+                let text = options[i].textContent.toLowerCase();
+                if (text.includes(searchInput)) {
+                    options[i].style.display = "";
+                } else {
+                    options[i].style.display = "none";
+                }
+            }
+        }
+    
+        function openSymptomModal() {
+            document.getElementById("symptomModal").style.display = "flex";
+        }
+    
+        function closeSymptomModal() {
+            document.getElementById("symptomModal").style.display = "none";
+        }
+    
+        function saveSymptom() {
+            const name = document.getElementById("new_symptom_name").value;
+            const description = document.getElementById("new_symptom_description").value;
+    
+            if (name.trim() === "") {
+                alert("Please enter a symptom name");
+                return;
+            }
+    
+            fetch("{{ url_for('main.add_symptom_ajax') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ symptom_name: name, symptom_description: description })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Add new symptom to the dropdown
+                    const select = document.getElementById("available_symptoms"); // Fixed ID
+                    const option = document.createElement("option");
+                    option.value = data.symptom_id;
+                    option.textContent = name;
+                    option.ondblclick = selectSymptom; // Add event listener for double click
+                    select.appendChild(option);
+                    select.value = data.symptom_id;
+    
+                    // Close modal
+                    closeSymptomModal();
+                    alert("Symptom added successfully!");
+                } else {
+                    alert("Failed to add symptom.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    
+        function selectSymptom(event) {
+            let selectedSymptoms = document.getElementById("selected_symptoms");
+            let availableSymptoms = document.getElementById("available_symptoms");
+            let option = event.target;
+
+            // Move selected symptom to "Selected Symptoms"
+            let selectedOption = document.createElement("option");
+            selectedOption.value = option.value;
+            selectedOption.textContent = option.textContent;
+            selectedOption.ondblclick = removeSymptom;
+
+            selectedSymptoms.appendChild(selectedOption);
+            availableSymptoms.removeChild(option);
+
+            updateHiddenInput();
+        }
+    
+        function removeSymptom(event) {
+            let selectedSymptoms = document.getElementById("selected_symptoms");
+            let availableSymptoms = document.getElementById("available_symptoms");
+            let option = event.target;
+
+            // Move symptom back to "Available Symptoms"
+            let availableOption = document.createElement("option");
+            availableOption.value = option.value;
+            availableOption.textContent = option.textContent;
+            availableOption.ondblclick = selectSymptom;
+
+            availableSymptoms.appendChild(availableOption);
+            selectedSymptoms.removeChild(option);
+
+            updateHiddenInput();
+        }
+    
+        function updateHiddenInput() {
+            let selectedSymptoms = document.getElementById("selected_symptoms");
+            let hiddenInput = document.getElementById("selected_symptoms_input");
+
+            let symptomIds = [];
+            for (let option of selectedSymptoms.options) {
+                symptomIds.push(option.value);
+            }
+
+            hiddenInput.value = symptomIds.join(",");
+        }
+    
+        document.getElementById("available_symptoms").ondblclick = selectSymptom;
+        document.getElementById("selected_symptoms").ondblclick = removeSymptom;    
+    </script>
+    
+</body>
+</html>
