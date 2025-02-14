@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breed Chat</title>
+    <style>
+        .home-btn {
+            display: block;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px;
+            background-color: #1b5e20; /* Darker green for contrast */
+            color: white;
+            text-decoration: none;
+            border-bottom: 2px solid #388e3c;
+        }
+        .home-btn:hover {
+            background-color: #388e3c; /* Slightly lighter green */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 120vh;
+            background-color: #e8f5e9;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #2e7d32;
+            color: white;
+            padding-top: 10px;
+            position: fixed;
+            height: 100%;
+        }
+        .sidebar h2 {
+            text-align: center;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .sidebar a:hover {
+            background-color: #388e3c;
+        }
+        /* Main Content */
+        .main-content {
+            margin-left: 270px;
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .chat-container {
+            width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #a5d6a7;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f1f8e9;
+        }
+        .chat-message {
+            margin-bottom: 10px;
+        }
+        .user-message {
+            color: #1b5e20;
+            font-weight: bold;
+        }
+        .bot-message {
+            color: #2e7d32;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #a5d6a7;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #43a047;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/home" class="home-btn">🏠 Home</a> <!-- Home Button -->
+        <h2>Queries</h2>
+        <a href="#">None</a>
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="main-content">
+        <div class="chat-container">
+            <h2 style="text-align: center; color: #2e7d32;">Breed Related Queries</h2>
+
+            <!-- Breed Selection -->
+            
+            <label for="breed-select">Select Breed:</label>
+            <select id="breed-select">
+                {% for breed in breeds %}
+                <option value="{{breed.breed_name}}">{{breed.breed_name}}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Chat Box -->
+            <div class="chat-box" id="chat-box"></div>
+
+            <!-- Input and Send Button -->
+            <input type="text" id="user-input" placeholder="Ask about a breed...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            let inputField = document.getElementById("user-input");
+            let breedSelect = document.getElementById("breed-select");
+            let userMessage = inputField.value.trim();
+            let selectedBreed = breedSelect.options[breedSelect.selectedIndex].text;
+
+            if (userMessage === "") return;
+
+            let chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<div class="chat-message user-message">You: (${selectedBreed}) ${userMessage}</div>`;
+
+            // Simulate bot response (replace with API call in Flask)
+            setTimeout(() => {
+                let botReply = getBotResponse(selectedBreed, userMessage);
+                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: ${botReply}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1000);
+
+            inputField.value = "";
+        }
+
+        function getBotResponse(breed, query) {
+            // Simulated responses (Replace with Flask API)
+            let responses = {
+                "Leghorn": "Leghorns are excellent egg-layers with white feathers.",
+                "Rhode Island Red": "Rhode Island Reds are great for both meat and eggs.",
+                "Sussex": "Sussex chickens are friendly and good for backyards.",
+                "Plymouth Rock": "Plymouth Rocks are hardy birds known for good meat quality."
+            };
+            return responses[breed] || "I'm not sure. Let me check my database.";
+        }
+    </script>
+
+</body>
+</html>

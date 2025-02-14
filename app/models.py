@@ -8,6 +8,17 @@ from sqlalchemy.dialects.postgresql import JSONB
 
 eat_tz = pytz.timezone("Africa/Nairobi")
 
+disease_symptom = db.Table(
+    'disease_symptom',
+    db.Column('disease_id', db.String(10), db.ForeignKey('diseases.disease_id'), primary_key=True),
+    db.Column('symptom_id', db.String(10), db.ForeignKey('symptom.symptom_id'), primary_key=True)
+)
+
+farmer_breed = db.Table(
+    "farmer_breed",
+    db.Column("user_id", db.String, db.ForeignKey("user.user_id"), primary_key=True),
+    db.Column("breed_id", db.String(5), db.ForeignKey("breed.breed_id"), primary_key=True),
+)
 
 class User(db.Model, UserMixin):
     ADMIN = "admin"
@@ -23,6 +34,8 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
     last_login = db.Column(db.DateTime(timezone=True), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
+
+    breeds = db.relationship("Breed", secondary=farmer_breed, back_populates="farmers")
 
     def __repr__(self):
         return f"<User {self.username} - Role: {self.user_role}>"
@@ -43,12 +56,6 @@ class User(db.Model, UserMixin):
     def is_farmer(self):
         """Check if the user is a farmer"""
         return self.user_role == self.FARMER
-
-disease_symptom = db.Table(
-    'disease_symptom',
-    db.Column('disease_id', db.String(10), db.ForeignKey('diseases.disease_id'), primary_key=True),
-    db.Column('symptom_id', db.String(10), db.ForeignKey('symptom.symptom_id'), primary_key=True)
-)
 
 class Symptom(db.Model):
     symptom_id = db.Column(db.String(10), primary_key=True)
@@ -108,6 +115,8 @@ class Breed(db.Model):
     disease_prevention_health = db.Column(JSONB)
     breeding_reproduction = db.Column(JSONB)
     productivity_economics = db.Column(JSONB)
+
+    farmers = db.relationship("User", secondary=farmer_breed, back_populates="breeds")
 
     def __repr__(self):
         return self.breed_name

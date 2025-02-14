@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e8f5e9; /* Light green background */
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        .form-container h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #2e7d32; /* Dark green */
+        }
+        input, select, button {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #a5d6a7; /* Light green border */
+            border-radius: 4px;
+        }
+        button {
+            background-color: #43a047;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #388e3c;
+        }
+        .alert {
+            padding: 10px;
+            color: white;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .alert.success { background-color: #4CAF50; }
+        .alert.danger { background-color: #f44336; }
+
+        /* Dual listbox styling */
+        .breed-selection-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .breed-list {
+            width: 45%;
+        }
+        select {
+            width: 100%;
+            height: 120px;
+            border: 1px solid #a5d6a7;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Register</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('main.select_breeds', user_id=user.user_id) }}" method="POST">
+            <div class="breed-selection-container">
+                <div class="breed-list">
+                    <label>Available Breeds</label>
+                    <select id="availableBreeds" multiple ondblclick="moveBreed('availableBreeds', 'selectedBreeds')">
+                        {% for breed in breeds %}
+                            {% if breed not in user.breeds %}
+                                <option value="{{ breed.breed_id }}">{{ breed.breed_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="breed-list">
+                    <label>Selected Breeds</label>
+                    <select id="selectedBreeds" name="selected_breeds" multiple ondblclick="moveBreed('selectedBreeds', 'availableBreeds')">
+                        {% for breed in user.breeds %}
+                            <option value="{{ breed.breed_id }}">{{ breed.breed_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        
+            <input type="hidden" name="selected_breeds" id="selectedBreedsInput">
+            <button type="submit">Save Breeds</button>
+        </form>
+    </div>
+
+    <script>
+        function moveBreed(fromId, toId) {
+            let fromSelect = document.getElementById(fromId);
+            let toSelect = document.getElementById(toId);
+    
+            for (let i = 0; i < fromSelect.options.length; i++) {
+                if (fromSelect.options[i].selected) {
+                    toSelect.appendChild(fromSelect.options[i]);
+                    i--; // Adjust index after moving
+                }
+            }
+            updateHiddenField();
+        }
+    
+        function updateHiddenField() {
+            let selectedBreeds = document.getElementById("selectedBreeds");
+            let selectedValues = [];
+            for (let option of selectedBreeds.options) {
+                selectedValues.push(option.value);
+            }
+            document.getElementById("selectedBreedsInput").value = selectedValues.join(",");
+        }
+    </script>
+</body>
+</html>

@@ -15,6 +15,29 @@ def blank():
 def home():
     return render_template("home.html")
 
+@main_blueprint.route("/select_breeds/<user_id>", methods=["GET", "POST"])
+def select_breeds(user_id):
+    user = User.query.filter_by(user_id=user_id).first()
+    all_breeds = Breed.query.all()  # Fetch all available breeds
+
+    if not user:
+        return redirect(url_for("main.dashboard"))  # Adjust redirect as needed
+
+    if request.method == "POST":
+        selected_breed_ids = request.form.get("selected_breeds", "").split(",")
+
+        # Fetch selected breeds from DB
+        selected_breeds = Breed.query.filter(Breed.breed_id.in_(selected_breed_ids)).all()
+        
+        # Assign breeds to user
+        user.breeds = selected_breeds
+        db.session.commit()
+
+        return redirect(url_for("auth.login"))  # Redirect to another page after saving
+
+    return render_template("select_breeds.html", user=user, breeds=all_breeds)
+
+
 @main_blueprint.route("/admin_dashboard", methods = ['GET'])
 @login_required
 def admin_dashboard():
@@ -216,3 +239,11 @@ def add_breeds():
         return redirect(url_for('main.breeds_page'))
 
     return render_template('admin/add_breed.html')
+
+@main_blueprint.route("/breed_queries")
+@login_required
+def breed_queries():
+    user = User.query.get(current_user.user_id)  # Get the logged-in user
+    selected_breeds = user.breeds  # Fetch breeds the user has selected
+    return render_template("breed_queries.html", breeds=selected_breeds)
+

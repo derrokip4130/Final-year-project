@@ -1,0 +1,12 @@
+<div class="navbar">
+    <a href="/home">Home</a>
+
+    {% if current_user.is_authenticated %}
+        <a href="/breed_queries">Breed Query</a>
+        <a href="#">Disease Diagnosis</a>
+        <a href="/logout">Logout</a>
+    {% else %}
+        <a href="/register">Register</a>
+        <a href="/login">Login</a>
+    {% endif %}
+</div>

@@ -1,6 +1,6 @@
 import pytz
 from flask import request, render_template, redirect, url_for, jsonify, Blueprint
-from app.models import User
+from app.models import User, Breed
 from app.extensions import db
 from datetime import datetime
 from flask_login import login_user, logout_user, login_required
@@ -12,6 +12,9 @@ eat_tz = pytz.timezone("Africa/Nairobi")
 
 @auth_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
+    
+    breeds = Breed.query.all()
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -37,9 +40,10 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        return redirect(url_for('auth.login'))  # Redirect to login page after registration
+        if user_role == User.FARMER:
+            return redirect(url_for('main.select_breeds', user_id=new_user.user_id))  # Redirect to login page after registration
 
-    return render_template('auth/register.html')  # Render form for GET request
+    return render_template('auth/register.html',breeds=breeds)  # Render form for GET request
 
 @auth_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
