@@ -144,7 +144,7 @@
                     </button>
                     </a>
                 {% endif %}
-                {% if current_user.user_role == 'admin' %}
+                {% if current_user.user_role == 'admin' and current_user.user_id != user.user_id %}
                 <form id="delete-form" method="POST" action="{{ url_for('main.delete_user', user_id=user.user_id) }}" 
                       style="display: inline;">
                     <button type="button" onclick="confirmDelete()" 
