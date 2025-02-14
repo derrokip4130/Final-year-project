@@ -1,10 +1,13 @@
-import uuid
+import uuid, pytz
 from app import db
 from datetime import datetime
 from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSONB
+
+eat_tz = pytz.timezone("Africa/Nairobi")
+
 
 class User(db.Model, UserMixin):
     ADMIN = "admin"
@@ -74,8 +77,8 @@ class Disease(db.Model):
     disease_name = db.Column(db.String(50), nullable=False)
     disease_description = db.Column(db.String(100), nullable=True)
     causes = db.Column(db.String(255), nullable=True)  # Causes of the disease
-    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_updated = db.Column(db.DateTime, default=datetime.now(eat_tz), onupdate=datetime.now(eat_tz))
+    created_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
 
     symptoms = db.relationship('Symptom', secondary=disease_symptom, backref=db.backref('diseases', lazy='dynamic'))
 

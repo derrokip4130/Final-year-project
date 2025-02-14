@@ -1,3 +1,4 @@
+import pytz
 from flask import request, render_template, redirect, url_for, jsonify, Blueprint
 from app.models import User
 from app.extensions import db
@@ -5,8 +6,9 @@ from datetime import datetime
 from flask_login import login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash
 
-
 auth_blueprint = Blueprint("auth", __name__)
+eat_tz = pytz.timezone("Africa/Nairobi")
+
 
 @auth_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
@@ -48,7 +50,7 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):  # Correct password check
-            user.last_login = datetime.utcnow()
+            user.last_login = datetime.now(eat_tz)
             db.session.commit()
 
             login_user(user)

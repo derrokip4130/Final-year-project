@@ -5,6 +5,11 @@ from flask_login import login_required, current_user
 
 main_blueprint = Blueprint('main', __name__)
 
+@main_blueprint.route("/")
+def blank():
+    if current_user.user_role == User.ADMIN:
+        return redirect(url_for('main.admin_dashboard'))
+    return redirect(url_for('home'))
 
 @main_blueprint.route("/home")
 def home():
