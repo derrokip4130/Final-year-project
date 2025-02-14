@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e8f5e9;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h2 {
+            color: #2e7d32;
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            color: #2e7d32;
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea, select {
+            width: 90%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #a5d6a7;
+            border-radius: 4px;
+        }
+        input:focus, textarea:focus {
+            border-color: #66bb6a;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            background-color: #43a047;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #388e3c;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #1b5e20;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #a5d6a7;
+            border-radius: 5px;
+            background-color: #f1f8e9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Add Breed</h2>
+        <form action="{{ url_for('main.update_user', user_id=user.user_id) }}" method="POST">
+            
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{user.username}}" >
+
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" value="{{user.email}}">
+
+            <label for="phone_num">Phone Number:</label>
+            <input type="text" id="phone_num" name="phone_num" value="{{user.phone_num}}">
+
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" value="{{user.location}}">
+
+            <!--<div class="section">
+                <h3>Disease Prevention & Health</h3>
+                <label>Common Diseases:</label>
+                <input type="text" name="common_diseases" placeholder="Comma-separated values">
+
+                <label>Vaccination Schedule:</label>
+                <input type="text" name="vaccination_schedule" placeholder="Comma-separated values">
+
+            </div>-->
+
+            <button type="submit">Update details</button>
+        </form>
+
+        <a href="{{ url_for('main.user_page', user_id=user.user_id) }}" class="back-link">Back to user page</a>
+    </div>
+
+</body>
+</html>

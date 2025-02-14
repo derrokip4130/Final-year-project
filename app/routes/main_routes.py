@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, render_template, redirect, url_for
+from flask import Blueprint, jsonify, request, render_template, redirect, url_for, abort
 from app.models import User, Disease, Symptom, Breed
 from app.extensions import db
 from flask_login import login_required, current_user
@@ -19,6 +19,54 @@ def admin_dashboard():
     if not current_user.is_admin:
         return jsonify({'message': 'Access denied! Admins only.'}), 403
     return render_template("admin/admin_dashboard.html", user_count=user_count, disease_count=disease_count, breed_count=breed_count)
+
+@main_blueprint.route("/users", methods=["GET"])
+@login_required
+def users_page():
+    users=User.query.all()
+    return render_template("admin/users.html",users=users)
+
+@main_blueprint.route("/user/<user_id>",methods=["GET","POST"])
+@login_required
+def user_page(user_id):
+    
+    user = User.query.filter_by(user_id=user_id).first()
+    title = f"{user.username}"
+    is_owner = current_user.user_id==user_id
+    is_admin = current_user.user_role==User.ADMIN
+
+    return render_template("admin/user_page.html",user=user, is_owner=is_owner, is_admin=is_admin,title=title)
+
+@main_blueprint.route("/update_user/<user_id>", methods=["GET","POST"])
+@login_required
+def update_user(user_id):
+    user = User.query.filter_by(user_id=user_id).first()
+    
+    if request.method == "POST":
+        user.username = request.form.get("username")
+        user.email = request.form.get("email")
+        user.phone_num = request.form.get("phone_num")
+        user.location = request.form.get("location")
+
+        try:
+            db.session.commit()
+            return redirect(url_for('main.user_page', user_id=user_id))
+        except:
+            db.session.rollback()
+    
+    return render_template('admin/update_user.html', user=current_user)
+
+@main_blueprint.route("/delete_user/<user_id>",methods=["GET","POST"])
+@login_required
+def delete_user(user_id):
+    if current_user.user_role != User.ADMIN:
+        abort(403) 
+
+    user = User.query.get(user_id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+    return redirect(url_for('main.users_page'))
 
 @main_blueprint.route("/diseases", methods = ["GET"])
 @login_required
