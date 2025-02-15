@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error {{ error_code }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 50px;
+        }
+        .error-box {
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        .error-box h1 {
+            font-size: 48px;
+        }
+        .error-box p {
+            font-size: 18px;
+        }
+        .home-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #721c24;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-box">
+        <h1>Error {{ error_code }}</h1>
+        <p>{{ error_message }}</p>
+        {% if current_user.user_role =='farmer' %}
+        <a href="{{ url_for('main.home') }}" class="home-button">Go Back Home</a>
+        {% else %}
+        <a href="{{ url_for('main.admin_dashboard') }}" class="home-button">Go to Admin Dashboard</a>
+        {% endif %}
+    </div>
+</body>
+</html>

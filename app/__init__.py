@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_cors import CORS
 from app.extensions import db, bcrypt, migrate, login_manager
 from app.routes.auth_routes import auth_blueprint
@@ -20,6 +20,16 @@ def create_app():
     # Register blueprints
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(main_blueprint)
+
+    from flask import render_template
+
+    @app.errorhandler(404)
+    @app.errorhandler(500)
+    @app.errorhandler(403)
+    @app.errorhandler(400)
+    @app.errorhandler(401)
+    def handle_errors(error):
+        return render_template('error.html', error_code=error.code, error_message=error.description), error.code
 
     return app
 
