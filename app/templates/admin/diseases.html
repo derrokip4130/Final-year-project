@@ -81,9 +81,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Disease ID</th>
                             <th>Name</th>
-                            <!--<th>Description</th>-->
                             <th>Causes</th>
                             <th>Last Updated</th>
                             <th>Added on</th>
@@ -93,11 +91,9 @@
                     <tbody>
                         {% for disease in diseases %}
                             <tr>
-                                <td>{{ disease.disease_id }}</td>
-                                <td>{{ disease.disease_name }}</td>
-                                <!--<td>{{ disease.disease_description or "N/A" }}</td>-->
+                                <td><a style="text-decoration: none;color: black;" href="{{ url_for('main.disease_page',disease_id=disease.disease_id) }}"> {{disease.disease_name }}</a></td>
                                 <td>{{ disease.causes or "N/A" }}</td>
-                                <td>{{ disease.last_updated.strftime('%Y-%m-%d %H:%M:%S') if disease.last_updated else "Never Updated" }}</td>
+                                <td>{{ disease.last_updated.strftime('%Y-%m-%d') if disease.last_updated else "Never Updated" }}</td>
                                 <td>{{ disease.created_at.strftime('%Y-%m-%d') }}</td>
                                 <td>
                                     {% if disease.symptoms %}

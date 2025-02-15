@@ -45,19 +45,23 @@ def admin_dashboard():
     breed_count = Breed.query.count()
     disease_count = Disease.query.count()
     user_count = User.query.filter_by(user_role="farmer").count()
-    
+    if not current_user.is_admin:
+        abort(403)
     return render_template("admin/admin_dashboard.html", user_count=user_count, disease_count=disease_count, breed_count=breed_count)
 
 @main_blueprint.route("/users", methods=["GET"])
 @login_required
 def users_page():
+    if not current_user.is_admin:
+        abort(403)
     users=User.query.all()
     return render_template("admin/users.html",users=users)
 
 @main_blueprint.route("/user/<user_id>",methods=["GET","POST"])
 @login_required
 def user_page(user_id):
-    
+    if not current_user.is_admin:
+        abort(403)
     user = User.query.filter_by(user_id=user_id).first()
     title = f"{user.username}"
     is_owner = current_user.user_id==user_id
@@ -69,7 +73,8 @@ def user_page(user_id):
 @login_required
 def update_user(user_id):
     user = User.query.filter_by(user_id=user_id).first()
-    
+    if not current_user.is_admin:
+        abort(403)
     if request.method == "POST":
         user.username = request.form.get("username")
         user.email = request.form.get("email")
@@ -99,12 +104,16 @@ def delete_user(user_id):
 @main_blueprint.route("/diseases", methods = ["GET"])
 @login_required
 def diseases_page():
+    if not current_user.is_admin:
+        abort(403)
     diseases = Disease.query.all()
     return render_template("admin/diseases.html", diseases=diseases)
 
 @main_blueprint.route('/add_disease', methods=['GET', 'POST'])
 @login_required
 def add_disease():
+    if not current_user.is_admin:
+        abort(403)
     if request.method == 'POST':
         disease_name = request.form.get('disease_name')
         disease_description = request.form.get('disease_description')
@@ -134,6 +143,8 @@ def add_disease():
 @main_blueprint.route('/add_symptom_ajax', methods=['POST'])
 @login_required
 def add_symptom_ajax():
+    if not current_user.is_admin:
+        abort(403)
     data = request.get_json()
     symptom_name = data.get("symptom_name")
     symptom_description = data.get("symptom_description") or None  # Allow empty description
@@ -151,16 +162,68 @@ def add_symptom_ajax():
 
     return jsonify({"success": True, "symptom_id": new_symptom.symptom_id})
 
+@main_blueprint.route("/disease/<disease_id>",methods=["GET","POST"])
+@login_required
+def disease_page(disease_id):
+
+    disease = Disease.query.filter_by(disease_id=disease_id).first()
+
+    return render_template("admin/disease_page.html",disease=disease)
+
+@main_blueprint.route("/update_disease/<disease_id>",methods=["GET","POST"])
+@login_required
+def update_disease(disease_id):
+
+    disease = Disease.query.filter_by(disease_id=disease_id).first()
+    symptoms = Symptom.query.all()
+
+    if request.method == "POST":
+        disease.disease_name = request.form.get('disease_name')
+        disease.disease_description = request.form.get('disease_description')
+        disease.causes = request.form.get('causes')
+        updated_symptom_ids = request.form.getlist('symptoms')  # List of selected symptoms
+        
+        # Clear existing symptoms to avoid duplicates
+        disease.symptoms.clear()
+
+        # Fetch and add newly selected symptoms
+        if updated_symptom_ids:
+            selected_symptoms = Symptom.query.filter(Symptom.symptom_id.in_(updated_symptom_ids)).all()
+            disease.symptoms.extend(selected_symptoms)
+
+        try:
+            db.session.commit()
+            return redirect(url_for('main.disease_page', disease_id=disease.disease_id))
+        except:
+            db.session.rollback()
+
+    return render_template("admin/update_disease.html",disease=disease,symptoms=symptoms)
+
+@main_blueprint.route("/delete_disease/<disease_id>", methods=["GET","POST"])
+@login_required
+def delete_disease(disease_id):
+    if not current_user.is_admin:
+        abort(403)
+    disease = Disease.query.filter_by(disease_id=disease_id).first()
+    
+    if request.method =="POST":
+        db.session.delete(disease)
+        db.session.commit()
+    return redirect(url_for('main.diseases_page'))
+
 @main_blueprint.route("/breeds", methods=["GET"])
 @login_required
 def breeds_page():
-    
+    if not current_user.is_admin:
+        abort(403)
     breeds = Breed.query.all()
     return render_template("admin/breeds.html", breeds=breeds)
 
 @main_blueprint.route("/add_breed", methods = ["GET","POST"])
 @login_required
 def add_breeds():
+    if not current_user.is_admin:
+        abort(403)
     if request.method == 'POST':
         breed_name = request.form.get('breed_name')
         breed_category = request.form.get('breed_category')
@@ -243,7 +306,8 @@ def add_breeds():
 @main_blueprint.route("/breed/<breed_id>", methods=["GET","POST"])
 @login_required
 def breed_page(breed_id):
-
+    if not current_user.is_admin:
+        abort(403)
     breed = Breed.query.filter_by(breed_id=breed_id).first()
 
     return render_template("admin/breed_page.html",breed=breed)
@@ -251,7 +315,8 @@ def breed_page(breed_id):
 @main_blueprint.route("/delete_breed/<breed_id>", methods=["GET","POST"])
 @login_required
 def delete_breed(breed_id):
-
+    if not current_user.is_admin:
+        abort(403)
     breed = Breed.query.filter_by(breed_id=breed_id).first()
     
     if request.method =="POST":
@@ -262,7 +327,8 @@ def delete_breed(breed_id):
 @main_blueprint.route("/update_breed/<breed_id>", methods=["GET","POST"])
 @login_required
 def update_breed(breed_id):
-
+    if not current_user.is_admin:
+        abort(403)
     breed = Breed.query.filter_by(breed_id=breed_id).first()
     
     if request.method =="POST":
@@ -324,7 +390,6 @@ def update_breed(breed_id):
             }
             try:
                 db.session.commit()
-                print(breed)
                 return redirect(url_for('main.breed_page', breed_id=breed.breed_id))
             except:
                 db.session.rollback()

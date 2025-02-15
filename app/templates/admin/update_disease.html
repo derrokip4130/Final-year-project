@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Disease - Poultry Care System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 150vh;
+            background-color: #e8f5e9;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        h2 {
+            color: #2e7d32;
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            color: #2e7d32;
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #a5d6a7;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            background-color: #43a047;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #388e3c;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #1b5e20;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Update Disease</h2>
+        <form action="{{ url_for('main.update_disease', disease_id=disease.disease_id) }}" method="POST">
+            <label for="disease_name">Disease Name:</label>
+            <input type="text" id="disease_name" name="disease_name" value="{{ disease.disease_name }}" required>
+        
+            <label for="disease_description">Description:</label>
+            <textarea id="disease_description" name="disease_description" rows="3" required>{{ disease.disease_description }}</textarea>
+        
+            <label for="causes">Causes:</label>
+            <textarea id="causes" name="causes" rows="3">{{ disease.causes }}</textarea>
+        
+            <label for="search_symptoms">Search Symptoms:</label>
+            <input type="text" id="search_symptoms" placeholder="Search for symptoms..." onkeyup="filterSymptoms()">
+        
+            <label for="available_symptoms">Available Symptoms:</label>
+            <select id="available_symptoms" size="5">
+                {% for symptom in symptoms %}
+                    {% if symptom not in disease.symptoms %}
+                        <option value="{{ symptom.symptom_id }}">{{ symptom.symptom_name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        
+            <label for="selected_symptoms">Selected Symptoms:</label>
+            <select id="selected_symptoms" size="5" multiple>
+                {% for symptom in disease.symptoms %}
+                    <option value="{{ symptom.symptom_id }}" selected>{{ symptom.symptom_name }}</option>
+                {% endfor %}
+            </select>
+        
+            <input type="hidden" name="symptoms" id="selected_symptoms_input">
+        
+            <button type="submit">Update Disease</button>
+        </form>
+    
+        <a href="{{ url_for('main.disease_page',disease_id=disease.disease_id) }}" class="back-link">Back to {{ disease.disease_name }} page</a>
+    </div>
+    
+    <script>
+        function filterSymptoms() {
+            let searchInput = document.getElementById("search_symptoms").value.toLowerCase();
+            let symptoms = document.getElementById("available_symptoms");
+            let options = symptoms.getElementsByTagName("option");
+    
+            for (let i = 0; i < options.length; i++) {
+                let text = options[i].textContent.toLowerCase();
+                options[i].style.display = text.includes(searchInput) ? "" : "none";
+            }
+        }
+
+        function updateHiddenInput() {
+            let selectedSymptoms = document.getElementById("selected_symptoms");
+            let hiddenInput = document.getElementById("selected_symptoms_input");
+            let symptomIds = [];
+            for (let option of selectedSymptoms.options) {
+                symptomIds.push(option.value);
+            }
+            hiddenInput.value = symptomIds.join(",");
+        }
+    </script>
+    
+</body>
+</html>
