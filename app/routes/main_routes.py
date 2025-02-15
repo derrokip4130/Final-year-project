@@ -45,8 +45,7 @@ def admin_dashboard():
     breed_count = Breed.query.count()
     disease_count = Disease.query.count()
     user_count = User.query.filter_by(user_role="farmer").count()
-    if not current_user.is_admin:
-        return jsonify({'message': 'Access denied! Admins only.'}), 403
+    
     return render_template("admin/admin_dashboard.html", user_count=user_count, disease_count=disease_count, breed_count=breed_count)
 
 @main_blueprint.route("/users", methods=["GET"])
@@ -241,10 +240,101 @@ def add_breeds():
 
     return render_template('admin/add_breed.html')
 
+@main_blueprint.route("/breed/<breed_id>", methods=["GET","POST"])
+@login_required
+def breed_page(breed_id):
+
+    breed = Breed.query.filter_by(breed_id=breed_id).first()
+
+    return render_template("admin/breed_page.html",breed=breed)
+
+@main_blueprint.route("/delete_breed/<breed_id>", methods=["GET","POST"])
+@login_required
+def delete_breed(breed_id):
+
+    breed = Breed.query.filter_by(breed_id=breed_id).first()
+    
+    if request.method =="POST":
+        db.session.delete(breed)
+        db.session.commit()
+    return redirect(url_for('main.breeds_page'))
+
+@main_blueprint.route("/update_breed/<breed_id>", methods=["GET","POST"])
+@login_required
+def update_breed(breed_id):
+
+    breed = Breed.query.filter_by(breed_id=breed_id).first()
+    
+    if request.method =="POST":
+            breed.breed_name = request.form.get('breed_name')
+            breed.breed_category = request.form.get('breed_category')
+            breed.breed_purpose = request.form.get('breed_purpose')
+
+            breed.breed_characteristics = {
+                "temperament":request.form.get("temperament"),
+                "farming_suitability":request.form.get("farming_suitability"),
+                "climate_suitability":request.form.get("climate_suitability"),
+                "special_needs":request.form.get("special_needs"),
+            }
+
+            breed.breeding_reproduction = {
+                "best_breading_age":request.form.get("best_breeding_age"),
+                "egg_production":request.form.get("egg_production"),
+                "brooding_requirements":request.form.get("brooding_requirements"),
+                "incubation_period":request.form.get("incubation_period"),
+            }
+
+            breed.feeding_nutrition = {
+                "Chick": {
+                    "feed_type": request.form.get("chick_feed_type"),
+                    "daily_quantity": request.form.get("chick_daily_quantity"),
+                    "schedule": request.form.get("chick_schedule"),
+                },
+                "Grower": {
+                    "feed_type": request.form.get("grower_feed_type"),
+                    "daily_quantity": request.form.get("grower_daily_quantity"),
+                    "schedule": request.form.get("grower_schedule"),
+                },
+                "Broiler": {
+                    "feed_type": request.form.get("broiler_feed_type"),
+                    "daily_quantity": request.form.get("broiler_daily_quantity"),
+                    "schedule": request.form.get("broiler_schedule"),
+                },
+                "Supplementation": request.form.getlist("supplementation"),
+                "Alternative_feeds": request.form.getlist("alternative_feeds"),
+            }
+
+            breed.housing_environment = {
+                "Space_per_bird": request.form.get("space_per_bird"),
+                "Ventilation": request.form.get("ventilation"),
+                "Temperature": request.form.get("temperature"),
+                "Humidity": request.form.get("humidity"),
+                "Biosecurity": request.form.getlist("biosecurity"),
+            }
+
+            breed.disease_prevention_health = {
+                "common_diseases":request.form.get("common_diseases"),
+                "vaccination_schedule":request.form.get("vaccination_schedule"),
+            }
+
+            breed.productivity_economics = {
+                "growth_rate":request.form.get("growth_rate"),
+                "egg_laying":request.form.get("egg_laying"),
+                "market_price":request.form.get("market_price"),
+            }
+            try:
+                db.session.commit()
+                print(breed)
+                return redirect(url_for('main.breed_page', breed_id=breed.breed_id))
+            except:
+                db.session.rollback()
+
+    return render_template("admin/update_breeds.html",breed=breed)
+
+
 @main_blueprint.route("/breed_queries")
 @login_required
 def breed_queries():
     user = User.query.get(current_user.user_id)  # Get the logged-in user
     selected_breeds = user.breeds  # Fetch breeds the user has selected
     return render_template("breed_queries.html", breeds=selected_breeds)
-

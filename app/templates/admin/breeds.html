@@ -97,7 +97,7 @@
             <tbody>
                 {% for breed in breeds %}
                 <tr>
-                    <td style="padding: 10px;">{{ breed.breed_name }}</td>
+                    <td style="padding: 10px;"><a style="text-decoration: none;color: black;" href="{{ url_for('main.breed_page', breed_id=breed.breed_id) }}">{{ breed.breed_name }}</a></td>
                     <td style="padding: 10px;">{{ breed.breed_category }}</td>
                     <td style="padding: 10px;">{{ breed.breed_purpose }}</td>
                 </tr>

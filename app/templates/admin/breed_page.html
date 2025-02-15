@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ breed.breed_name }} - Poultry Care System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #2e7d32;
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            height: 100%;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .sidebar a:hover {
+            background-color: #388e3c;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+            background: #e8f5e9;
+            height: 100vh;
+        }
+        .header {
+            background: white;
+            padding: 15px;
+            border-bottom: 2px solid #2e7d32;
+        }
+        .table-container {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #2e7d32;
+            color: white;
+        }
+        .btn-container {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .btn-update {
+            background-color: #fbc02d;
+            color: black;
+        }
+        .btn-update:hover {
+            background-color: #f9a825;
+        }
+        .btn-delete {
+            background-color: #d32f2f;
+            color: white;
+        }
+        .btn-delete:hover {
+            background-color: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    {% block navbar %}
+        {% include 'admin/admin_navbar.html' %}
+    {% endblock %}
+
+    <div class="content">
+        <div class="header">
+            <h1>Welcome {{ current_user.username }}</h1>
+        </div>
+
+        <div class="table-container">
+            <h2>{{ breed.breed_name }} Information</h2>
+
+            <table>
+                <tr>
+                    <th>Breed Name</th>
+                    <td>{{ breed.breed_name }}</td>
+                </tr>
+                <tr>
+                    <th>Purpose</th>
+                    <td>{{ breed.breed_purpose }}</td>
+                </tr>
+                <tr>
+                    <th>Category</th>
+                    <td>{{ breed.breed_category }}</td>
+                </tr>
+                <tr>
+                    <th>Characteristics</th>
+                    <td>
+                        {% for key, value in breed.breed_characteristics.items() %}
+                            <b>{{ key }}:</b> {{ value }}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Feeding & Nutrition</th>
+                    <td>
+                        {% for key, value in breed.feeding_nutrition.items() %}
+                            <b>{{ key }}:</b> {{ value }}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Housing & Environment</th>
+                    <td>
+                        {% for key, value in breed.housing_environment.items() %}
+                            <b>{{ key }}:</b> {{ value }}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Disease Prevention</th>
+                    <td>
+                        {% for key, value in breed.disease_prevention_health.items() %}
+                            <b>{{ key }}:</b> {{ value }}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Breeding & Reproduction</th>
+                    <td>
+                        {% for key, value in breed.breeding_reproduction.items() %}
+                            <b>{{ key }}:</b> {{ value }}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Productivity & Economics</th>
+                    <td>
+                        {% for key, value in breed.productivity_economics.items() %}
+                            <b>{{ key }}:</b> {{ value }}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            </table>
+
+            <div class="btn-container">
+                <!-- Update Button -->
+                <a href="{{ url_for('main.update_breed', breed_id=breed.breed_id) }}" class="btn btn-update">Update Breed</a>
+                <!---->
+                <!-- Delete Button (with form to prevent accidental clicks) -->
+                <form action="{{ url_for('main.delete_breed', breed_id=breed.breed_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this breed?');">
+                    <button type="submit" class="btn btn-delete">Delete Breed</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
