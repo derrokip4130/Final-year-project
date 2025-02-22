@@ -403,3 +403,9 @@ def breed_queries():
     user = User.query.get(current_user.user_id)  # Get the logged-in user
     selected_breeds = user.breeds  # Fetch breeds the user has selected
     return render_template("breed_queries.html", breeds=selected_breeds)
+
+@main_blueprint.route("/disease_diagnosis", methods=["GET","POST"])
+@login_required
+def disease_diagnosis():
+
+    return render_template("disease_diagnosis.html")
