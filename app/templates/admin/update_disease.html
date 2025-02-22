@@ -119,7 +119,24 @@
                 options[i].style.display = text.includes(searchInput) ? "" : "none";
             }
         }
-
+    
+        function moveOption(sourceId, targetId) {
+            let source = document.getElementById(sourceId);
+            let target = document.getElementById(targetId);
+    
+            // Move selected option from source to target
+            for (let i = 0; i < source.options.length; i++) {
+                if (source.options[i].selected) {
+                    let option = source.options[i];
+                    source.remove(i);
+                    target.appendChild(option);
+                    i--; // Adjust index after removal
+                }
+            }
+    
+            updateHiddenInput(); // Update form data
+        }
+    
         function updateHiddenInput() {
             let selectedSymptoms = document.getElementById("selected_symptoms");
             let hiddenInput = document.getElementById("selected_symptoms_input");
@@ -129,7 +146,17 @@
             }
             hiddenInput.value = symptomIds.join(",");
         }
+    
+        // Add double-click event listeners
+        document.getElementById("available_symptoms").ondblclick = function () {
+            moveOption("available_symptoms", "selected_symptoms");
+        };
+    
+        document.getElementById("selected_symptoms").ondblclick = function () {
+            moveOption("selected_symptoms", "available_symptoms");
+        };
     </script>
+    
     
 </body>
 </html>
