@@ -36,6 +36,7 @@ class User(db.Model, UserMixin):
     is_active = db.Column(db.Boolean, default=True)
 
     breeds = db.relationship("Breed", secondary=farmer_breed, back_populates="farmers")
+    chats = db.relationship('Chat', backref='user', lazy=True)
 
     def __repr__(self):
         return f"<User {self.username} - Role: {self.user_role}>"
@@ -130,4 +131,71 @@ class Breed(db.Model):
         else:
             new_id = "B-001"  # First entry
         
+        return new_id
+
+
+class Image(db.Model):
+
+    image_id = db.Column(db.String(10), primary_key=True)
+    image_url = db.Column(db.String(255))
+    uploaded_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
+
+    def __repr__(self):
+        return self.image_id
+
+    @staticmethod
+    def generate_image_id():
+        last_image = Image.query.order_by(Image.image_id.desc()).first()
+        if last_image:
+            last_image_id = int(last_image.image_id.split("-")[1])
+            new_id = f"I-{last_image_id + 1:03d}"
+        else:
+            new_id = "I-001"
+        
+        return new_id
+    
+class BreedQuery(db.Model):
+
+    query_id = db.Column(db.String(10), primary_key=True)
+    chat_id = db.Column(db.String(36), db.ForeignKey('chat.chat_id'), nullable=False)
+    breed_name = db.Column(db.String(100), nullable=False)
+    user_query = db.Column(db.Text, nullable=False)
+    bot_response = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.now(eat_tz))
+
+    def __repr__(self):
+        return f"<Query {self.query_id} for {self.breed_name}>"
+    
+    @staticmethod
+    def generate_query_id():
+        last_query = BreedQuery.query.order_by(BreedQuery.query_id.desc()).first()
+        if last_query:
+            last_query_id = int(last_query.query_id.split("-")[1])
+            new_id = f"Q-{last_query_id + 1:03d}"
+        else:
+            new_id = "Q-001"
+
+        return new_id
+    
+class Chat(db.Model):
+
+    chat_id = db.Column(db.String(10), primary_key=True)
+    chat_title = db.Column(db.String(150))
+    user_id = db.Column(db.String(36), db.ForeignKey('user.user_id'), nullable=False)  # Foreign Key
+    created_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
+
+    breed_queries = db.relationship('BreedQuery', backref='chat', cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return self.chat_title
+    
+    @staticmethod
+    def generate_chat_id():
+        last_chat = Chat.query.order_by(Chat.chat_id.desc()).first()
+        if last_chat:
+            last_chat_id = int(last_chat.chat_id.split("-")[1])
+            new_id = f"C-{last_chat_id + 1:03d}"
+        else:
+            new_id = "C-001"
+
         return new_id

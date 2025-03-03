@@ -10,7 +10,7 @@
             text-align: center;
             font-size: 20px;
             font-weight: bold;
-            padding: 15px;
+            padding: 5px;
             background-color: #1b5e20; /* Darker green for contrast */
             color: white;
             text-decoration: none;
@@ -33,7 +33,24 @@
             color: white;
             padding-top: 10px;
             position: fixed;
-            height: 100%;
+            height: 100vh; /* Full height of viewport */
+            overflow-y: auto; /* Enables vertical scrolling */
+            scrollbar-width: thin; /* Makes scrollbar thinner */
+            scrollbar-color: #a5d6a7 #2e7d32; /* Scrollbar color */
+        }
+
+        /* Customize scrollbar for WebKit browsers (Chrome, Edge, Safari) */
+        .sidebar::-webkit-scrollbar {
+            width: 8px; /* Thin scrollbar */
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #a5d6a7; /* Scrollbar handle */
+            border-radius: 4px; /* Rounded edges */
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background-color: #2e7d32; /* Track color */
         }
         .sidebar h2 {
             text-align: center;
@@ -58,17 +75,17 @@
             justify-content: center;
         }
         .chat-container {
-            width: 600px;
+            width: 800px;
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .chat-box {
-            height: 400px;
+            height: 270px;
             overflow-y: auto;
             border: 1px solid #a5d6a7;
-            padding: 10px;
+            padding: 9px;
             border-radius: 5px;
             background-color: #f1f8e9;
         }
@@ -105,9 +122,16 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <a href="/home" class="home-btn">🏠 Home</a> <!-- Home Button -->
+        <a href="" id="new-chat-btn">➕ New Chat</a>
         <h2>Queries</h2>
-        <a href="#">None</a>
-    </div>
+        {% if chats %}
+        {% for chat in chats %}
+            <a href="#" onclick="loadChat('{{ chat.chat_id }}')">{{chat.chat_title}}</a>
+        {% endfor %}
+        {% else %}
+            <a href="#">None</a>
+        {% endif %}
+        </div>
 
     <!-- Chat Interface -->
     <div class="main-content">
@@ -133,37 +157,117 @@
     </div>
 
     <script>
+        let activeChatId = null;  // Track selected chat
+
         function sendMessage() {
             let inputField = document.getElementById("user-input");
             let breedSelect = document.getElementById("breed-select");
             let userMessage = inputField.value.trim();
-            let selectedBreed = breedSelect.options[breedSelect.selectedIndex].text;
+            let selectedBreed = breedSelect.value;
 
             if (userMessage === "") return;
 
             let chatBox = document.getElementById("chat-box");
             chatBox.innerHTML += `<div class="chat-message user-message">You: (${selectedBreed}) ${userMessage}</div>`;
 
-            // Simulate bot response (replace with API call in Flask)
-            setTimeout(() => {
-                let botReply = getBotResponse(selectedBreed, userMessage);
-                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: ${botReply}</div>`;
+            fetch("/get_chat_response", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ breed: selectedBreed, message: userMessage }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: ${data.response}</div>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
-            }, 1000);
+            })
+            .catch(error => {
+                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: An error occurred. Please try again.</div>`;
+            });
 
             inputField.value = "";
         }
 
-        function getBotResponse(breed, query) {
-            // Simulated responses (Replace with Flask API)
-            let responses = {
-                "Leghorn": "Leghorns are excellent egg-layers with white feathers.",
-                "Rhode Island Red": "Rhode Island Reds are great for both meat and eggs.",
-                "Sussex": "Sussex chickens are friendly and good for backyards.",
-                "Plymouth Rock": "Plymouth Rocks are hardy birds known for good meat quality."
-            };
-            return responses[breed] || "I'm not sure. Let me check my database.";
+        function loadChat(chatId) {
+            activeChatId = chatId; // Set active chat
+            let chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML = "<p>Loading chat...</p>";
+
+            fetch(`/get_chat_queries/${chatId}`)
+            .then(response => response.json())
+            .then(data => {
+                chatBox.innerHTML = "";
+
+                if (data.error) {
+                    chatBox.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                    return;
+                }
+
+                data.queries.forEach(query => {
+                    chatBox.innerHTML += `<div class="chat-message user-message">You: ${query.user_query}</div>`;
+                    chatBox.innerHTML += `<div class="chat-message bot-message">Bot: ${query.bot_response}</div>`;
+                });
+
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => {
+                chatBox.innerHTML = `<p style="color: red;">Error loading chat.</p>`;
+            });
         }
+
+        function sendMessage() {
+            let inputField = document.getElementById("user-input");
+            let breedSelect = document.getElementById("breed-select");
+            let userMessage = inputField.value.trim();
+            let selectedBreed = breedSelect.value;
+
+            if (userMessage === "") return;
+
+            let chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<div class="chat-message user-message">You: (${selectedBreed}) ${userMessage}</div>`;
+
+            fetch("/get_chat_response", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ breed: selectedBreed, message: userMessage, chat_id: activeChatId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!activeChatId) {
+                    activeChatId = data.chat_id; // Set new chat ID
+                    if (data.chat_title) {
+                        addChatToSidebar(data.chat_id, data.chat_title); // Update sidebar
+                    }
+                }
+
+                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: ${data.response}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => {
+                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: An error occurred. Please try again.</div>`;
+            });
+
+            inputField.value = "";
+        }
+
+        function addChatToSidebar(chatId, chatTitle) {
+            let sidebar = document.querySelector(".sidebar");
+            let newChat = document.createElement("a");
+            newChat.href = "#";
+            newChat.textContent = chatTitle;
+            newChat.onclick = function () { loadChat(chatId); };
+            sidebar.appendChild(newChat);
+        }
+
+        function startNewChat() {
+            activeChatId = null; // Reset the selected chat
+            document.getElementById("chat-box").innerHTML = ""; // Clear the chat area
+
+            // Optionally remove active styling from selected chat in sidebar
+            document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
+        }
+
+        document.getElementById("new-chat-btn").addEventListener("click", startNewChat);
+
     </script>
 
 </body>
