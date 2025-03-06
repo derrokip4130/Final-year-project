@@ -91,7 +91,7 @@
             padding: 10px;
         }
         select, input, button {
-            width: 100%;
+            width: 90%;
             padding: 10px;
             margin-top: 10px;
             border: 1px solid #a5d6a7;
@@ -153,13 +153,23 @@
             fetch("/get_chat_response", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ breed: selectedBreed, message: userMessage }),
+                body: JSON.stringify({ 
+                    chat_id: activeChatId,  // Send the active chat ID if available
+                    breed: selectedBreed, 
+                    message: userMessage 
+                }),
             })
             .then(response => response.json())
             .then(data => {
                 let formattedResponse = formatResponse(data.response);
                 chatBox.innerHTML += `<div class="chat-message bot-message">${formattedResponse}</div>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
+
+                // If this is a new chat, update the active chat ID and sidebar
+                if (!activeChatId && data.chat_id) {
+                    activeChatId = data.chat_id;
+                    addChatToSidebar(data.chat_id, data.chat_title);
+                }
             })
             .catch(error => {
                 chatBox.innerHTML += `<div class="chat-message bot-message">An error occurred. Please try again.</div>`;
