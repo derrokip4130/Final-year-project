@@ -5,99 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Breed Chat</title>
     <style>
-        .home-btn {
-            display: block;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            padding: 5px;
-            background-color: #1b5e20; /* Darker green for contrast */
-            color: white;
-            text-decoration: none;
-            border-bottom: 2px solid #388e3c;
-        }
-        .home-btn:hover {
-            background-color: #388e3c; /* Slightly lighter green */
-        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             display: flex;
-            height: 120vh;
+            height: 100vh;
             background-color: #e8f5e9;
+            color: #1b5e20;
         }
         /* Sidebar */
         .sidebar {
-            width: 250px;
-            background-color: #2e7d32;
+            width: 260px;
+            background-color: #1b5e20;
             color: white;
             padding-top: 10px;
             position: fixed;
-            height: 100vh; /* Full height of viewport */
-            overflow-y: auto; /* Enables vertical scrolling */
-            scrollbar-width: thin; /* Makes scrollbar thinner */
-            scrollbar-color: #a5d6a7 #2e7d32; /* Scrollbar color */
-        }
-
-        /* Customize scrollbar for WebKit browsers (Chrome, Edge, Safari) */
-        .sidebar::-webkit-scrollbar {
-            width: 8px; /* Thin scrollbar */
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background-color: #a5d6a7; /* Scrollbar handle */
-            border-radius: 4px; /* Rounded edges */
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background-color: #2e7d32; /* Track color */
+            height: 100vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #a5d6a7 #1b5e20;
         }
         .sidebar h2 {
             text-align: center;
+            font-size: 18px;
+            padding: 10px 0;
         }
         .sidebar a {
             display: block;
             color: white;
             padding: 15px;
             text-decoration: none;
-            font-size: 18px;
+            font-size: 16px;
+            transition: background 0.3s;
         }
-        .sidebar a:hover {
+        .sidebar a:hover, .sidebar a.active {
             background-color: #388e3c;
         }
         /* Main Content */
         .main-content {
             margin-left: 270px;
-            width: 70%;
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
         .chat-container {
-            width: 800px;
+            width: 80%;
+            max-width: 800px;
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .chat-box {
-            height: 270px;
+            height: 300px;
             overflow-y: auto;
             border: 1px solid #a5d6a7;
-            padding: 9px;
+            padding: 10px;
             border-radius: 5px;
             background-color: #f1f8e9;
         }
         .chat-message {
+            padding: 10px;
+            border-radius: 5px;
             margin-bottom: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
         }
         .user-message {
-            color: #1b5e20;
+            background-color: #c8e6c9;
+            align-self: flex-end;
+            text-align: right;
             font-weight: bold;
+            border: 1px solid #2e7d32;
+            border-radius: 10px 10px 0 10px;
+            padding: 10px;
         }
         .bot-message {
-            color: #2e7d32;
+            background-color: #e8f5e9;
+            align-self: flex-start;
+            text-align: left;
+            border: 1px solid #1b5e20;
+            border-radius: 10px 10px 10px 0;
+            padding: 10px;
         }
         select, input, button {
             width: 100%;
@@ -119,45 +110,34 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
     <div class="sidebar">
-        <a href="/home" class="home-btn">🏠 Home</a> <!-- Home Button -->
-        <a href="" id="new-chat-btn">➕ New Chat</a>
+        <a href="/home" class="home-btn">🏠 Home</a>
+        <a href="#" id="new-chat-btn">➕ New Chat</a>
         <h2>Queries</h2>
-        {% if chats %}
-        {% for chat in chats %}
-            <a href="#" onclick="loadChat('{{ chat.chat_id }}')">{{chat.chat_title}}</a>
-        {% endfor %}
-        {% else %}
-            <a href="#">None</a>
-        {% endif %}
+        <div id="chat-list">
+            {% for chat in chats %}
+                <a href="#" onclick="loadChat('{{ chat.chat_id }}')" id="chat-{{ chat.chat_id }}">{{chat.chat_title}}</a>
+            {% endfor %}
         </div>
+    </div>
 
-    <!-- Chat Interface -->
     <div class="main-content">
         <div class="chat-container">
             <h2 style="text-align: center; color: #2e7d32;">Breed Related Queries</h2>
-
-            <!-- Breed Selection -->
-            
             <label for="breed-select">Select Breed:</label>
             <select id="breed-select">
                 {% for breed in breeds %}
                 <option value="{{breed.breed_name}}">{{breed.breed_name}}</option>
                 {% endfor %}
             </select>
-
-            <!-- Chat Box -->
             <div class="chat-box" id="chat-box"></div>
-
-            <!-- Input and Send Button -->
             <input type="text" id="user-input" placeholder="Ask about a breed...">
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
-        let activeChatId = null;  // Track selected chat
+        let activeChatId = null;
 
         function sendMessage() {
             let inputField = document.getElementById("user-input");
@@ -177,18 +157,60 @@
             })
             .then(response => response.json())
             .then(data => {
-                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: ${data.response}</div>`;
+                let formattedResponse = formatResponse(data.response);
+                chatBox.innerHTML += `<div class="chat-message bot-message">${formattedResponse}</div>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
             })
             .catch(error => {
-                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: An error occurred. Please try again.</div>`;
+                chatBox.innerHTML += `<div class="chat-message bot-message">An error occurred. Please try again.</div>`;
             });
 
             inputField.value = "";
         }
 
+        // Function to format Markdown-style text into HTML
+        function formatResponse(text) {
+            let lines = text.split("\n");
+            let formattedText = "";
+            let inList = false;
+
+            lines.forEach(line => {
+                line = line.replace(/\*\*(.*?)\*\*/g, "$1"); // Remove **bold** formatting
+
+                if (line.startsWith("##")) {
+                    if (inList) {
+                        formattedText += "</ul>"; // Close list before adding a heading
+                        inList = false;
+                    }
+                    formattedText += `<h3>${line.replace(/##\s*/, "")}</h3>`;
+                } else if (line.startsWith("-")) {
+                    if (!inList) {
+                        formattedText += "<ul>"; // Open list before adding list items
+                        inList = true;
+                    }
+                    formattedText += `<li>${line.replace(/-\s*/, "")}</li>`;
+                } else {
+                    if (inList) {
+                        formattedText += "</ul>"; // Close list before adding normal text
+                        inList = false;
+                    }
+                    formattedText += `<p>${line}</p>`;
+                }
+            });
+
+            if (inList) {
+                formattedText += "</ul>"; // Ensure list is closed at the end
+            }
+
+            return formattedText;
+        }
+
+
+
         function loadChat(chatId) {
-            activeChatId = chatId; // Set active chat
+            activeChatId = chatId;
+            document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
+            document.getElementById(`chat-${chatId}`).classList.add("active");
             let chatBox = document.getElementById("chat-box");
             chatBox.innerHTML = "<p>Loading chat...</p>";
 
@@ -196,79 +218,33 @@
             .then(response => response.json())
             .then(data => {
                 chatBox.innerHTML = "";
-
-                if (data.error) {
-                    chatBox.innerHTML = `<p style="color: red;">${data.error}</p>`;
-                    return;
-                }
-
                 data.queries.forEach(query => {
                     chatBox.innerHTML += `<div class="chat-message user-message">You: ${query.user_query}</div>`;
-                    chatBox.innerHTML += `<div class="chat-message bot-message">Bot: ${query.bot_response}</div>`;
+                    chatBox.innerHTML += `<div class="chat-message bot-message">${formatResponse(query.bot_response)}</div>`;
                 });
-
                 chatBox.scrollTop = chatBox.scrollHeight;
             })
-            .catch(error => {
+            .catch(() => {
                 chatBox.innerHTML = `<p style="color: red;">Error loading chat.</p>`;
             });
         }
 
-        function sendMessage() {
-            let inputField = document.getElementById("user-input");
-            let breedSelect = document.getElementById("breed-select");
-            let userMessage = inputField.value.trim();
-            let selectedBreed = breedSelect.value;
-
-            if (userMessage === "") return;
-
-            let chatBox = document.getElementById("chat-box");
-            chatBox.innerHTML += `<div class="chat-message user-message">You: (${selectedBreed}) ${userMessage}</div>`;
-
-            fetch("/get_chat_response", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ breed: selectedBreed, message: userMessage, chat_id: activeChatId }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!activeChatId) {
-                    activeChatId = data.chat_id; // Set new chat ID
-                    if (data.chat_title) {
-                        addChatToSidebar(data.chat_id, data.chat_title); // Update sidebar
-                    }
-                }
-
-                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: ${data.response}</div>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            })
-            .catch(error => {
-                chatBox.innerHTML += `<div class="chat-message bot-message">Bot: An error occurred. Please try again.</div>`;
-            });
-
-            inputField.value = "";
-        }
-
         function addChatToSidebar(chatId, chatTitle) {
-            let sidebar = document.querySelector(".sidebar");
-            let newChat = document.createElement("a");
-            newChat.href = "#";
-            newChat.textContent = chatTitle;
-            newChat.onclick = function () { loadChat(chatId); };
-            sidebar.appendChild(newChat);
+            let chatList = document.getElementById("chat-list");
+            if (!document.getElementById(`chat-${chatId}`)) {
+                let newChat = document.createElement("a");
+                newChat.href = "#";
+                newChat.textContent = chatTitle;
+                newChat.id = `chat-${chatId}`;
+                newChat.onclick = function () { loadChat(chatId); };
+                chatList.appendChild(newChat);
+            }
         }
 
-        function startNewChat() {
-            activeChatId = null; // Reset the selected chat
-            document.getElementById("chat-box").innerHTML = ""; // Clear the chat area
-
-            // Optionally remove active styling from selected chat in sidebar
-            document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
-        }
-
-        document.getElementById("new-chat-btn").addEventListener("click", startNewChat);
-
+        document.getElementById("new-chat-btn").addEventListener("click", () => {
+            activeChatId = null;
+            document.getElementById("chat-box").innerHTML = "";
+        });
     </script>
-
 </body>
 </html>

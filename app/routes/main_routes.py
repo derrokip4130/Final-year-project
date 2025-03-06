@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request, render_template, redirect, url_fo
 from app.models import User, Disease, Symptom, Breed, BreedQuery, Chat
 from app.extensions import db
 from flask_login import login_required, current_user
-from app.scripts.intent import get_response
+from app.scripts.breed_queries import get_response
 from datetime import datetime
 
 
@@ -427,6 +427,8 @@ def get_breed_data(breed_name):
 
     dataset = {
         breed.breed_name: {
+            "Purpose": breed.breed_purpose,
+            "Category": breed.breed_category,
             "Feeding and Nutrition": {
                 "Chick": {
                     "feed_type": breed.feeding_nutrition['Chick']['feed_type'],
@@ -538,4 +540,3 @@ def get_chat_queries(chat_id):
     ]
 
     return jsonify({"queries": query_list})
-
