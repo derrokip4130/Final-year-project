@@ -78,7 +78,7 @@
         <p>Your trusted assistant for diagnosing poultry diseases and managing breed care.</p>
     
         {% if not current_user.is_authenticated %}
-            <a href="/register" class="btn">Get Started</a>
+            <a href="{{ url_for('auth.register') }}" class="btn">Get Started</a>
         {% endif %}
     </div>
 </body>

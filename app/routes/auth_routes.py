@@ -13,8 +13,6 @@ eat_tz = pytz.timezone("Africa/Nairobi")
 @auth_blueprint.route('/register', methods=['GET', 'POST'])
 def register():
 
-    breeds = Breed.query.all()
-
     if not current_user.is_authenticated:
         if request.method == 'POST':
             username = request.form.get('username')
@@ -41,9 +39,9 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-        return redirect(url_for('main.home'))
+            return redirect(url_for('main.home'))
 
-    return render_template('auth/register.html',breeds=breeds)  # Render form for GET request
+    return render_template('auth/register.html')  # Render form for GET request
 
 @auth_blueprint.route('/login', methods=['GET', 'POST'])
 def login():

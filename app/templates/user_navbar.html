@@ -6,7 +6,7 @@
         <a href="{{ url_for('main.disease_diagnosis') }}">Disease Diagnosis</a>
         <a href="/logout">Logout</a>
     {% else %}
-        <a href="/register">Register</a>
+        <a href="{{ url_for('auth.register') }}">Register</a>
         <a href="/login">Login</a>
     {% endif %}
 </div>

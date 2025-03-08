@@ -427,7 +427,7 @@ def update_breed(breed_id):
 @login_required
 def breed_queries():
     breeds = Breed.query.all()
-    chats = Chat.query.all()
+    chats = Chat.query.filter_by(user_id=current_user.user_id).all()
 
     return render_template("breed_queries.html", breeds=breeds, chats=chats)
 
