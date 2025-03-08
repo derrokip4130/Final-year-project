@@ -71,14 +71,25 @@
             <input type="email" name="email" placeholder="Email" required>
             <input type="text" name="phone_num" placeholder="Phone Number (optional)">
             <input type="text" name="location" placeholder="Location (optional)">
-            <select name="user_role" required>
+            <!--<select name="user_role" required>
                 <option value="farmer">Farmer</option>
                 <option value="admin">Admin</option>
-            </select>
-            <input type="password" name="password" placeholder="Password" required>
+            </select>-->
+            <div style="position: relative;">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <span id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+            </div>
             <button type="submit">Register</button>
         </form>
         <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login</a></p>
     </div>
+    <script>
+    document.getElementById('togglePassword').addEventListener('click',
+     function(){
+        let passwordField = document.getElementById('password');
+        passwordField.type = passwordField.type === 'password' ?
+        'text' : 'password';
+     });
+    </script>
 </body>
 </html>

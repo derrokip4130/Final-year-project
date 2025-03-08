@@ -22,29 +22,6 @@ def blank():
 def home():
     return render_template("home.html")
 
-@main_blueprint.route("/select_breeds/<user_id>", methods=["GET", "POST"])
-def select_breeds(user_id):
-    user = User.query.filter_by(user_id=user_id).first()
-    all_breeds = Breed.query.all()  # Fetch all available breeds
-
-    if not user:
-        return redirect(url_for("main.dashboard"))  # Adjust redirect as needed
-
-    if request.method == "POST":
-        selected_breed_ids = request.form.get("selected_breeds", "").split(",")
-
-        # Fetch selected breeds from DB
-        selected_breeds = Breed.query.filter(Breed.breed_id.in_(selected_breed_ids)).all()
-        
-        # Assign breeds to user
-        user.breeds = selected_breeds
-        db.session.commit()
-
-        return redirect(url_for("auth.login"))  # Redirect to another page after saving
-
-    return render_template("select_breeds.html", user=user, breeds=all_breeds)
-
-
 @main_blueprint.route("/admin_dashboard", methods = ['GET'])
 @login_required
 def admin_dashboard():
@@ -225,89 +202,104 @@ def breeds_page():
     breeds = Breed.query.all()
     return render_template("admin/breeds.html", breeds=breeds)
 
-@main_blueprint.route("/add_breed", methods = ["GET","POST"])
+@main_blueprint.route("/add_breed", methods=["GET", "POST"])
 @login_required
 def add_breeds():
     if not current_user.is_admin:
         abort(403)
+
     if request.method == 'POST':
         breed_name = request.form.get('breed_name')
-        breed_category = request.form.get('breed_category')
-        breed_purpose = request.form.get('breed_purpose')
-
-        breed_characteristics = {
-            "temperament":request.form.get("temperament"),
-            "farming_suitability":request.form.get("farming_suitability"),
-            "climate_suitability":request.form.get("climate_suitability"),
-            "special_needs":request.form.get("special_needs"),
-        }
-
-        breeding_reproduction = {
-            "best_breading_age":request.form.get("best_breeding_age"),
-            "egg_production":request.form.get("egg_production"),
-            "brooding_requirements":request.form.get("brooding_requirements"),
-            "incubation_period":request.form.get("incubation_period"),
-        }
-
 
         feeding_nutrition = {
             "Chick": {
-                "feed_type": request.form.get("chick_feed_type"),
-                "daily_quantity": request.form.get("chick_daily_quantity"),
-                "schedule": request.form.get("chick_schedule"),
+                "feed_type": request.form.get("Feeding_and_Nutrition[Chick][feed_type]"),
+                "daily_quantity": request.form.get("Feeding_and_Nutrition[Chick][daily_quantity]"),
+                "schedule": request.form.get("Feeding_and_Nutrition[Chick][schedule]"),
             },
             "Grower": {
-                "feed_type": request.form.get("grower_feed_type"),
-                "daily_quantity": request.form.get("grower_daily_quantity"),
-                "schedule": request.form.get("grower_schedule"),
+                "feed_type": request.form.get("Feeding_and_Nutrition[Grower][feed_type]"),
+                "daily_quantity": request.form.get("Feeding_and_Nutrition[Grower][daily_quantity]"),
+                "schedule": request.form.get("Feeding_and_Nutrition[Grower][schedule]"),
             },
             "Broiler": {
-                "feed_type": request.form.get("broiler_feed_type"),
-                "daily_quantity": request.form.get("broiler_daily_quantity"),
-                "schedule": request.form.get("broiler_schedule"),
+                "feed_type": request.form.get("Feeding_and_Nutrition[Broiler][feed_type]"),
+                "daily_quantity": request.form.get("Feeding_and_Nutrition[Broiler][daily_quantity]"),
+                "schedule": request.form.get("Feeding_and_Nutrition[Broiler][schedule]"),
             },
-            "Supplementation": request.form.getlist("supplementation"),
-            "Alternative_feeds": request.form.getlist("alternative_feeds"),
+            "Supplementation": request.form.get("Feeding_and_Nutrition[Supplementation]", "").split(","),
+            "Alternative_feeds": request.form.get("Feeding_and_Nutrition[Alternative_feeds]", "").split(","),
         }
 
-        # Similar structure for other JSON fields
         housing_environment = {
-            "Space_per_bird": request.form.get("space_per_bird"),
-            "Ventilation": request.form.get("ventilation"),
-            "Temperature": request.form.get("temperature"),
-            "Humidity": request.form.get("humidity"),
-            "Biosecurity": request.form.getlist("biosecurity"),
+            "Space_per_bird": request.form.get("Housing_and_Environment[Space_per_bird]"),
+            "Ventilation": request.form.get("Housing_and_Environment[Ventilation]"),
+            "Temperature": request.form.get("Housing_and_Environment[Temperature]"),
+            "Humidity": request.form.get("Housing_and_Environment[Humidity]"),
+            "Biosecurity": request.form.get("Housing_and_Environment[Biosecurity]", "").split(","),
         }
 
         disease_prevention_health = {
-            "common_diseases":request.form.get("common_diseases"),
-            "vaccination_schedule":request.form.get("vaccination_schedule"),
+            "common_diseases": request.form.get("Disease_Prevention_and_Health[Common_diseases]", "").split(","),
+            "vaccination_schedule": [],
+            "deworming": request.form.get("Disease_Prevention_and_Health[Deworming]")
+        }
+
+        # Process dynamic vaccination schedule
+        index = 0
+        while request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Disease]"):
+            disease_prevention_health["vaccination_schedule"].append({
+                "Disease": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Disease]"),
+                "Age": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Age]"),
+                "Method": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Method]"),
+            })
+            index += 1
+
+        disease_prevention_health["Signs_of_illness"] = request.form.get(
+            "Disease_Prevention_and_Health[Signs_of_illness]", "").split(",")
+
+        disease_prevention_health["Deworming"] = request.form.get("Disease_Prevention_and_Health[Deworming]")
+
+        breeding_reproduction = {
+            "best_breeding_age": request.form.get("Breeding_and_Reproduction[Best_breeding_age]"),
+            "egg_production": request.form.get("Breeding_and_Reproduction[Egg_production]"),
+            "brooding_requirements": request.form.get("Breeding_and_Reproduction[Brooding_requirements]"),
+            "incubation_methods": request.form.get("Breeding_and_Reproduction[Incubation_methods]"),
         }
 
         productivity_economics = {
-            "growth_rate":request.form.get("growth_rate"),
-            "egg_laying":request.form.get("egg_laying"),
-            "market_price":request.form.get("market_price"),
+            "growth_rate": request.form.get("Productivity_and_Economics[Growth_rate]"),
+            "egg_laying": request.form.get("Productivity_and_Economics[Egg_laying]"),
+            "market_price": request.form.get("Productivity_and_Economics[Market_price]"),
+            "profit_maximization": request.form.get("Productivity_and_Economics[Profit_maximization]", "").split(","),
         }
 
+        breed_characteristics = {
+            "temperament": request.form.get("Breed_Characteristics[Temperament]"),
+            "farming_suitability": request.form.get("Breed_Characteristics[Farming_suitability]"),
+            "climate_adaptability": request.form.get("Breed_Characteristics[Climate_adaptability]"),
+            "special_needs": request.form.get("Breed_Characteristics[Special_needs]"),
+        }
+
+        # Create breed object
         new_breed = Breed(
             breed_id=Breed.generate_breed_id(),
             breed_name=breed_name,
-            breed_category=breed_category,
-            breed_purpose=breed_purpose,
             feeding_nutrition=feeding_nutrition,
             housing_environment=housing_environment,
-            breed_characteristics=breed_characteristics,
-            breeding_reproduction=breeding_reproduction,
             disease_prevention_health=disease_prevention_health,
-            productivity_economics=productivity_economics
+            breeding_reproduction=breeding_reproduction,
+            productivity_economics=productivity_economics,
+            breed_characteristics=breed_characteristics
         )
 
+        # Add and commit to the database
         db.session.add(new_breed)
         db.session.commit()
         return redirect(url_for('main.breeds_page'))
 
     return render_template('admin/add_breed.html')
+
 
 @main_blueprint.route("/breed/<breed_id>", methods=["GET","POST"])
 @login_required
@@ -315,6 +307,7 @@ def breed_page(breed_id):
     if not current_user.is_admin:
         abort(403)
     breed = Breed.query.filter_by(breed_id=breed_id).first()
+    print(breed.productivity_economics)
 
     return render_template("admin/breed_page.html",breed=breed)
 
@@ -330,77 +323,104 @@ def delete_breed(breed_id):
         db.session.commit()
     return redirect(url_for('main.breeds_page'))
 
-@main_blueprint.route("/update_breed/<breed_id>", methods=["GET","POST"])
+@main_blueprint.route("/update_breed/<string:breed_id>", methods=["GET", "POST"])
 @login_required
 def update_breed(breed_id):
     if not current_user.is_admin:
         abort(403)
+
     breed = Breed.query.filter_by(breed_id=breed_id).first()
-    
-    if request.method =="POST":
-            breed.breed_name = request.form.get('breed_name')
-            breed.breed_category = request.form.get('breed_category')
-            breed.breed_purpose = request.form.get('breed_purpose')
+    if not breed:
+        abort(404)
 
-            breed.breed_characteristics = {
-                "temperament":request.form.get("temperament"),
-                "farming_suitability":request.form.get("farming_suitability"),
-                "climate_suitability":request.form.get("climate_suitability"),
-                "special_needs":request.form.get("special_needs"),
-            }
+    if request.method == "POST":
+        breed.breed_name = request.form.get("breed_name")
 
-            breed.breeding_reproduction = {
-                "best_breading_age":request.form.get("best_breeding_age"),
-                "egg_production":request.form.get("egg_production"),
-                "brooding_requirements":request.form.get("brooding_requirements"),
-                "incubation_period":request.form.get("incubation_period"),
-            }
+        # Feeding and Nutrition
+        breed.feeding_nutrition = {
+            "Chick": {
+                "feed_type": request.form.get("Feeding_and_Nutrition[Chick][feed_type]"),
+                "daily_quantity": request.form.get("Feeding_and_Nutrition[Chick][daily_quantity]"),
+                "schedule": request.form.get("Feeding_and_Nutrition[Chick][schedule]"),
+            },
+            "Grower": {
+                "feed_type": request.form.get("Feeding_and_Nutrition[Grower][feed_type]"),
+                "daily_quantity": request.form.get("Feeding_and_Nutrition[Grower][daily_quantity]"),
+                "schedule": request.form.get("Feeding_and_Nutrition[Grower][schedule]"),
+            },
+            "Broiler": {
+                "feed_type": request.form.get("Feeding_and_Nutrition[Broiler][feed_type]"),
+                "daily_quantity": request.form.get("Feeding_and_Nutrition[Broiler][daily_quantity]"),
+                "schedule": request.form.get("Feeding_and_Nutrition[Broiler][schedule]"),
+            },
+            "Supplementation": request.form.get("Feeding_and_Nutrition[Supplementation]", "").split(","),
+            "Alternative_feeds": request.form.get("Feeding_and_Nutrition[Alternative_feeds]", "").split(","),
+        }
 
-            breed.feeding_nutrition = {
-                "Chick": {
-                    "feed_type": request.form.get("chick_feed_type"),
-                    "daily_quantity": request.form.get("chick_daily_quantity"),
-                    "schedule": request.form.get("chick_schedule"),
-                },
-                "Grower": {
-                    "feed_type": request.form.get("grower_feed_type"),
-                    "daily_quantity": request.form.get("grower_daily_quantity"),
-                    "schedule": request.form.get("grower_schedule"),
-                },
-                "Broiler": {
-                    "feed_type": request.form.get("broiler_feed_type"),
-                    "daily_quantity": request.form.get("broiler_daily_quantity"),
-                    "schedule": request.form.get("broiler_schedule"),
-                },
-                "Supplementation": request.form.getlist("supplementation"),
-                "Alternative_feeds": request.form.getlist("alternative_feeds"),
-            }
+        # Housing and Environment
+        breed.housing_environment = {
+            "Space_per_bird": request.form.get("Housing_and_Environment[Space_per_bird]"),
+            "Ventilation": request.form.get("Housing_and_Environment[Ventilation]"),
+            "Temperature": request.form.get("Housing_and_Environment[Temperature]"),
+            "Humidity": request.form.get("Housing_and_Environment[Humidity]"),
+            "Biosecurity": request.form.get("Housing_and_Environment[Biosecurity]", "").split(","),
+        }
 
-            breed.housing_environment = {
-                "Space_per_bird": request.form.get("space_per_bird"),
-                "Ventilation": request.form.get("ventilation"),
-                "Temperature": request.form.get("temperature"),
-                "Humidity": request.form.get("humidity"),
-                "Biosecurity": request.form.getlist("biosecurity"),
-            }
+        # Disease Prevention and Health
+        disease_prevention_health = {
+            "common_diseases": request.form.get("Disease_Prevention_and_Health[Common_diseases]", "").split(","),
+            "vaccination_schedule": [],
+            "deworming": request.form.get("Disease_Prevention_and_Health[Deworming]"),
+        }
 
-            breed.disease_prevention_health = {
-                "common_diseases":request.form.get("common_diseases"),
-                "vaccination_schedule":request.form.get("vaccination_schedule"),
-            }
+        # Process dynamic vaccination schedule
+        index = 0
+        while request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Disease]"):
+            disease_prevention_health["vaccination_schedule"].append({
+                "Disease": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Disease]"),
+                "Age": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Age]"),
+                "Method": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Method]"),
+            })
+            index += 1
 
-            breed.productivity_economics = {
-                "growth_rate":request.form.get("growth_rate"),
-                "egg_laying":request.form.get("egg_laying"),
-                "market_price":request.form.get("market_price"),
-            }
-            try:
-                db.session.commit()
-                return redirect(url_for('main.breed_page', breed_id=breed.breed_id))
-            except:
-                db.session.rollback()
+        disease_prevention_health["Signs_of_illness"] = request.form.get(
+            "Disease_Prevention_and_Health[Signs_of_illness]", "").split(",")
 
-    return render_template("admin/update_breeds.html",breed=breed)
+        breed.disease_prevention_health = disease_prevention_health
+
+        # Breeding and Reproduction
+        breed.breeding_reproduction = {
+            "best_breeding_age": request.form.get("Breeding_and_Reproduction[Best_breeding_age]"),
+            "egg_production": request.form.get("Breeding_and_Reproduction[Egg_production]"),
+            "brooding_requirements": request.form.get("Breeding_and_Reproduction[Brooding_requirements]"),
+            "incubation_methods": request.form.get("Breeding_and_Reproduction[Incubation_methods]"),
+        }
+
+        # Productivity and Economics
+        breed.productivity_economics = {
+            "growth_rate": request.form.get("Productivity_and_Economics[Growth_rate]"),
+            "egg_laying": request.form.get("Productivity_and_Economics[Egg_laying]"),
+            "market_price": request.form.get("Productivity_and_Economics[Market_price]"),
+            "profit_maximization": request.form.get("Productivity_and_Economics[Profit_maximization]", "").split(","),
+        }
+
+        # Breed Characteristics
+        breed.breed_characteristics = {
+            "temperament": request.form.get("Breed_Characteristics[Temperament]"),
+            "farming_suitability": request.form.get("Breed_Characteristics[Farming_suitability]"),
+            "climate_adaptability": request.form.get("Breed_Characteristics[Climate_adaptability]"),
+            "special_needs": request.form.get("Breed_Characteristics[Special_needs]"),
+        }
+
+        # Commit changes to the database
+        try:
+            db.session.commit()
+            return redirect(url_for('main.breed_page', breed_id=breed.breed_id))
+        except:
+            db.session.rollback()
+
+    return render_template("admin/update_breeds.html", breed=breed)
+
 
 
 @main_blueprint.route("/breed_queries", methods=["GET","POST"])
@@ -420,58 +440,54 @@ def disease_diagnosis():
 @main_blueprint.route("/get_breed_data/<breed_name>", methods=["GET"])
 #@login_required
 def get_breed_data(breed_name):
-    breed = Breed.query.filter_by(breed_name=breed_name).first()
+    try:
+        breed = Breed.query.filter_by(breed_name=breed_name).first()
 
-    if not breed:
-        return jsonify({"error": "Breed not found"}), 404
+        if not breed:
+            return jsonify({"error": "Breed not found"}), 404
 
-    dataset = {
-        breed.breed_name: {
+        dataset = {
+            "breed_name": breed.breed_name,
             "Purpose": breed.breed_purpose,
             "Category": breed.breed_category,
             "Feeding and Nutrition": {
-                "Chick": {
-                    "feed_type": breed.feeding_nutrition['Chick']['feed_type'],
-                    "daily_quantity": breed.feeding_nutrition['Chick']['daily_quantity'],
-                    "schedule": breed.feeding_nutrition['Chick']['schedule'],
-                },
-                "Grower": {
-                    "feed_type": breed.feeding_nutrition['Grower']['feed_type'],
-                    "daily_quantity": breed.feeding_nutrition['Grower']['daily_quantity'],
-                    "schedule": breed.feeding_nutrition['Grower']['schedule'],
-                },
+                stage: {
+                    "feed_type": breed.feeding_nutrition.get(stage, {}).get("feed_type", "N/A"),
+                    "daily_quantity": breed.feeding_nutrition.get(stage, {}).get("daily_quantity", "N/A"),
+                    "schedule": breed.feeding_nutrition.get(stage, {}).get("schedule", "N/A"),
+                } for stage in ["Chick", "Grower"]
             },
             "Housing and Environment": {
-                "Space_per_bird": breed.housing_environment['Space_per_bird'],
-                "Ventilation": breed.housing_environment['Ventilation'],
-                "Temperature": breed.housing_environment['Temperature'],
-                "Humidity": breed.housing_environment['Humidity'],
+                key: breed.housing_environment.get(key, "N/A") for key in [
+                    "Space_per_bird", "Ventilation", "Temperature", "Humidity", "Biosecurity"
+                ]
             },
             "Disease Prevention and Health": {
-                "Common_diseases": breed.disease_prevention_health['common_diseases'],
-                "Vaccination_schedule": breed.disease_prevention_health['vaccination_schedule'],
+                key: breed.disease_prevention_health.get(key, "N/A") for key in [
+                    "common_diseases", "vaccination_schedule", "deworming"
+                ]
             },
             "Breeding and Reproduction": {
-                "Best_breeding_age": breed.breeding_reproduction['best_breading_age'],
-                "Egg_production": breed.breeding_reproduction['egg_production'],
-                "Brooding_requirements": breed.breeding_reproduction['brooding_requirements'],
-                "Incubation_methods": breed.breeding_reproduction['incubation_period'],
+                key: breed.breeding_reproduction.get(key, "N/A") for key in [
+                    "best_breeding_age", "egg_production", "brooding_requirements", "incubation_period"
+                ]
             },
             "Productivity and Economics": {
-                "Growth_rate": breed.productivity_economics['growth_rate'],
-                "Egg_laying": breed.productivity_economics['egg_laying'],
-                "Market_price": breed.productivity_economics['market_price'],
+                key: breed.productivity_economics.get(key, "N/A") for key in [
+                    "growth_rate", "egg_laying", "market_price"
+                ]
             },
             "Breed Characteristics": {
-                "Temperament": breed.breed_characteristics['temperament'],
-                "Farming_suitability": breed.breed_characteristics['farming_suitability'],
-                "Climate_adaptability": breed.breed_characteristics['climate_suitability'],
-                "Special_needs": breed.breed_characteristics['special_needs'],
-            },
+                key: breed.breed_characteristics.get(key, "N/A") for key in [
+                    "temperament", "farming_suitability", "climate_suitability", "special_needs"
+                ]
+            }
         }
-    }
 
-    return dataset
+        return dataset
+
+    except Exception as e:
+        return jsonify({"error": "An unexpected error occurred", "details": str(e)}), 500
 
 @main_blueprint.route("/get_chat_response", methods=["POST"])
 @login_required

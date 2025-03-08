@@ -41,9 +41,6 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            if user_role == User.FARMER:
-                return redirect(url_for('main.select_breeds', user_id=new_user.user_id))  # Redirect to login page after registration
-    else:
         return redirect(url_for('main.home'))
 
     return render_template('auth/register.html',breeds=breeds)  # Render form for GET request

@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             display: flex;
-            height: 100vh;
+            height: 150vh;
             background-color: #e8f5e9;
             color: #1b5e20;
         }
@@ -125,11 +125,12 @@
         <div class="chat-container">
             <h2 style="text-align: center; color: #2e7d32;">Breed Related Queries</h2>
             <label for="breed-select">Select Breed:</label>
-            <select id="breed-select">
+            <select id="breed-select" onchange="updateBreedImage()">
                 {% for breed in breeds %}
                 <option value="{{breed.breed_name}}">{{breed.breed_name}}</option>
                 {% endfor %}
             </select>
+            <img id="breed-image" src="https://d1lg8auwtggj9x.cloudfront.net/images/SA51A_v3.width-610.png" alt="Breed Image" style="max-width: 100%; height: 200px; border-radius: 10px; margin-top: 10px;">
             <div class="chat-box" id="chat-box"></div>
             <input type="text" id="user-input" placeholder="Ask about a breed...">
             <button onclick="sendMessage()">Send</button>
@@ -215,8 +216,6 @@
             return formattedText;
         }
 
-
-
         function loadChat(chatId) {
             activeChatId = chatId;
             document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
@@ -255,6 +254,19 @@
             activeChatId = null;
             document.getElementById("chat-box").innerHTML = "";
         });
+
+        function updateBreedImage() {
+            let breedSelect = document.getElementById("breed-select");
+            let breedImage = document.getElementById("breed-image");
+            let selectedBreed = breedSelect.value;
+
+            // Placeholder logic (Replace with real images when available)
+            let breedImages = {
+                "Sasso": "https://d1lg8auwtggj9x.cloudfront.net/images/SA51A_v3.width-610.png",
+            };
+
+            breedImage.src = breedImages[selectedBreed] || "/static/images/placeholder.jpg";
+        }
     </script>
 </body>
 </html>

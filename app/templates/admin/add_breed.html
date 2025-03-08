@@ -13,7 +13,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 400vh;
+            height: 500vh;
             background-color: #e8f5e9;
         }
         .form-container {
@@ -76,6 +76,13 @@
             border-radius: 5px;
             background-color: #f1f8e9;
         }
+        .vaccination-entry {
+            margin-bottom: 10px; /* Adds spacing between vaccinations */
+            padding: 10px;
+            border: 1px solid #a5d6a7;
+            border-radius: 5px;
+            background-color: #f1f8e9;
+        }
     </style>
 </head>
 <body>
@@ -83,101 +90,136 @@
     <div class="form-container">
         <h2>Add Breed</h2>
         <form action="{{ url_for('main.add_breeds') }}" method="POST">
-            
             <label for="breed_name">Breed Name:</label>
             <input type="text" id="breed_name" name="breed_name" required>
-
-            <label for="breed_category">Category:</label>
-            <input type="text" id="breed_category" name="breed_category">
-
-            <label for="breed_purpose">Purpose:</label>
-            <input type="text" id="breed_purpose" name="breed_purpose">
-
-            <div class="section">
-                <h3>Breed Characteristics</h3>
-                <label>Temperament:</label>
-                <input type="text" name="temperament" placeholder="Feed Type">
-
-                <label>Farming suitability:</label>
-                <input type="text" name="farming_suitability" placeholder="Farming suitability">
-
-                <label>Climate adaptability:</label>
-                <input type="text" name="climate_adaptability" placeholder="Climate adaptability">
-
-                <label>Special needs:</label>
-                <input type="text" name="special_needs" placeholder="Special needs">
-            </div>
-
-            <div class="section">
-                <h3>Breeding and Reproduction</h3>
-                <label>Best breeding age:</label>
-                <input type="text" name="best_breeding_age" placeholder="Best age for breeding">
-
-                <label>Egg production:</label>
-                <input type="text" name="egg_production" placeholder="Egg production rate">
-
-                <label>Brooding requirements:</label>
-                <input type="text" name="brooding_requirements" placeholder="Any special brooding requirements">
-
-                <label>Incubation method:</label>
-                <input type="text" name="incubation_period" placeholder="Recommended incubation period">
-            </div>
-
+        
             <div class="section">
                 <h3>Feeding & Nutrition</h3>
+                
                 <label>Chick Feed:</label>
-                <input type="text" name="chick_feed_type" placeholder="Feed Type">
-                <input type="text" name="chick_daily_quantity" placeholder="Daily Quantity">
-                <input type="text" name="chick_schedule" placeholder="Schedule">
-
+                <input type="text" name="Feeding_and_Nutrition[Chick][feed_type]" placeholder="Feed Type">
+                <input type="text" name="Feeding_and_Nutrition[Chick][daily_quantity]" placeholder="Daily Quantity">
+                <input type="text" name="Feeding_and_Nutrition[Chick][schedule]" placeholder="Schedule">
+                
                 <label>Grower Feed:</label>
-                <input type="text" name="grower_feed_type" placeholder="Feed Type">
-                <input type="text" name="grower_daily_quantity" placeholder="Daily Quantity">
-                <input type="text" name="grower_schedule" placeholder="Schedule">
+                <input type="text" name="Feeding_and_Nutrition[Grower][feed_type]" placeholder="Feed Type">
+                <input type="text" name="Feeding_and_Nutrition[Grower][daily_quantity]" placeholder="Daily Quantity">
+                <input type="text" name="Feeding_and_Nutrition[Grower][schedule]" placeholder="Schedule">
+        
+                <label>Broiler Feed:</label>
+                <input type="text" name="Feeding_and_Nutrition[Broiler][feed_type]" placeholder="Feed Type">
+                <input type="text" name="Feeding_and_Nutrition[Broiler][daily_quantity]" placeholder="Daily Quantity">
+                <input type="text" name="Feeding_and_Nutrition[Broiler][schedule]" placeholder="Schedule">
+        
+                <label>Supplementation (Comma-separated):</label>
+                <input type="text" name="Feeding_and_Nutrition[Supplementation]" placeholder="e.g. Calcium, Vitamins">
+        
+                <label>Alternative Feeds (Comma-separated):</label>
+                <input type="text" name="Feeding_and_Nutrition[Alternative_feeds]" placeholder="e.g. Groundnut cake, Fish meal">
             </div>
-
+        
             <div class="section">
                 <h3>Housing & Environment</h3>
                 <label>Space per Bird:</label>
-                <input type="text" name="space_per_bird">
-
+                <input type="text" name="Housing_and_Environment[Space_per_bird]">
+                
                 <label>Ventilation:</label>
-                <input type="text" name="ventilation">
-
+                <input type="text" name="Housing_and_Environment[Ventilation]">
+        
                 <label>Temperature:</label>
-                <input type="text" name="temperature">
-
+                <input type="text" name="Housing_and_Environment[Temperature]">
+        
                 <label>Humidity:</label>
-                <input type="text" name="humidity">
+                <input type="text" name="Housing_and_Environment[Humidity]">
+        
+                <label>Biosecurity (Comma-separated):</label>
+                <input type="text" name="Housing_and_Environment[Biosecurity]" placeholder="e.g. Hygiene, Pest control">
             </div>
-
+        
             <div class="section">
                 <h3>Disease Prevention & Health</h3>
-                <label>Common Diseases:</label>
-                <input type="text" name="common_diseases" placeholder="Comma-separated values">
-
+                <label>Common Diseases (Comma-separated):</label>
+                <input type="text" name="Disease_Prevention_and_Health[Common_diseases]" placeholder="e.g. Newcastle Disease, Coccidiosis">
+        
                 <label>Vaccination Schedule:</label>
-                <input type="text" name="vaccination_schedule" placeholder="Comma-separated values">
-
+                <div id="vaccination-container">
+                    <div>
+                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][0][Disease]" placeholder="Disease">
+                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][0][Age]" placeholder="Age">
+                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][0][Method]" placeholder="Method">
+                    </div>
+                </div>
+                <button type="button" onclick="addVaccination()">+ Add Vaccination</button>
+        
+                <label>Signs of Illness (Comma-separated):</label>
+                <input type="text" name="Disease_Prevention_and_Health[Signs_of_illness]" placeholder="e.g. Weakness, Pale comb">
+        
+                <label>Deworming Schedule:</label>
+                <input type="text" name="Disease_Prevention_and_Health[Deworming]" placeholder="e.g. Start at 4 weeks, repeat every 8 weeks">
             </div>
-
+        
+            <div class="section">
+                <h3>Breeding & Reproduction</h3>
+                <label>Best Breeding Age:</label>
+                <input type="text" name="Breeding_and_Reproduction[Best_breeding_age]" placeholder="Best age for breeding">
+                
+                <label>Egg Production:</label>
+                <input type="text" name="Breeding_and_Reproduction[Egg_production]" placeholder="Annual egg production">
+        
+                <label>Brooding Requirements:</label>
+                <input type="text" name="Breeding_and_Reproduction[Brooding_requirements]" placeholder="Special brooding needs">
+        
+                <label>Incubation Methods:</label>
+                <input type="text" name="Breeding_and_Reproduction[Incubation_methods]" placeholder="e.g. Natural or artificial">
+            </div>
+        
             <div class="section">
                 <h3>Productivity and Economics</h3>
-                <label>Growth rate:</label>
-                <input type="text" name="growth_rate" placeholder="Growth rate">
-
+                <label>Growth Rate:</label>
+                <input type="text" name="Productivity_and_Economics[Growth_rate]" placeholder="e.g. 2.8-3.5 kg in 10-12 weeks">
+                
                 <label>Egg Laying:</label>
-                <input type="text" name="egg_laying" placeholder="Egg laying period">
-
+                <input type="text" name="Productivity_and_Economics[Egg_laying]" placeholder="High frequency">
+        
                 <label>Market Price:</label>
-                <input type="text" name="market_price" placeholder="Market price of meat or eggs">
+                <input type="text" name="Productivity_and_Economics[Market_price]" placeholder="e.g. Good demand in local markets">
+        
+                <label>Profit Maximization (Comma-separated):</label>
+                <input type="text" name="Productivity_and_Economics[Profit_maximization]" placeholder="e.g. Efficient feeding, Disease prevention">
             </div>
-
+        
+            <div class="section">
+                <h3>Breed Characteristics</h3>
+                <label>Temperament:</label>
+                <input type="text" name="Breed_Characteristics[Temperament]" placeholder="Temperament">
+        
+                <label>Farming Suitability:</label>
+                <input type="text" name="Breed_Characteristics[Farming_suitability]" placeholder="Farming Suitability">
+        
+                <label>Climate Adaptability:</label>
+                <input type="text" name="Breed_Characteristics[Climate_adaptability]" placeholder="Climate adaptability">
+        
+                <label>Special Needs:</label>
+                <input type="text" name="Breed_Characteristics[Special_needs]" placeholder="Special Needs">
+            </div>
+        
             <button type="submit">Add Breed</button>
         </form>
-
-        <a href="{{ url_for('main.breeds_page') }}" class="back-link">Back to Breed List</a>
-    </div>
+        
+        <script>
+            function addVaccination() {
+                let container = document.getElementById("vaccination-container");
+                let index = container.children.length;
+                let div = document.createElement("div");
+                div.className = "vaccination-entry";
+                div.innerHTML = `
+                    <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][${index}][Disease]" placeholder="Disease">
+                    <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][${index}][Age]" placeholder="Age">
+                    <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][${index}][Method]" placeholder="Method">
+                `;
+                container.appendChild(div);
+            }
+        </script>
 
 </body>
 </html>

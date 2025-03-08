@@ -66,10 +66,21 @@
         <h1>Login</h1>
         <form action="/login" method="POST">
             <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <div style="position: relative;">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <span id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+            </div>
             <button type="submit">Login</button>
         </form>
         <p>Don't have an account? <a href="/register">Register</a></p>
     </div>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click',
+        function(){
+            let passwordField = document.getElementById('password');
+            passwordField.type = passwordField.type === 'password' ?
+            'text' : 'password';
+        });
+    </script>
 </body>
 </html>
