@@ -1,15 +1,22 @@
-import requests,  pytz
+import requests,  pytz, cloudinary, cloudinary.uploader, cloudinary.api
 from flask import Blueprint, jsonify, request, render_template, redirect, url_for, abort
 from app.models import User, Disease, Symptom, Breed, BreedQuery, Chat
 from app.extensions import db
 from flask_login import login_required, current_user
 from app.scripts.breed_queries import get_response
 from datetime import datetime
-
+from app.config import Config
 
 main_blueprint = Blueprint('main', __name__)
 
 eat_tz = pytz.timezone("Africa/Nairobi")
+
+# Configure Cloudinary using Flask app config
+cloudinary.config(
+    cloud_name=Config.CLOUDINARY_CLOUD_NAME,
+    api_key=Config.CLOUDINARY_API_KEY,
+    api_secret=Config.CLOUDINARY_API_SECRET
+)
 
 @main_blueprint.route("/")
 def blank():
@@ -202,6 +209,21 @@ def breeds_page():
     breeds = Breed.query.all()
     return render_template("admin/breeds.html", breeds=breeds)
 
+@main_blueprint.route("/upload_image", methods=['POST'])
+def upload_image():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    file = request.files['file']
+
+    # Upload to Cloudinary
+    result = cloudinary.uploader.upload(file)
+
+    # Get the uploaded image URL
+    image_url = result.get("secure_url")
+
+    return jsonify({"image_url": image_url})
+
 @main_blueprint.route("/add_breed", methods=["GET", "POST"])
 @login_required
 def add_breeds():
@@ -210,6 +232,20 @@ def add_breeds():
 
     if request.method == 'POST':
         breed_name = request.form.get('breed_name')
+
+        if "breed_images" not in request.files:
+            return "No file part in the request"
+
+        breed_image_url = None
+        if 'breed_images' in request.files:
+            try:
+                image_file = request.files['breed_images']
+                if image_file.filename:  # Ensure a file was selected
+                    upload_result = cloudinary.uploader.upload(image_file)
+                    breed_image_url = upload_result.get("secure_url")  # Get the uploaded image URL
+            except Exception as e:
+                print(f"Cloudinary Upload Error: {e}")
+                breed_image_url = None
 
         feeding_nutrition = {
             "Chick": {
@@ -230,6 +266,8 @@ def add_breeds():
             "Supplementation": request.form.get("Feeding_and_Nutrition[Supplementation]", "").split(","),
             "Alternative_feeds": request.form.get("Feeding_and_Nutrition[Alternative_feeds]", "").split(","),
         }
+
+
 
         housing_environment = {
             "Space_per_bird": request.form.get("Housing_and_Environment[Space_per_bird]"),
@@ -281,6 +319,17 @@ def add_breeds():
             "special_needs": request.form.get("Breed_Characteristics[Special_needs]"),
         }
 
+        breed_physical_description = {
+            "body_shape": request.form.get("Physical_Description[Body_Shape]"),
+            "feather_color_pattern": request.form.get("Physical_Description[Feather_Color_Pattern]"),
+            "comb_type": request.form.get("Physical_Description[Comb_Type]"),
+            "leg_color_features": request.form.get("Physical_Description[Leg_Color_Features]"),
+            "beak_shape_color": request.form.get("Physical_Description[Beak_Shape_Color]"),
+            "wattles_earlobes": request.form.get("Physical_Description[Wattles_Earlobes]"),
+            "skin_color": request.form.get("Physical_Description[Skin_Color]"),
+            "tail_shape_size": request.form.get("Physical_Description[Tail_Shape_Size]"),
+        }
+
         # Create breed object
         new_breed = Breed(
             breed_id=Breed.generate_breed_id(),
@@ -290,7 +339,9 @@ def add_breeds():
             disease_prevention_health=disease_prevention_health,
             breeding_reproduction=breeding_reproduction,
             productivity_economics=productivity_economics,
-            breed_characteristics=breed_characteristics
+            breed_characteristics=breed_characteristics,
+            breed_physical_description=breed_physical_description,
+            breed_image_url=breed_image_url
         )
 
         # Add and commit to the database
@@ -307,7 +358,7 @@ def breed_page(breed_id):
     if not current_user.is_admin:
         abort(403)
     breed = Breed.query.filter_by(breed_id=breed_id).first()
-    print(breed.productivity_economics)
+    #print(breed.breed_physical_description)
 
     return render_template("admin/breed_page.html",breed=breed)
 
@@ -335,6 +386,22 @@ def update_breed(breed_id):
 
     if request.method == "POST":
         breed.breed_name = request.form.get("breed_name")
+
+        if "breed_images" not in request.files:
+            return jsonify({"error": "No file uploaded"}), 400
+
+        image_file = request.files["breed_images"]
+        if image_file.filename:  # Ensure a file is selected
+            try:
+                # Upload the new image to Cloudinary
+                upload_result = cloudinary.uploader.upload(image_file)
+                new_image_url = upload_result.get("secure_url")
+
+                if new_image_url:
+                    # Update the breed's image in the database
+                    breed.breed_image_url = new_image_url
+            except Exception as e:
+                print(f"Cloudinary Upload Error: {e}")
 
         # Feeding and Nutrition
         breed.feeding_nutrition = {
@@ -412,6 +479,17 @@ def update_breed(breed_id):
             "special_needs": request.form.get("Breed_Characteristics[Special_needs]"),
         }
 
+        breed.breed_physical_description = {
+            "body_shape": request.form.get("Physical_Description[Body_Shape]"),
+            "feather_color_pattern": request.form.get("Physical_Description[Feather_Color_Pattern]"),
+            "comb_type": request.form.get("Physical_Description[Comb_Type]"),
+            "leg_color_features": request.form.get("Physical_Description[Leg_Color_Features]"),
+            "beak_shape_color": request.form.get("Physical_Description[Beak_Shape_Color]"),
+            "wattles_earlobes": request.form.get("Physical_Description[Wattles_Earlobes]"),
+            "skin_color": request.form.get("Physical_Description[Skin_Color]"),
+            "tail_shape_size": request.form.get("Physical_Description[Tail_Shape_Size]"),
+        }
+
         # Commit changes to the database
         try:
             db.session.commit()
@@ -480,6 +558,11 @@ def get_breed_data(breed_name):
             "Breed Characteristics": {
                 key: breed.breed_characteristics.get(key, "N/A") for key in [
                     "temperament", "farming_suitability", "climate_suitability", "special_needs"
+                ]
+            },
+            "Breed Physical Description": {
+                key: breed.breed_physical_description.get(key, "N/A") for key in [
+                    "body_shape", "feather_color_pattern", "comb_type", "leg_color_features", "beak_shape_color", "wattles_earlobes", "skin_color", "tail_shape_size"
                 ]
             }
         }

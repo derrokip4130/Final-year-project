@@ -108,6 +108,8 @@ class Breed(db.Model):
 
     breed_id = db.Column(db.String(5), primary_key=True)
     breed_name = db.Column(db.String(50))
+    breed_image_url = db.Column(db.String(255),nullable=True)
+    breed_physical_description = db.Column(JSONB, nullable=True)
     breed_characteristics = db.Column(JSONB)
     breed_purpose = db.Column(db.String(10))
     breed_category = db.Column(db.String(10))
@@ -130,27 +132,6 @@ class Breed(db.Model):
             new_id = f"B-{last_id + 1:03d}"  # Increment and format as D-XXX
         else:
             new_id = "B-001"  # First entry
-        
-        return new_id
-
-
-class Image(db.Model):
-
-    image_id = db.Column(db.String(10), primary_key=True)
-    image_url = db.Column(db.String(255))
-    uploaded_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
-
-    def __repr__(self):
-        return self.image_id
-
-    @staticmethod
-    def generate_image_id():
-        last_image = Image.query.order_by(Image.image_id.desc()).first()
-        if last_image:
-            last_image_id = int(last_image.image_id.split("-")[1])
-            new_id = f"I-{last_image_id + 1:03d}"
-        else:
-            new_id = "I-001"
         
         return new_id
     

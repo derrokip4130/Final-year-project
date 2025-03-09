@@ -13,7 +13,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 500vh;
+            height: 650vh;
             background-color: #e8f5e9;
         }
         .form-container {
@@ -89,7 +89,7 @@
 
     <div class="form-container">
         <h2>Update Breed Information</h2>
-        <form action="{{ url_for('main.update_breed', breed_id=breed.breed_id) }}" method="POST">
+        <form action="{{ url_for('main.update_breed', breed_id=breed.breed_id) }}" method="POST" enctype="multipart/form-data">
             <label for="breed_name">Breed Name:</label>
             <input type="text" id="breed_name" name="breed_name" value="{{ breed.breed_name }}" required>
         
@@ -115,14 +115,14 @@
                 <label>Ventilation:</label>
                 <input type="text" name="Housing_and_Environment[Ventilation]" value="{{ breed.housing_environment['Ventilation'] }}">
 
-                label>Temperature:</label>
+                <label>Temperature:</label>
                 <input type="text" name="Housing_and_Environment[Temperature]" value="{{ breed.housing_environment['Temperature'] }}">
         
                 <label>Humidity:</label>
                 <input type="text" name="Housing_and_Environment[Humidity]" value="{{ breed.housing_environment['Humidity'] }}">
         
                 <label>Biosecurity (Comma-separated):</label>
-                <input type="text" name="Housing_and_Environment[Biosecurity]" value="{{ breed.housing_environment['Biosecurity'] }}">
+                <input type="text" name="Housing_and_Environment[Biosecurity]" value="{{ ', '.join(breed.housing_environment['Biosecurity']) }}">
             </div>
         
             <div class="section">
@@ -189,6 +189,42 @@
                 <label>Special Needs:</label>
                 <input type="text" name="Breed_Characteristics[Special_needs]" value="{{ breed.breed_characteristics['special_needs'] }}">
             </div>
+
+            <div class="section">
+                <h3>Physical Description</h3>
+            
+                <label>Body Shape:</label>
+                <input type="text" name="Physical_Description[Body_Shape]" placeholder="e.g. Medium-sized, well-proportioned body" value="{{ breed.breed_physical_description.body_shape if breed else '' }}">
+            
+                <label>Feather Color & Pattern:</label>
+                <input type="text" name="Physical_Description[Feather_Color_Pattern]" placeholder="e.g. Reddish-brown with some white patches" value="{{ breed.breed_physical_description.feather_color_pattern if breed else '' }}">
+            
+                <label>Comb Type:</label>
+                <input type="text" name="Physical_Description[Comb_Type]" placeholder="e.g. Single comb, medium size" value="{{ breed.breed_physical_description.comb_type if breed else '' }}">
+            
+                <label>Leg Color & Features:</label>
+                <input type="text" name="Physical_Description[Leg_Color_Features]" placeholder="e.g. Yellow to light brown, sturdy legs" value="{{ breed.breed_physical_description.leg_color_features if breed else '' }}">
+            
+                <label>Beak Shape & Color:</label>
+                <input type="text" name="Physical_Description[Beak_Shape_Color]" placeholder="e.g. Short, slightly curved, yellowish" value="{{ breed.breed_physical_description.beak_shape_color if breed else '' }}">
+            
+                <label>Wattles & Earlobes:</label>
+                <input type="text" name="Physical_Description[Wattles_Earlobes]" placeholder="e.g. Medium-sized, red" value="{{ breed.breed_physical_description.wattles_earlobes if breed else '' }}">
+            
+                <label>Skin Color:</label>
+                <input type="text" name="Physical_Description[Skin_Color]" placeholder="e.g. Yellow" value="{{ breed.breed_physical_description.skin_color if breed else '' }}">
+            
+                <label>Tail Shape & Size:</label>
+                <input type="text" name="Physical_Description[Tail_Shape_Size]" placeholder="e.g. Moderate length, slightly upright" value="{{ breed.breed_physical_description.tail_shape_size if breed else '' }}">
+            </div>
+            
+            <div class="section">
+                <h3>Breed Images</h3>
+                <label>Upload Images:</label>
+                <input type="file" name="breed_images" id="breed_images" multiple accept="image/*" required>
+                
+                <div id="image-preview-container"></div>
+            </div>
         
             <button type="submit">Update Breed</button>
         </form>
@@ -206,6 +242,25 @@
                 `;
                 container.appendChild(div);
             }
+
+            document.getElementById("breed_images").addEventListener("change", function(event) {
+                let previewContainer = document.getElementById("image-preview-container");
+                previewContainer.innerHTML = ""; // Clear previous previews
+                
+                Array.from(event.target.files).forEach(file => {
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        let img = document.createElement("img");
+                        img.src = e.target.result;
+                        img.style.width = "100px";
+                        img.style.margin = "5px";
+                        img.style.borderRadius = "5px";
+                        img.style.boxShadow = "0px 0px 5px rgba(0,0,0,0.2)";
+                        previewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
 
         </script>
 

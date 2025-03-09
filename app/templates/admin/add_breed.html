@@ -13,7 +13,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 500vh;
+            height: 650vh;
             background-color: #e8f5e9;
         }
         .form-container {
@@ -88,8 +88,8 @@
 <body>
 
     <div class="form-container">
-        <h2>Add Breed</h2>
-        <form action="{{ url_for('main.add_breeds') }}" method="POST">
+        <h2>Add Breed</h2> 
+        <form action="{{ url_for('main.add_breeds') }}" method="POST" enctype="multipart/form-data">
             <label for="breed_name">Breed Name:</label>
             <input type="text" id="breed_name" name="breed_name" required>
         
@@ -202,11 +202,54 @@
                 <label>Special Needs:</label>
                 <input type="text" name="Breed_Characteristics[Special_needs]" placeholder="Special Needs">
             </div>
+
+            <div class="section">
+                <h3>Physical Description</h3>
+            
+                <label>Body Shape:</label>
+                <input type="text" name="Physical_Description[Body_Shape]" placeholder="e.g. Medium-sized, well-proportioned body">
+            
+                <label>Feather Color & Pattern:</label>
+                <input type="text" name="Physical_Description[Feather_Color_Pattern]" placeholder="e.g. Reddish-brown with some white patches">
+            
+                <label>Comb Type:</label>
+                <input type="text" name="Physical_Description[Comb_Type]" placeholder="e.g. Single comb, medium size">
+            
+                <label>Leg Color & Features:</label>
+                <input type="text" name="Physical_Description[Leg_Color_Features]" placeholder="e.g. Yellow to light brown, sturdy legs">
+            
+                <label>Beak Shape & Color:</label>
+                <input type="text" name="Physical_Description[Beak_Shape_Color]" placeholder="e.g. Short, slightly curved, yellowish">
+            
+                <label>Wattles & Earlobes:</label>
+                <input type="text" name="Physical_Description[Wattles_Earlobes]" placeholder="e.g. Medium-sized, red">
+            
+                <label>Skin Color:</label>
+                <input type="text" name="Physical_Description[Skin_Color]" placeholder="e.g. Yellow">
+            
+                <label>Tail Shape & Size:</label>
+                <input type="text" name="Physical_Description[Tail_Shape_Size]" placeholder="e.g. Moderate length, slightly upright">
+            </div>
+            
+            <div class="section">
+                <h3>Breed Images</h3>
+                <label>Upload Images:</label>
+                <input type="file" name="breed_images" id="breed_images" multiple accept="image/*" required>
+                
+                <div id="image-preview-container"></div>
+            </div>
         
             <button type="submit">Add Breed</button>
         </form>
         
         <script>
+            document.querySelector("form").addEventListener("submit", function(event) {
+                let fileInput = document.querySelector("input[type='file']");
+                if (!fileInput.files.length) {
+                    event.preventDefault();
+                    alert("Please select a file before submitting!");
+                }
+            });
             function addVaccination() {
                 let container = document.getElementById("vaccination-container");
                 let index = container.children.length;
@@ -219,6 +262,24 @@
                 `;
                 container.appendChild(div);
             }
+            document.getElementById("breed_images").addEventListener("change", function(event) {
+                let previewContainer = document.getElementById("image-preview-container");
+                previewContainer.innerHTML = ""; // Clear previous previews
+                
+                Array.from(event.target.files).forEach(file => {
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        let img = document.createElement("img");
+                        img.src = e.target.result;
+                        img.style.width = "100px";
+                        img.style.margin = "5px";
+                        img.style.borderRadius = "5px";
+                        img.style.boxShadow = "0px 0px 5px rgba(0,0,0,0.2)";
+                        previewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
         </script>
 
 </body>

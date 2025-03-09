@@ -102,7 +102,14 @@
 
         <div class="table-container">
             <h2>{{ breed.breed_name }} Information</h2>
-
+            <h2>Breed Images</h2>
+            <div class="image-gallery">
+                {% if breed.breed_image_url %}
+                    <img src="{{ breed.breed_image_url }}" alt="{{ breed.breed_name }} Image">
+                {% else %}
+                    <p>No images available for this breed.</p>
+                {% endif %}
+            </div>
             <table>
                 <tr>
                     <th>Breed Name</th>
@@ -156,6 +163,15 @@
                         {% endfor %}
                     </td>
                 </tr>
+                <tr>
+                    <th>Physical Description</th>
+                    <td>
+                        {% for key, value in breed.breed_physical_description.items() %}
+                            <b>{{ key.replace('_', ' ') }}:</b> {{ value }}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                
                 <tr>
                     <th>Productivity & Economics</th>
                     <td>
