@@ -11,6 +11,7 @@ valid_categories = {
     "Disease Prevention and Health": ["Common_diseases", "Vaccination_schedule", "Signs_of_illness", "Deworming"],
     "Breed Characteristics": ["Temperament", "Farming_suitability", "Climate_adaptability", "Special_needs"],
     "General Poultry Care": ["Injection_types", "Biosecurity_measures", "Common_treatments"],
+    "Breed Physical Description": ["body_shape", "feather_color_pattern", "comb_type", "leg_color_features", "beak_shape_color", "wattles_earlobes", "skin_color", "tail_shape_size"],
     "Purpose": [],
     "Category": []
 }
@@ -26,16 +27,22 @@ def format_vaccination_schedule(vaccination_data):
     )
     return formatted_schedule
 
-def get_response(selected_breed, user_input):
+def get_response(selected_breed, user_input, chat_history):
+    for query in chat_history:
+        if query["role"] == "USER":
+            query["role"] = "User"
+        elif query["role"] == "BOT":
+            query["role"] = "Chatbot"
+
     # Fetch breed data dynamically
     response = requests.get(f"http://127.0.0.1:5000/get_breed_data/{selected_breed}")
-    
+
     if response.status_code != 200:
         return "Error: Breed data not found."
 
     dataset = response.json()
 
-    # Modify prompt to allow multiple categories
+    # Extract intent
     response = co.chat(
         model="command-r-plus",
         message=f"""
@@ -53,10 +60,10 @@ def get_response(selected_breed, user_input):
                 {{"intent": "Disease Prevention and Health", "subcategory": "Vaccination_schedule"}}
             ]
         }}
-        """
+        """,
+        chat_history = chat_history
     )
 
-    # Extract JSON from response
     match = re.search(r"\{.*\}", response.text, re.DOTALL)
 
     if match:
@@ -75,20 +82,41 @@ def get_response(selected_breed, user_input):
         intent = item.get("intent", "Unknown")
         subcategory = item.get("subcategory", None)
 
-        # Handle breed-related data
-        if intent in dataset:
-            if intent == "Disease Prevention and Health" and subcategory == "Vaccination_schedule":
-                vaccination_data = dataset.get(intent, {}).get("vaccination_schedule", [])
-                formatted_result = format_vaccination_schedule(vaccination_data)
+        # Handle disease-specific vaccination schedule
+        if intent == "Disease Prevention and Health" and subcategory == "Vaccination_schedule":
+            vaccination_data = dataset.get(intent, {}).get("vaccination_schedule", [])
+
+            # Extract possible disease name from user input
+            known_diseases = [entry["Disease"].lower() for entry in vaccination_data]
+            disease_queried = None
+
+            for disease in known_diseases:
+                if disease in user_input.lower():
+                    disease_queried = disease
+                    break
+
+            if disease_queried:
+                # Filter vaccination schedule for the specific disease
+                filtered_schedule = [
+                    entry for entry in vaccination_data if entry["Disease"].lower() == disease_queried
+                ]
+                if filtered_schedule:
+                    formatted_result = format_vaccination_schedule(filtered_schedule)
+                else:
+                    formatted_result = f"No vaccination data found for {disease_queried}."
             else:
-                formatted_result = dataset.get(intent, {}).get(subcategory, dataset.get(intent, "No data available."))
-            
+                formatted_result = format_vaccination_schedule(vaccination_data)
+
+            results.append(f"**Vaccination Schedule**:\n{formatted_result}")
+
+        elif intent in dataset:
+            formatted_result = dataset.get(intent, {}).get(subcategory, dataset.get(intent, "No data available."))
+
             if isinstance(formatted_result, list):
                 formatted_result = "\n".join(f"- {entry}" for entry in formatted_result)
-            
+
             results.append(f"**{intent}**:\n{formatted_result}")
 
-        # Handle general poultry care
         elif intent == "General Poultry Care":
             general_response = co.chat(
                 model="command-r-plus",
@@ -100,7 +128,7 @@ def get_response(selected_breed, user_input):
             )
             return general_response.text
 
-    # If no relevant data found, check if it's unrelated to poultry
+    # If no relevant data found
     if not results:
         return "I'm here to help with poultry care and breed-related queries. Your question seems to be outside this scope."
 
@@ -119,11 +147,13 @@ def get_response(selected_breed, user_input):
         Ensure the response is structured, concise, and naturally includes the breed name.
         Format lists using bullet points if necessary.
         """,
+        chat_history=chat_history,
         temperature=0.8,
         k=90
     )
 
     return final_response.text
+
 
 if __name__ == "__main__":
     print(get_response("Sasso", "what is a subcutaneous injection"))

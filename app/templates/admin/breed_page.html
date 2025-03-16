@@ -88,6 +88,20 @@
         .btn-delete:hover {
             background-color: #b71c1c;
         }
+        .image-gallery {
+            display: flex;
+            gap: 10px; /* Space between images */
+            margin-top: 10px;
+        }
+
+        .image-gallery img {
+            width: calc(33.33% - 10px); /* Ensures 3 images fit in one row */
+            max-height: 200px; /* Adjust height as needed */
+            object-fit: cover;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
     </style>
 </head>
 <body>
@@ -104,12 +118,16 @@
             <h2>{{ breed.breed_name }} Information</h2>
             <h2>Breed Images</h2>
             <div class="image-gallery">
-                {% if breed.breed_image_url %}
-                    <img src="{{ breed.breed_image_url }}" alt="{{ breed.breed_name }} Image">
+                {% if breed.breed_images %}
+                    {% set random_images = breed.breed_images | shuffle %}
+                    {% for image in random_images[:3] %}
+                        <img src="{{ image.image_url }}" alt="Breed Image">
+                    {% endfor %}
                 {% else %}
-                    <p>No images available for this breed.</p>
+                    <p>No images available</p>
                 {% endif %}
             </div>
+            
             <table>
                 <tr>
                     <th>Breed Name</th>

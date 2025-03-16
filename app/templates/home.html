@@ -6,17 +6,19 @@
     <title>Home - Poultry Care System</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f0fdf4; /* Light green */
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             height: 100vh;
-            background-color: #e8f5e9; /* Light green background */
             text-align: center;
         }
+
+        /* Navbar */
         .navbar {
             width: 100%;
             background-color: #2e7d32; /* Dark green */
@@ -26,45 +28,67 @@
             left: 0;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .navbar a {
             color: white;
             text-decoration: none;
             font-size: 18px;
             font-weight: bold;
+            transition: 0.3s;
+            padding: 10px 15px;
         }
+
         .navbar a:hover {
-            text-decoration: underline;
+            background-color: #388e3c;
+            border-radius: 5px;
         }
-        .container {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        /* Hero Section */
+        .hero {
             width: 90%;
-            max-width: 600px;
-            margin-top: 80px;
+            max-width: 700px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+            margin-top: 90px;
+            position: relative;
         }
+
         h1 {
-            color: #2e7d32; /* Dark green */
+            color: #1b5e20; /* Dark green */
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
+
         p {
             font-size: 16px;
             color: #444;
+            line-height: 1.6;
+            margin-bottom: 20px;
         }
+
+        /* Button */
         .btn {
             display: inline-block;
             background-color: #43a047; /* Green */
             color: white;
-            padding: 12px 20px;
-            border-radius: 5px;
+            padding: 14px 22px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
-            margin-top: 15px;
+            font-size: 16px;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .btn:hover {
-            background-color: #388e3c; /* Darker green */
+            background-color: #2e7d32; /* Darker green */
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -73,13 +97,15 @@
     {% block navbar %}
         {% include 'user_navbar.html' %}
     {% endblock %}
-    <div class="container">
-        <h1>Welcome to the Poultry Care System</h1>
+
+    <div class="hero">
+        <h1>🐔 Welcome to the Poultry Care System</h1>
         <p>Your trusted assistant for diagnosing poultry diseases and managing breed care.</p>
     
         {% if not current_user.is_authenticated %}
             <a href="{{ url_for('auth.register') }}" class="btn">Get Started</a>
         {% endif %}
     </div>
+
 </body>
 </html>

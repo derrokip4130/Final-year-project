@@ -1,6 +1,6 @@
 import requests,  pytz, cloudinary, cloudinary.uploader, cloudinary.api
 from flask import Blueprint, jsonify, request, render_template, redirect, url_for, abort
-from app.models import User, Disease, Symptom, Breed, BreedQuery, Chat
+from app.models import User, Disease, Symptom, Breed, BreedQuery, Chat, Image
 from app.extensions import db
 from flask_login import login_required, current_user
 from app.scripts.breed_queries import get_response
@@ -234,18 +234,7 @@ def add_breeds():
         breed_name = request.form.get('breed_name')
 
         if "breed_images" not in request.files:
-            return "No file part in the request"
-
-        breed_image_url = None
-        if 'breed_images' in request.files:
-            try:
-                image_file = request.files['breed_images']
-                if image_file.filename:  # Ensure a file was selected
-                    upload_result = cloudinary.uploader.upload(image_file)
-                    breed_image_url = upload_result.get("secure_url")  # Get the uploaded image URL
-            except Exception as e:
-                print(f"Cloudinary Upload Error: {e}")
-                breed_image_url = None
+            return jsonify({"error": "No file uploaded"}), 400
 
         feeding_nutrition = {
             "Chick": {
@@ -341,11 +330,25 @@ def add_breeds():
             productivity_economics=productivity_economics,
             breed_characteristics=breed_characteristics,
             breed_physical_description=breed_physical_description,
-            breed_image_url=breed_image_url
         )
 
         # Add and commit to the database
         db.session.add(new_breed)
+        db.session.flush()
+
+        # Process images
+        if "breed_images" in request.files:
+            files = request.files.getlist("breed_images")  # Ensure correct form name
+            for file in files:
+                if file:
+                    upload_result = cloudinary.uploader.upload(file)
+                    new_image = Image(
+                        image_id=Image.generate_image_id(),
+                        image_url=upload_result["secure_url"],
+                        breed_id=new_breed.breed_id  # Link image to breed
+                    )
+                    db.session.add(new_image)
+
         db.session.commit()
         return redirect(url_for('main.breeds_page'))
 
@@ -386,22 +389,6 @@ def update_breed(breed_id):
 
     if request.method == "POST":
         breed.breed_name = request.form.get("breed_name")
-
-        if "breed_images" not in request.files:
-            return jsonify({"error": "No file uploaded"}), 400
-
-        image_file = request.files["breed_images"]
-        if image_file.filename:  # Ensure a file is selected
-            try:
-                # Upload the new image to Cloudinary
-                upload_result = cloudinary.uploader.upload(image_file)
-                new_image_url = upload_result.get("secure_url")
-
-                if new_image_url:
-                    # Update the breed's image in the database
-                    breed.breed_image_url = new_image_url
-            except Exception as e:
-                print(f"Cloudinary Upload Error: {e}")
 
         # Feeding and Nutrition
         breed.feeding_nutrition = {
@@ -489,6 +476,20 @@ def update_breed(breed_id):
             "skin_color": request.form.get("Physical_Description[Skin_Color]"),
             "tail_shape_size": request.form.get("Physical_Description[Tail_Shape_Size]"),
         }
+
+        # Process images only if the user uploaded them
+        if "breed_images" in request.files:
+            files = request.files.getlist("breed_images")
+            for file in files:
+                if file and file.filename:  # Ensure the file is not empty
+                    upload_result = cloudinary.uploader.upload(file)
+                    new_image = Image(
+                        image_id=Image.generate_image_id(),
+                        image_url=upload_result["secure_url"],
+                        breed_id=breed.breed_id  # Link image to existing breed
+                    )
+                    db.session.add(new_image)
+
 
         # Commit changes to the database
         try:
@@ -603,7 +604,11 @@ def get_chat_response():
         db.session.add(chat)
         db.session.commit()
 
-    response_text = get_response(breed, message)
+    chat_history = fetch_chat_queries(chat.chat_id, user_id)  # Get structured chat history
+    if not chat_history:
+        chat_history = []  # Ensure it's a list
+
+    response_text = get_response(breed, message, chat_history)
 
     new_query = BreedQuery(
         query_id=BreedQuery.generate_query_id(),
@@ -626,16 +631,49 @@ def get_chat_response():
 @main_blueprint.route("/get_chat_queries/<chat_id>", methods=["GET"])
 @login_required
 def get_chat_queries(chat_id):
-    chat = Chat.query.filter_by(chat_id=chat_id, user_id=current_user.user_id).first()
+    query_list = fetch_chat_queries(chat_id, current_user.user_id)
+    if not query_list:
+        return jsonify({"error": "Chat not found"}), 404
+
+    return jsonify({"queries": query_list})
+
+def fetch_chat_queries(chat_id, user_id):
+    chat = Chat.query.filter_by(chat_id=chat_id, user_id=user_id).first()
     
     if not chat:
-        return jsonify({"error": "Chat not found"}), 404
+        return []
 
     queries = BreedQuery.query.filter_by(chat_id=chat_id).order_by(BreedQuery.timestamp).all()
 
-    query_list = [
-        {"user_query": query.user_query, "bot_response": query.bot_response}
-        for query in queries
-    ]
+    chat_history = []
+    
+    for query in queries:
+        if query.user_query:  # User's message
+            chat_history.append({"role": "USER", "message": query.user_query})
+        if query.bot_response:  # Bot's response
+            chat_history.append({"role": "BOT", "message": query.bot_response})
 
-    return jsonify({"queries": query_list})
+    return chat_history
+
+@main_blueprint.route("/rename_chat/<chat_id>", methods = ["POST"])
+@login_required
+def rename_chat(chat_id):
+    data = request.json
+    new_title = data.get("new_title")
+    
+    chat = Chat.query.get(chat_id)
+    if chat:
+        chat.chat_title = new_title
+        db.session.commit()
+        return jsonify({"success": True})
+    return jsonify({"success": False})
+
+@main_blueprint.route("/delete_chat/<chat_id>", methods = ["DELETE"])
+@login_required
+def delete_chat(chat_id):
+    chat = Chat.query.get(chat_id)
+    if chat:
+        db.session.delete(chat)
+        db.session.commit()
+        return jsonify({"success": True})
+    return jsonify({"success": False})
