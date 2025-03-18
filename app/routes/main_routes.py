@@ -649,9 +649,9 @@ def fetch_chat_queries(chat_id, user_id):
     
     for query in queries:
         if query.user_query:  # User's message
-            chat_history.append({"role": "USER", "message": query.user_query})
+            chat_history.append({"role": "USER", "message": query.user_query, "query_breed": query.breed_name})
         if query.bot_response:  # Bot's response
-            chat_history.append({"role": "BOT", "message": query.bot_response})
+            chat_history.append({"role": "BOT", "message": query.bot_response, "query_breed": query.breed_name})
 
     return chat_history
 

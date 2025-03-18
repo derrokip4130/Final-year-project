@@ -4,197 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Breed Chat</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            background-color: #f0fdf4;
-            color: #1b5e20;
-        }
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            background-color: #1b5e20;
-            color: white;
-            padding-top: 15px;
-            position: fixed;
-            height: 100vh;
-            top: 0;
-            left: 0;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #a5d6a7 #1b5e20;
-        }
-        .sidebar h2 {
-            text-align: center;
-            font-size: 18px;
-            padding: 10px;
-            margin-bottom: 5px;
-            border-bottom: 1px solid #4caf50;
-        }
-        .sidebar a {
-            display: block;
-            color: white;
-            padding: 12px 20px;
-            text-decoration: none;
-            font-size: 16px;
-            transition: background 0.3s, transform 0.1s;
-            border-radius: 5px;
-            margin: 5px;
-        }
-        .sidebar a:hover, .sidebar a.active {
-            background-color: #388e3c;
-            transform: scale(1.02);
-        }
-        .header-bar {
-            background-color: #2e7d32;
-            color: white;
-            text-align: center;
-            padding: 12px;
-            font-size: 20px;
-            font-weight: bold;
-            position: fixed;
-            top: 0;
-            left: 280px;
-            width: calc(100% - 280px);
-            z-index: 1000;
-        }
-        /* Main Content */
-        .main-content {
-            margin-left: 280px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 60px;
-        }
-        .chat-container {
-            width: 90%;
-            max-width: 800px;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .chat-box {
-            height: 350px;
-            overflow-y: auto;
-            border: 1px solid #a5d6a7;
-            padding: 12px;
-            border-radius: 8px;
-            background-color: #f1f8e9;
-        }
-        .chat-message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            max-width: 90%;
-            word-wrap: break-word;
-        }
-        .user-message {
-            background-color: #c8e6c9;
-            align-self: flex-end;
-            text-align: right;
-            font-weight: bold;
-            border: 1px solid #2e7d32;
-            border-radius: 15px 15px 0 15px;
-        }
-        .bot-message {
-            background-color: #e8f5e9;
-            align-self: flex-start;
-            text-align: left;
-            border: 1px solid #1b5e20;
-            border-radius: 15px 15px 15px 0;
-        }
-        select, input, button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border: 1px solid #a5d6a7;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #43a047;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-        }
-        button:hover {
-            background-color: #388e3c;
-        }
-        .chat-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            justify-content: space-between;
-            padding: 5px;
-            position: relative;
-        }
-
-        .chat-item button {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s;
-            display: none; /* Hide by default */
-        }
-
-        .chat-item:hover button {
-            display: inline-block; /* Show on hover */
-        }
-
-        .chat-item button:hover {
-            color: red;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="sidebar">
-        <a href="/home">🏠 Home</a>
-        <a href="#" id="new-chat-btn">➕ New Chat</a>
-        <h2>Queries</h2>
-        <div id="chat-list">
+<body class="bg-green-50 text-green-900">
+
+    <!-- Sidebar -->
+    <div class="w-72 fixed h-full bg-green-800 text-white p-5 shadow-lg">
+        <h2 class="text-xl font-bold text-center border-b border-green-600 pb-2">📑 Queries</h2>
+        <nav class="mt-5 space-y-2">
+            <a href="/home" class="block p-3 bg-green-700 rounded-lg hover:bg-green-600 transition">🏠 Home</a>
+            <button id="new-chat-btn" class="block w-full p-3 bg-green-700 rounded-lg hover:bg-green-600 transition">
+                ➕ New Chat
+            </button>
+        </nav>
+        <div id="chat-list" class="mt-5 space-y-3">
             {% for chat in chats %}
-                <div class="chat-item">
-                    <a href="#" onclick="loadChat('{{ chat.chat_id }}')" id="chat-{{ chat.chat_id }}">{{ chat.chat_title }}</a>
-                    <button onclick="renameChat('{{ chat.chat_id }}')">✏️</button>
-                    <button onclick="deleteChat('{{ chat.chat_id }}')">🗑️</button>
+                <div class="flex justify-between items-center p-2 bg-green-700 rounded-lg" data-id="{{ chat.chat_id }}">
+                    <a href="#" onclick="loadChat('{{ chat.chat_id }}')" class="text-white">{{ chat.chat_title }}</a>
+                    <div class="flex gap-2">
+                        <button onclick="renameChat('{{ chat.chat_id }}')" class="text-white hover:text-yellow-400">✏️</button>
+                        <button onclick="deleteChat('{{ chat.chat_id }}')" class="text-white hover:text-red-400">🗑️</button>
+                    </div>
                 </div>
             {% endfor %}
         </div>
-        
     </div>
 
-    <div class="header-bar">
-        Breed Related Queries
-    </div>
+    <!-- Header -->
+    <header class="bg-green-700 text-white text-center py-4 text-lg font-bold fixed top-0 left-72 w-[calc(100%-18rem)]">
+        🐔 Breed Related Queries
+    </header>
 
-    <div class="main-content">
-        <div class="chat-container">
-            <label for="breed-select">Select Breed:</label>
-            <select id="breed-select" onchange="updateBreedImage()">
+    <!-- Main Content -->
+    <div class="ml-72 pt-16 flex flex-col items-center px-5">
+        <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-3xl">
+            <label for="breed-select" class="block font-bold">Select Breed:</label>
+            <select id="breed-select" onchange="updateBreedImage()" class="w-full p-2 border border-green-400 rounded-lg mt-2">
                 {% for breed in breeds %}
                     <option value="{{ breed.breed_name }}" data-images="{{ breed.breed_images | map(attribute='image_url') | join(',') }}">
-                    {{breed.breed_name}}
-                </option>
+                        {{breed.breed_name}}
+                    </option>
                 {% endfor %}
             </select>
-            <div style="text-align: center; margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
-                <img class="breed-image" style="max-width: 100px; height: 100px; border-radius: 10px; display: none;">
-                <img class="breed-image" style="max-width: 100px; height: 100px; border-radius: 10px; display: none;">
-                <img class="breed-image" style="max-width: 100px; height: 100px; border-radius: 10px; display: none;">
+
+            <!-- Breed Images -->
+            <div class="flex justify-center gap-4 mt-5">
+                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg">
+                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg">
+                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg">
             </div>
-            
-            <br>
-            <div class="chat-box" id="chat-box"></div>
-            <input type="text" id="user-input" placeholder="Ask about a breed...">
-            <button onclick="sendMessage()">Send</button>
+
+            <!-- Chat Box -->
+            <div class="chat-box border border-green-300 bg-green-50 p-4 mt-5 h-64 overflow-y-auto rounded-lg shadow-md"></div>
+
+            <!-- Input Box -->
+            <div class="mt-4 flex gap-3">
+                <input type="text" id="user-input" class="flex-1 p-3 border border-green-400 rounded-lg" placeholder="Ask about a breed...">
+                <button onclick="sendMessage()" class="bg-green-700 text-white px-4 py-3 rounded-lg hover:bg-green-600 transition">Send</button>
+            </div>
         </div>
     </div>
 
@@ -206,35 +73,42 @@
             let breedSelect = document.getElementById("breed-select");
             let userMessage = inputField.value.trim();
             let selectedBreed = breedSelect.value;
+            let chatBox = document.querySelector(".chat-box");
 
             if (userMessage === "") return;
 
-            let chatBox = document.getElementById("chat-box");
-            chatBox.innerHTML += `<div class="chat-message user-message">You: (${selectedBreed}) ${userMessage}</div>`;
+            // Append user message
+            chatBox.insertAdjacentHTML("beforeend", `<div class="chat-message user-message bg-green-200 p-3 rounded-lg max-w-full self-end shadow-md"> 
+                <strong>You:</strong> (${selectedBreed}) ${userMessage} 
+            </div><br>`);
+
 
             fetch("/get_chat_response", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    chat_id: activeChatId,  // Send the active chat ID if available
-                    breed: selectedBreed, 
-                    message: userMessage 
+                body: JSON.stringify({
+                    chat_id: activeChatId || null,  // Ensure correct handling for new chats
+                    breed: selectedBreed,
+                    message: userMessage
                 }),
             })
             .then(response => response.json())
             .then(data => {
                 let formattedResponse = formatResponse(data.response);
-                chatBox.innerHTML += `<div class="chat-message bot-message">${formattedResponse}</div>`;
+                chatBox.insertAdjacentHTML("beforeend", `<div class="chat-message bot-message bg-white p-3 rounded-lg max-w-full shadow-md"> 
+                    ${formattedResponse} 
+                </div>`);
+
                 chatBox.scrollTop = chatBox.scrollHeight;
 
-                // If this is a new chat, update the active chat ID and sidebar
+                // Update chat ID if it's a new chat
                 if (!activeChatId && data.chat_id) {
                     activeChatId = data.chat_id;
                     addChatToSidebar(data.chat_id, data.chat_title);
                 }
             })
-            .catch(error => {
-                chatBox.innerHTML += `<div class="chat-message bot-message">An error occurred. Please try again.</div>`;
+            .catch(() => {
+                chatBox.insertAdjacentHTML("beforeend", `<div class="chat-message bot-message" style="color:red;">An error occurred. Please try again.</div>`);
             });
 
             inputField.value = "";
@@ -247,26 +121,26 @@
             let inList = false;
 
             lines.forEach(line => {
-                line = line.replace(/\*\*(.*?)\*\*/g, "$1"); // Remove **bold** formatting
+                line = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"); // Convert **bold** to <strong>
 
                 if (line.startsWith("##")) {
                     if (inList) {
                         formattedText += "</ul>"; // Close list before adding a heading
                         inList = false;
                     }
-                    formattedText += `<h3>${line.replace(/##\s*/, "")}</h3>`;
+                    formattedText += `<h3 class="text-lg font-bold text-green-800 mt-2">${line.replace(/##\s*/, "")}</h3>`;
                 } else if (line.startsWith("-")) {
                     if (!inList) {
-                        formattedText += "<ul>"; // Open list before adding list items
+                        formattedText += "<ul class='list-disc list-inside mt-1'>"; // Open list before adding list items
                         inList = true;
                     }
-                    formattedText += `<li>${line.replace(/-\s*/, "")}</li>`;
+                    formattedText += `<li class="text-green-700">${line.replace(/-\s*/, "")}</li>`;
                 } else {
                     if (inList) {
                         formattedText += "</ul>"; // Close list before adding normal text
                         inList = false;
                     }
-                    formattedText += `<p>${line}</p>`;
+                    formattedText += `<p class="text-base text-green-900">${line}</p>`;
                 }
             });
 
@@ -279,26 +153,19 @@
 
         function loadChat(chatId) {
             activeChatId = chatId;
-            document.querySelectorAll(".sidebar a").forEach(link => link.classList.remove("active"));
-            document.getElementById(`chat-${chatId}`).classList.add("active");
-            let chatBox = document.getElementById("chat-box");
+            let chatBox = document.querySelector(".chat-box");
             chatBox.innerHTML = "<p>Loading chat...</p>";
 
-            fetch(`/get_chat_queries/${chatId}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": "febvgtrb48gbvr6e5f4v"  // Replace with your actual token
-                }
-            })
+            fetch(`/get_chat_queries/${chatId}`)
             .then(response => response.json())
             .then(data => {
                 chatBox.innerHTML = "";
-                
+
                 data.queries.forEach(query => {
                     if (query.role === "USER") {
-                        chatBox.innerHTML += `<div class="chat-message user-message">You: ${query.message}</div>`;
+                        chatBox.innerHTML += `<div class="chat-message user-message bg-green-200 p-3 rounded-lg max-w-full self-end shadow-md"><strong>You (${query.query_breed}):</strong> ${query.message}</div><br>`;
                     } else if (query.role === "BOT") {
-                        chatBox.innerHTML += `<div class="chat-message bot-message">${formatResponse(query.message)}</div>`;
+                        chatBox.innerHTML += `<div class="chat-message bot-message bg-white p-3 rounded-lg max-w-full shadow-md">${formatResponse(query.message)}</div>`;
                     }
                 });
 
@@ -309,23 +176,45 @@
             });
         }
 
-
         function addChatToSidebar(chatId, chatTitle) {
             let chatList = document.getElementById("chat-list");
-            if (!document.getElementById(`chat-${chatId}`)) {
-                let newChat = document.createElement("a");
-                newChat.href = "#";
-                newChat.textContent = chatTitle;
-                newChat.id = `chat-${chatId}`;
-                newChat.onclick = function () { loadChat(chatId); };
-                chatList.appendChild(newChat);
-            }
+
+            let chatItem = document.createElement("div");
+            chatItem.className = "flex justify-between items-center p-2 bg-green-700 rounded-lg";
+            chatItem.setAttribute("data-id", chatId);
+
+            chatItem.innerHTML = `
+                <a href="#" onclick="loadChat('${chatId}')" class="text-white">${chatTitle}</a>
+                <div class="flex gap-2">
+                    <button onclick="renameChat('${chatId}')" class="text-white hover:text-yellow-400">✏️</button>
+                    <button onclick="deleteChat('${chatId}')" class="text-white hover:text-red-400">🗑️</button>
+                </div>
+            `;
+
+            chatList.appendChild(chatItem);
         }
 
         document.getElementById("new-chat-btn").addEventListener("click", () => {
             activeChatId = null;
-            document.getElementById("chat-box").innerHTML = "";
+            let chatBox = document.querySelector(".chat-box");
+
+            // Clear the chat area
+            chatBox.innerHTML = "";
+
+            // Add placeholder text
+            let placeholder = document.createElement("p");
+            placeholder.classList.add("text-gray-500");
+            placeholder.textContent = "New chat started. Ask a question...";
+            chatBox.appendChild(placeholder);
+
+            // Remove the placeholder text after 3 seconds
+            setTimeout(() => {
+                if (chatBox.contains(placeholder)) {
+                    placeholder.remove();
+                }
+            }, 3000);
         });
+
         function updateBreedImage() {
             let breedSelect = document.getElementById("breed-select");
             let selectedOption = breedSelect.options[breedSelect.selectedIndex];
@@ -359,7 +248,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById(`chat-${chatId}`).textContent = newTitle;
+                    let chatElement = document.querySelector(`#chat-list div[data-id='${chatId}'] a`);
+                    if (chatElement) {
+                        chatElement.textContent = newTitle;
+                    }
                 } else {
                     alert("Failed to rename chat.");
                 }
@@ -374,7 +266,24 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById(`chat-${chatId}`).parentElement.remove();
+                    let chatItem = document.querySelector(`#chat-list div[data-id='${chatId}']`);
+                    if (chatItem) {
+                        chatItem.remove();
+                    }
+                    // If the deleted chat was active, clear the chat box
+                    if (activeChatId === chatId) {
+                        activeChatId = null;
+                        let chatBox = document.querySelector(".chat-box");
+                        chatBox.innerHTML = `<p class="text-gray-500" id="clear-message">Chat cleared.</p>`;
+
+                        // Remove the "Chat cleared." message after 2 seconds
+                        setTimeout(() => {
+                            let clearMessage = document.getElementById("clear-message");
+                            if (clearMessage) {
+                                clearMessage.remove();
+                            }
+                        }, 2000);
+                    }
                 } else {
                     alert("Failed to delete chat.");
                 }

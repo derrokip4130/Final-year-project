@@ -6,15 +6,22 @@ load_dotenv()
 co = cohere.Client(os.getenv("COHERE_API_KEY"))
 
 valid_categories = {
-    "Feeding and Nutrition": ["Chick", "Grower", "Broiler", "Supplementation", "Alternative_feeds"],
+    "Feeding and Nutrition": ["Chick", "Grower", "Broiler", "Layer", "Supplementation", "Alternative_feeds"],
     "Housing and Environment": ["Space_per_bird", "Ventilation", "Temperature", "Humidity", "Biosecurity"],
     "Disease Prevention and Health": ["Common_diseases", "Vaccination_schedule", "Signs_of_illness", "Deworming"],
     "Breed Characteristics": ["Temperament", "Farming_suitability", "Climate_adaptability", "Special_needs"],
     "General Poultry Care": ["Injection_types", "Biosecurity_measures", "Common_treatments"],
-    "Breed Physical Description": ["body_shape", "feather_color_pattern", "comb_type", "leg_color_features", "beak_shape_color", "wattles_earlobes", "skin_color", "tail_shape_size"],
+    
+    "Breed Physical Description": ["Body_Shape", "Feather_Color_Pattern", "Comb_Type", "Leg_Color_Features", 
+                                   "Beak_Shape_Color", "Wattles_Earlobes", "Skin_Color", "Tail_Shape_Size"],
+
+    "Breeding and Reproduction": ["Best_breeding_age", "Egg_production", "Brooding_requirements", "Incubation_methods"],
+    "Productivity and Economics": ["Growth_rate", "Egg_laying", "Market_price", "Profit_maximization"],
+
     "Purpose": [],
     "Category": []
 }
+
 
 def format_vaccination_schedule(vaccination_data):
     """Format vaccination details as a structured list."""
@@ -38,7 +45,7 @@ def get_response(selected_breed, user_input, chat_history):
     response = requests.get(f"http://127.0.0.1:5000/get_breed_data/{selected_breed}")
 
     if response.status_code != 200:
-        return "Error: Breed data not found."
+        return f"Error: No data available for the breed '{selected_breed}'. Please check the breed name."
 
     dataset = response.json()
 
@@ -75,6 +82,25 @@ def get_response(selected_breed, user_input, chat_history):
             detected_intents = []
     else:
         detected_intents = []
+
+    # If no intents are detected, check if the question is unrelated
+    if not detected_intents:
+        unrelated_query_check = co.chat(
+            model="command-r-plus",
+            message=f"""
+            Determine if the user's question is related to poultry care or breed-specific knowledge.
+            If it is not related, return this exact response: "UNRELATED_QUERY".
+            Otherwise, return "RELATED_QUERY".
+            
+            User input: {user_input}
+            """,
+            chat_history=chat_history
+        )
+
+        if "UNRELATED_QUERY" in unrelated_query_check.text:
+            return "I'm here to assist with poultry breeds and care. Your query seems unrelated."
+
+        return "I couldn't determine the exact category of your question. Could you clarify?"
 
     # Retrieve relevant information for each detected category
     results = []
@@ -117,20 +143,9 @@ def get_response(selected_breed, user_input, chat_history):
 
             results.append(f"**{intent}**:\n{formatted_result}")
 
-        elif intent == "General Poultry Care":
-            general_response = co.chat(
-                model="command-r-plus",
-                message=f"""
-                The user asked a poultry-related question: {user_input}.
-                Provide a clear and concise response relevant to poultry care.
-                """,
-                temperature=0.7
-            )
-            return general_response.text
-
     # If no relevant data found
     if not results:
-        return "I'm here to help with poultry care and breed-related queries. Your question seems to be outside this scope."
+        return f"I'm here to assist with {selected_breed} breed information and poultry care. I couldn't find relevant data for your question."
 
     # Generate final response
     final_response = co.chat(
@@ -153,6 +168,7 @@ def get_response(selected_breed, user_input, chat_history):
     )
 
     return final_response.text
+
 
 
 if __name__ == "__main__":

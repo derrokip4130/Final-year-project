@@ -9,17 +9,11 @@
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0fdf4; /* Light green */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
+            background-color: #f0fdf4;
         }
 
-        /* Navbar */
-        .navbar {
+         /* Navbar */
+         .navbar {
             width: 100%;
             background-color: #2e7d32; /* Dark green */
             padding: 15px 0;
@@ -30,6 +24,7 @@
             justify-content: center;
             gap: 25px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
 
         .navbar a {
@@ -48,34 +43,46 @@
 
         /* Hero Section */
         .hero {
-            width: 90%;
-            max-width: 700px;
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
-            margin-top: 90px;
+            width: 100%;
+            height: 100vh;
+            background: url('https://source.unsplash.com/1600x900/?poultry,farm') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 20px;
             position: relative;
         }
 
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
         h1 {
-            color: #1b5e20; /* Dark green */
-            font-size: 28px;
+            font-size: 36px;
             font-weight: bold;
-            margin-bottom: 10px;
         }
 
         p {
-            font-size: 16px;
-            color: #444;
-            line-height: 1.6;
+            font-size: 18px;
             margin-bottom: 20px;
         }
 
-        /* Button */
         .btn {
-            display: inline-block;
-            background-color: #43a047; /* Green */
+            background-color: #388e3c;
             color: white;
             padding: 14px 22px;
             border-radius: 8px;
@@ -83,12 +90,44 @@
             font-weight: bold;
             font-size: 16px;
             transition: 0.3s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .btn:hover {
-            background-color: #2e7d32; /* Darker green */
-            transform: translateY(-2px);
+            background-color: #388e3c;
+        }
+
+        /* Services Section */
+        .services {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 50px 20px;
+            background-color: white;
+        }
+
+        .service {
+            width: 300px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .service img {
+            width: 100%;
+            height: 150px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Contact Section */
+        .contact {
+            background-color: #2e7d32;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .contact p {
+            margin: 5px 0;
         }
     </style>
 </head>
@@ -99,13 +138,40 @@
     {% endblock %}
 
     <div class="hero">
-        <h1>🐔 Welcome to the Poultry Care System</h1>
-        <p>Your trusted assistant for diagnosing poultry diseases and managing breed care.</p>
-    
-        {% if not current_user.is_authenticated %}
-            <a href="{{ url_for('auth.register') }}" class="btn">Get Started</a>
-        {% endif %}
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>🐔 Welcome to the Poultry Care System</h1>
+            <p>Your trusted assistant for diagnosing poultry diseases and managing breed care.</p>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.register') }}" class="btn">Get Started</a>
+            {% endif %}
+        </div>
     </div>
+
+    <section class="services">
+        <div class="service">
+            <img src="https://media.istockphoto.com/id/939826450/photo/two-veterinarians-in-hen-house.webp?a=1&b=1&s=612x612&w=0&k=20&c=8Y5Go252E_iF1HbGYdPi8aoDyy-FfsUXg0JGMDmqWQs=" alt="Poultry Diagnosis">
+            <h3>Poultry Disease Diagnosis</h3>
+            <p>Identify and manage poultry diseases effectively.</p>
+        </div>
+        <div class="service">
+            <img src="https://images.unsplash.com/photo-1612170153139-6f881ff067e0?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2hpY2tlbnxlbnwwfHwwfHx8MA%3D%3D" alt="Breeds Management">
+            <h3>Breeds Management</h3>
+            <p>Learn how to care for different poultry breeds.</p>
+        </div>
+        <div class="service">
+            <img src="https://images.unsplash.com/photo-1556316918-880f9e893822?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hpY2tlbnxlbnwwfHwwfHx8MA%3D%3D" alt="Poultry Farming Tips">
+            <h3>Poultry Farming Tips</h3>
+            <p>Best practices for maximizing farm productivity.</p>
+        </div>
+    </section>
+
+    <section class="contact">
+        <h2>Contact Us</h2>
+        <p>Email: support@poultrycare.com</p>
+        <p>Phone: +254 700 123 456</p>
+        <p>Address: Nairobi, Kenya</p>
+    </section>
 
 </body>
 </html>
