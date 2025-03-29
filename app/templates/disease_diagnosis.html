@@ -11,20 +11,27 @@
         <a href="/home" class="block text-center text-xl font-bold py-4 bg-green-800 hover:bg-green-600 rounded">🏠 Home</a>
         <h2 class="text-lg font-semibold text-center mt-4">Diagnosis History</h2>
     </div>
-
-    <div class="ml-72 mt-10 w-3/5 flex flex-col items-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 class="text-center text-2xl font-bold text-green-700">Poultry Disease Diagnosis</h2>
-            <label class="block mt-4 text-lg" for="symptoms">Enter Symptoms:</label>
-            <input type="text" id="symptoms" oninput="showSuggestions()" placeholder="Type a symptom..." class="w-full p-2 mt-2 border rounded-md">
-            <div id="autocomplete" class="bg-white shadow-md rounded-md mt-2"></div>
-            <div id="selected-symptoms" class="mt-2 flex flex-wrap"></div>
+    
+    <div class="ml-72 mt-10 w-4/5 flex justify-between">
+        <!-- Symptom Selection -->
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-center text-2xl font-bold text-green-700">Select Symptoms</h2>
+            <label class="block mt-4 text-lg" for="symptom-select">Symptoms:</label>
+            <select id="symptom-select" class="w-full p-2 mt-2 border rounded-md" onchange="addSymptom(this.value)">
+                <option value="" disabled selected>Select a symptom</option>
+            </select>
+            <div id="selected-symptoms" class="mt-4 hidden"></div>
             <button onclick="diagnose()" class="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-semibold">Diagnose</button>
-            <div id="diagnosis_result" class="mt-4 text-center"></div>
-            <h3 class="mt-6 text-lg font-semibold">Upload Image for Diagnosis</h3>
+            <h3 class="text-center text-2xl font-bold text-green-700">Upload Image for Diagnosis</h3>
             <input type="file" id="image-upload" accept="image/*" class="w-full border p-2 rounded-md mt-2">
             <button onclick="analyzeImage()" class="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-semibold">Analyze Image</button>
             <div id="image_result" class="mt-4 text-center"></div>
+        </div>
+        
+        <!-- Diagnosis Result (Initially Hidden) -->
+        <div id="diagnosis-box" class="bg-white p-6 rounded-lg shadow-lg w-1/2 hidden">
+            <h2 class="text-center text-2xl font-bold text-green-700">Diagnosis Result</h2>
+            <div id="diagnosis_result" class="mt-4 text-center"></div>
         </div>
     </div>
 
@@ -37,20 +44,20 @@
             { name: "Newcastle Disease", symptoms: ["Diarrhea", "Fever", "Lethargy", "Sneezing"] }
         ];
 
-        function showSuggestions() {
-            const input = document.getElementById("symptoms");
-            const list = document.getElementById("autocomplete");
-            list.innerHTML = "";
-            const query = input.value.toLowerCase();
-            if (!query) return;
-            const matches = symptomsList.filter(symptom => symptom.toLowerCase().includes(query));
-            matches.forEach(symptom => {
-                const item = document.createElement("div");
-                item.textContent = symptom;
-                item.classList.add("p-2", "cursor-pointer", "hover:bg-green-100", "rounded-md");
-                item.onclick = () => addSymptom(symptom);
-                list.appendChild(item);
-            });
+        // Populate the dropdown
+        const symptomSelect = document.getElementById("symptom-select");
+        symptomsList.forEach(symptom => {
+            let option = document.createElement("option");
+            option.value = symptom;
+            option.textContent = symptom;
+            symptomSelect.appendChild(option);
+        });
+
+        function addSymptom(symptom) {
+            if (!selectedSymptoms.includes(symptom) && symptom !== "") {
+                selectedSymptoms.push(symptom);
+                updateSelectedSymptoms();
+            }
         }
 
         function removeSymptom(symptom) {
@@ -58,21 +65,17 @@
             updateSelectedSymptoms();
         }
 
-        function addSymptom(symptom) {
-            if (!selectedSymptoms.includes(symptom)) {
-                selectedSymptoms.push(symptom);
-                updateSelectedSymptoms();
-            }
-            document.getElementById("symptoms").value = "";
-            document.getElementById("autocomplete").innerHTML = "";
-        }
-
         function updateSelectedSymptoms() {
             const container = document.getElementById("selected-symptoms");
             container.innerHTML = "";
+            if (selectedSymptoms.length === 0) {
+                container.classList.add("hidden");
+                return;
+            }
+            container.classList.remove("hidden");
             selectedSymptoms.forEach(symptom => {
                 const div = document.createElement("div");
-                div.classList.add("bg-green-100", "p-2", "rounded-md", "mr-2", "mt-2", "flex", "items-center");
+                div.classList.add("bg-green-100", "p-2", "rounded-md", "mr-2", "mt-2", "inline-flex", "items-center");
                 div.textContent = symptom;
                 
                 const button = document.createElement("button");
@@ -87,9 +90,10 @@
 
         function diagnose() {
             if (selectedSymptoms.length === 0) {
-                document.getElementById("diagnosis_result").innerText = "No symptoms entered.";
+                alert("Please select at least one symptom.");
                 return;
             }
+            document.getElementById("diagnosis-box").classList.remove("hidden");
             document.getElementById("diagnosis_result").innerHTML = "<p class='text-gray-600'>Analyzing symptoms...</p>";
             setTimeout(() => {
                 let results = diseases.map(disease => {
@@ -97,7 +101,9 @@
                     const probability = (matchedSymptoms.length / disease.symptoms.length) * 100;
                     return { name: disease.name, probability: probability.toFixed(1) };
                 }).filter(result => result.probability > 0);
-                document.getElementById("diagnosis_result").innerHTML = results.length > 0 ? results.map(result => `<p class='text-green-700 font-semibold'>${result.name}: ${result.probability}%</p>`).join(" ") : "No matching diseases found.";
+                document.getElementById("diagnosis_result").innerHTML = results.length > 0 
+                    ? results.map(result => `<p class='text-green-700 font-semibold'>${result.name}: ${result.probability}%</p>`).join(" ") 
+                    : "No matching diseases found.";
             }, 2000);
         }
     </script>

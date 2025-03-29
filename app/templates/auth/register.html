@@ -4,92 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #e8f5e9; /* Light green background */
-        }
-        .form-container {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        .form-container h1 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #2e7d32; /* Dark green */
-        }
-        input, select, button {
-            width: 90%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #a5d6a7; /* Light green border */
-            border-radius: 4px;
-        }
-        button {
-            background-color: #43a047;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #388e3c;
-        }
-        .alert {
-            padding: 10px;
-            color: white;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        .alert.success { background-color: #4CAF50; }
-        .alert.danger { background-color: #f44336; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="form-container">
-        <h1>Register</h1>
+<body class="flex justify-center items-center h-screen bg-green-100">
+    <div class="bg-white p-6 rounded-lg shadow-md w-80">
+        <h1 class="text-2xl font-bold text-green-700 mb-4">Register</h1>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert {{ category }}">{{ message }}</div>
+                    <div class="p-2 mb-2 text-white rounded {{ 'bg-green-500' if category == 'success' else 'bg-red-500' }}">
+                        {{ message }}
+                    </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <form action="{{ url_for('auth.register') }}" method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <input type="text" name="phone_num" placeholder="Phone Number (optional)">
-            <input type="text" name="location" placeholder="Location (optional)">
-            <!--<select name="user_role" required>
-                <option value="farmer">Farmer</option>
-                <option value="admin">Admin</option>
-            </select>-->
-            <div style="position: relative;">
-                <input type="password" id="password" name="password" placeholder="Password" required>
-                <span id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
+        <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-3">
+            <input type="text" name="username" placeholder="Username" required class="w-full p-2 border border-green-300 rounded">
+            <input type="email" name="email" placeholder="Email" required class="w-full p-2 border border-green-300 rounded">
+            <input type="text" name="phone_num" placeholder="Phone Number (optional)" class="w-full p-2 border border-green-300 rounded">
+            <input type="text" name="location" placeholder="Location (optional)" class="w-full p-2 border border-green-300 rounded">
+            
+            <div class="relative">
+                <input type="password" id="password" name="password" placeholder="Password" required class="w-full p-2 border border-green-300 rounded">
+                <span id="togglePassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer">👁️</span>
             </div>
-            <button type="submit">Register</button>
+            
+            <button type="submit" class="w-full p-2 bg-green-600 text-white font-bold rounded hover:bg-green-700">Register</button>
         </form>
-        <p>Already have an account? <a href="{{ url_for('auth.login') }}">Login</a></p>
+        
+        <p class="mt-3 text-sm text-gray-600">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-green-600 font-bold">Login</a></p>
     </div>
+    
     <script>
-    document.getElementById('togglePassword').addEventListener('click',
-     function(){
-        let passwordField = document.getElementById('password');
-        passwordField.type = passwordField.type === 'password' ?
-        'text' : 'password';
-     });
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            let passwordField = document.getElementById('password');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        });
     </script>
 </body>
 </html>

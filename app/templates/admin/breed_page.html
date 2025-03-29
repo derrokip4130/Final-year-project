@@ -4,209 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ breed.breed_name }} - Poultry Care System</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #2e7d32;
-            color: white;
-            padding-top: 20px;
-            position: fixed;
-            height: 100%;
-        }
-        .sidebar a {
-            display: block;
-            color: white;
-            padding: 15px;
-            text-decoration: none;
-            font-size: 18px;
-        }
-        .sidebar a:hover {
-            background-color: #388e3c;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            width: calc(100% - 250px);
-            background: #e8f5e9;
-            height: 100vh;
-        }
-        .header {
-            background: white;
-            padding: 15px;
-            border-bottom: 2px solid #2e7d32;
-        }
-        .table-container {
-            margin-top: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #2e7d32;
-            color: white;
-        }
-        .btn-container {
-            margin-top: 20px;
-            display: flex;
-            gap: 15px;
-        }
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
-        }
-        .btn-update {
-            background-color: #fbc02d;
-            color: black;
-        }
-        .btn-update:hover {
-            background-color: #f9a825;
-        }
-        .btn-delete {
-            background-color: #d32f2f;
-            color: white;
-        }
-        .btn-delete:hover {
-            background-color: #b71c1c;
-        }
-        .image-gallery {
-            display: flex;
-            gap: 10px; /* Space between images */
-            margin-top: 10px;
-        }
-
-        .image-gallery img {
-            width: calc(33.33% - 10px); /* Ensures 3 images fit in one row */
-            max-height: 200px; /* Adjust height as needed */
-            object-fit: cover;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    {% block navbar %}
-        {% include 'admin/admin_navbar.html' %}
-    {% endblock %}
+<body class="flex h-screen bg-green-100">
+    <div class="w-64 bg-green-700 text-white fixed h-full p-5">
+        {% block navbar %}
+            {% include 'admin/admin_navbar.html' %}
+        {% endblock %}
+    </div>
 
-    <div class="content">
-        <div class="header">
-            <h1>Welcome {{ current_user.username }}</h1>
+    <div class="ml-64 w-full p-6">
+        <div class="bg-white shadow-md p-6 rounded-lg border border-green-700">
+            <h1 class="text-2xl font-bold text-green-700">Welcome {{ current_user.username }}</h1>
         </div>
 
-        <div class="table-container">
-            <h2>{{ breed.breed_name }} Information</h2>
-            <h2>Breed Images</h2>
-            <div class="image-gallery">
+        <div class="mt-6 bg-white shadow-md p-6 rounded-lg border border-green-700">
+            <h2 class="text-xl font-semibold text-green-700">{{ breed.breed_name }} Information</h2>
+            
+            <h3 class="mt-4 text-lg font-semibold">Breed Images</h3>
+            <div class="grid grid-cols-3 gap-4 mt-2">
                 {% if breed.breed_images %}
-                    {% set random_images = breed.breed_images | shuffle %}
-                    {% for image in random_images[:3] %}
-                        <img src="{{ image.image_url }}" alt="Breed Image">
+                    {% for image in breed.breed_images[:3] %}
+                        <img src="{{ image.image_url }}" alt="Breed Image" class="w-full h-40 object-cover rounded-md shadow">
                     {% endfor %}
                 {% else %}
-                    <p>No images available</p>
+                    <p class="col-span-3 text-gray-600">No images available</p>
                 {% endif %}
             </div>
-            
-            <table>
-                <tr>
-                    <th>Breed Name</th>
-                    <td>{{ breed.breed_name }}</td>
+
+            <table class="w-full mt-6 border border-collapse border-gray-300">
+                <tr class="bg-green-700 text-white">
+                    <th class="p-3 border">Attribute</th>
+                    <th class="p-3 border">Details</th>
                 </tr>
-                <tr>
-                    <th>Purpose</th>
-                    <td>{{ breed.breed_purpose }}</td>
+                <tr class="border">
+                    <td class="p-3 border">Breed Name</td>
+                    <td class="p-3 border">{{ breed.breed_name }}</td>
                 </tr>
-                <tr>
-                    <th>Category</th>
-                    <td>{{ breed.breed_category }}</td>
+                <tr class="border">
+                    <td class="p-3 border">Purpose</td>
+                    <td class="p-3 border">{{ breed.breed_purpose }}</td>
                 </tr>
-                <tr>
-                    <th>Characteristics</th>
-                    <td>
-                        {% for key, value in breed.breed_characteristics.items() %}
-                            <b>{{ key }}:</b> {{ value }}<br>
-                        {% endfor %}
-                    </td>
+                <tr class="border">
+                    <td class="p-3 border">Category</td>
+                    <td class="p-3 border">{{ breed.breed_category }}</td>
                 </tr>
-                <tr>
-                    <th>Feeding & Nutrition</th>
-                    <td>
-                        {% for key, value in breed.feeding_nutrition.items() %}
-                            <b>{{ key }}:</b> {{ value }}<br>
-                        {% endfor %}
-                    </td>
+                <tr class="border">
+                    <td class="p-3 border">Characteristics</td>
+                    <td class="p-3 border">{% for key, value in breed.breed_characteristics.items() %}<b>{{ key }}:</b> {{ value }}<br>{% endfor %}</td>
                 </tr>
-                <tr>
-                    <th>Housing & Environment</th>
-                    <td>
-                        {% for key, value in breed.housing_environment.items() %}
-                            <b>{{ key }}:</b> {{ value }}<br>
-                        {% endfor %}
-                    </td>
+                <tr class="border">
+                    <td class="p-3 border">Feeding & Nutrition</td>
+                    <td class="p-3 border">{% for key, value in breed.feeding_nutrition.items() %}<b>{{ key }}:</b> {{ value }}<br>{% endfor %}</td>
                 </tr>
-                <tr>
-                    <th>Disease Prevention</th>
-                    <td>
-                        {% for key, value in breed.disease_prevention_health.items() %}
-                            <b>{{ key }}:</b> {{ value }}<br>
-                        {% endfor %}
-                    </td>
+                <tr class="border">
+                    <td class="p-3 border">Housing & Environment</td>
+                    <td class="p-3 border">{% for key, value in breed.housing_environment.items() %}<b>{{ key }}:</b> {{ value }}<br>{% endfor %}</td>
                 </tr>
-                <tr>
-                    <th>Breeding & Reproduction</th>
-                    <td>
-                        {% for key, value in breed.breeding_reproduction.items() %}
-                            <b>{{ key }}:</b> {{ value }}<br>
-                        {% endfor %}
-                    </td>
+                <tr class="border">
+                    <td class="p-3 border">Disease Prevention</td>
+                    <td class="p-3 border">{% for key, value in breed.disease_prevention_health.items() %}<b>{{ key }}:</b> {{ value }}<br>{% endfor %}</td>
                 </tr>
-                <tr>
-                    <th>Physical Description</th>
-                    <td>
-                        {% for key, value in breed.breed_physical_description.items() %}
-                            <b>{{ key.replace('_', ' ') }}:</b> {{ value }}<br>
-                        {% endfor %}
-                    </td>
+                <tr class="border">
+                    <td class="p-3 border">Breeding & Reproduction</td>
+                    <td class="p-3 border">{% for key, value in breed.breeding_reproduction.items() %}<b>{{ key }}:</b> {{ value }}<br>{% endfor %}</td>
                 </tr>
-                
-                <tr>
-                    <th>Productivity & Economics</th>
-                    <td>
-                        {% for key, value in breed.productivity_economics.items() %}
-                            <b>{{ key }}:</b> {{ value }}<br>
-                        {% endfor %}
-                    </td>
+                <tr class="border">
+                    <td class="p-3 border">Physical Description</td>
+                    <td class="p-3 border">{% for key, value in breed.breed_physical_description.items() %}<b>{{ key.replace('_', ' ') }}:</b> {{ value }}<br>{% endfor %}</td>
+                </tr>
+                <tr class="border">
+                    <td class="p-3 border">Productivity & Economics</td>
+                    <td class="p-3 border">{% for key, value in breed.productivity_economics.items() %}<b>{{ key }}:</b> {{ value }}<br>{% endfor %}</td>
                 </tr>
             </table>
-
-            <div class="btn-container">
-                <!-- Update Button -->
-                <a href="{{ url_for('main.update_breed', breed_id=breed.breed_id) }}" class="btn btn-update">Update Breed</a>
-                <!---->
-                <!-- Delete Button (with form to prevent accidental clicks) -->
+            
+            <div class="mt-6 flex gap-4">
+                <a href="{{ url_for('main.update_breed', breed_id=breed.breed_id) }}" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">Update Breed</a>
+                
                 <form action="{{ url_for('main.delete_breed', breed_id=breed.breed_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this breed?');">
-                    <button type="submit" class="btn btn-delete">Delete Breed</button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Delete Breed</button>
                 </form>
             </div>
         </div>

@@ -4,114 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disease List - Poultry Care System</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            width: calc(100% - 250px);
-            background: #e8f5e9;
-            height: 100vh;
-        }
-        .header {
-            background: white;
-            padding: 15px;
-            border-bottom: 2px solid #2e7d32;
-        }
-        .table-container {
-            margin-top: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #2e7d32;
-            color: white;
-        }
-        .no-data {
-            text-align: center;
-            font-size: 18px;
-            color: #777;
-            margin-top: 20px;
-        }
-        .btn {
-            background-color: #43a047;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .btn:hover {
-            background-color: #388e3c;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="flex h-screen bg-green-100">
     {% block navbar %}
         {% include 'admin/admin_navbar.html' %}
     {% endblock %}
-
-    <div class="content">
-        <div class="header">
-            <h1>Welcome {{ current_user.username }}</h1>
-            
+    
+    <div class="ml-64 flex-1 p-6">
+        <div class="bg-white p-4 border-b-2 border-green-700 shadow-md">
+            <h1 class="text-xl font-semibold">Welcome {{ current_user.username }}</h1>
         </div>
-        <h2>List of Diseases</h2>
-        <div class="table-container">
+        
+        <h2 class="text-2xl font-bold mt-6">List of Diseases</h2>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md mt-4">
             {% if diseases %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Causes</th>
-                            <th>Last Updated</th>
-                            <th>Added on</th>
-                            <th>Symptoms</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for disease in diseases %}
-                            <tr>
-                                <td><a style="text-decoration: none;color: black;" href="{{ url_for('main.disease_page',disease_id=disease.disease_id) }}"> {{disease.disease_name }}</a></td>
-                                <td>{{ disease.causes or "N/A" }}</td>
-                                <td>{{ disease.last_updated.strftime('%Y-%m-%d') if disease.last_updated else "Never Updated" }}</td>
-                                <td>{{ disease.created_at.strftime('%Y-%m-%d') }}</td>
-                                <td>
-                                    {% if disease.symptoms %}
-                                        {{ disease.symptoms | map(attribute='symptom_name') | join(', ') }}
-                                    {% else %}
-                                        <span>No symptoms associated</span>
-                                    {% endif %}
-                                </td>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300 mt-4">
+                        <thead>
+                            <tr class="bg-green-700 text-white">
+                                <th class="p-3 border">Name</th>
+                                <th class="p-3 border">Causes</th>
+                                <th class="p-3 border">Last Updated</th>
+                                <th class="p-3 border">Added on</th>
+                                <th class="p-3 border">Symptoms</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>                    
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for disease in diseases %}
+                                <tr class="border">
+                                    <td class="p-3 border">
+                                        <a href="{{ url_for('main.disease_page', disease_id=disease.disease_id) }}" class="text-black hover:text-green-700">{{ disease.disease_name }}</a>
+                                    </td>
+                                    <td class="p-3 border">{{ disease.causes or "N/A" }}</td>
+                                    <td class="p-3 border">{{ disease.last_updated.strftime('%Y-%m-%d') if disease.last_updated else "Never Updated" }}</td>
+                                    <td class="p-3 border">{{ disease.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td class="p-3 border">
+                                        {% if disease.symptoms %}
+                                            {{ disease.symptoms | map(attribute='symptom_name') | join(', ') }}
+                                        {% else %}
+                                            <span class="text-gray-500">No symptoms associated</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
-                <p class="no-data">No diseases found.</p>
+                <p class="text-center text-lg text-gray-600 mt-4">No diseases found.</p>
             {% endif %}
-            
         </div>
-        <button class="btn" onclick="location.href='/add_disease'">Add Disease</button>
+        
+        <button onclick="location.href='/add_disease'" class="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow">
+            Add Disease
+        </button>
     </div>
 </body>
 </html>

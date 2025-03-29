@@ -4,174 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Poultry Care System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0fdf4;
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .animated-bg {
+            background: linear-gradient(-45deg, #2e7d32, #66bb6a, #a5d6a7, #1b5e20);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+        }
+        @keyframes floatEffect {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
         }
 
-         /* Navbar */
-         .navbar {
-            width: 100%;
-            background-color: #2e7d32; /* Dark green */
-            padding: 15px 0;
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+        .animate-float {
+            animation: floatEffect 4s ease-in-out infinite;
+        }
+        @keyframes glowEffect {
+            0% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); }
+            100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); }
         }
 
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: bold;
-            transition: 0.3s;
-            padding: 10px 15px;
+        .animate-glow {
+            animation: glowEffect 3s ease-in-out infinite;
+        }
+        @keyframes chickenFloat {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
         }
 
-        .navbar a:hover {
-            background-color: #388e3c;
-            border-radius: 5px;
+        .animate-chicken {
+            animation: chickenFloat 3s ease-in-out infinite;
         }
-
-        /* Hero Section */
-        .hero {
-            width: 100%;
-            height: 100vh;
-            background: url('https://source.unsplash.com/1600x900/?poultry,farm') no-repeat center center/cover;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            padding: 20px;
-            position: relative;
-        }
-
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            pointer-events: none;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        h1 {
-            font-size: 36px;
-            font-weight: bold;
-        }
-
-        p {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            background-color: #388e3c;
-            color: white;
-            padding: 14px 22px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #388e3c;
-        }
-
-        /* Services Section */
-        .services {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 50px 20px;
-            background-color: white;
-        }
-
-        .service {
-            width: 300px;
-            margin: 20px;
-            text-align: center;
-        }
-
-        .service img {
-            width: 100%;
-            height: 150px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Contact Section */
-        .contact {
-            background-color: #2e7d32;
-            color: white;
-            text-align: center;
-            padding: 30px;
-        }
-
-        .contact p {
-            margin: 5px 0;
-        }
-    </style>
+        </style>
 </head>
-<body>
-
+<body class="bg-green-50 font-sans">
+    
     {% block navbar %}
         {% include 'user_navbar.html' %}
     {% endblock %}
 
-    <div class="hero">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1>🐔 Welcome to the Poultry Care System</h1>
-            <p>Your trusted assistant for diagnosing poultry diseases and managing breed care.</p>
-            {% if not current_user.is_authenticated %}
-                <a href="{{ url_for('auth.register') }}" class="btn">Get Started</a>
-            {% endif %}
+    <div class="relative h-[60vh] bg-cover bg-center animated-bg" style="background-image: url('https://source.unsplash.com/1600x900/?poultry,farm');">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent transition-all duration-1000 ease-in-out hover:from-black/50 hover:via-black/30">
+        </div>
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4 animate-float">
+            <div class="bg-white/20 backdrop-blur-lg p-6 rounded-lg shadow-lg animate-glow">
+                <div class="text-center absolute top-5 left-5 text-4xl animate-chicken">🐔</div><br>
+                <h1 class="text-3xl font-bold">Welcome to the Poultry Care System</h1>
+                <p class="text-md mt-2">Your trusted assistant for diagnosing poultry diseases and managing breed care.</p>
+                {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.register') }}" class="mt-3 px-5 py-2 bg-green-600 hover:bg-green-500 transition-colors duration-300 rounded-lg text-white font-semibold inline-block">Get Started</a>
+                {% endif %}
+            </div>
         </div>
     </div>
+    
 
-    <section class="services">
-        <div class="service">
-            <img src="https://media.istockphoto.com/id/939826450/photo/two-veterinarians-in-hen-house.webp?a=1&b=1&s=612x612&w=0&k=20&c=8Y5Go252E_iF1HbGYdPi8aoDyy-FfsUXg0JGMDmqWQs=" alt="Poultry Diagnosis">
-            <h3>Poultry Disease Diagnosis</h3>
-            <p>Identify and manage poultry diseases effectively.</p>
-        </div>
-        <div class="service">
-            <img src="https://images.unsplash.com/photo-1612170153139-6f881ff067e0?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2hpY2tlbnxlbnwwfHwwfHx8MA%3D%3D" alt="Breeds Management">
-            <h3>Breeds Management</h3>
-            <p>Learn how to care for different poultry breeds.</p>
-        </div>
-        <div class="service">
-            <img src="https://images.unsplash.com/photo-1556316918-880f9e893822?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hpY2tlbnxlbnwwfHwwfHx8MA%3D%3D" alt="Poultry Farming Tips">
-            <h3>Poultry Farming Tips</h3>
-            <p>Best practices for maximizing farm productivity.</p>
+    <section class="relative py-16 bg-white text-center">
+        <svg class="absolute top-0 left-0 w-full" viewBox="0 0 1440 320">
+            <path fill="#ffffff" fill-opacity="1" d="M0,64L40,74.7C80,85,160,107,240,112C320,117,400,107,480,128C560,149,640,203,720,218C800,233,880,203,960,181.3C1040,160,1120,144,1200,144C1280,144,1360,160,1400,168L1440,176V320H0Z"></path>
+        </svg>
+        <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 relative">
+            <div class="bg-gray-100 p-6 rounded-lg shadow-lg transition-colors duration-300 hover:bg-green-100">
+                <img class="w-full h-40 object-cover rounded-md" src="https://media.istockphoto.com/id/939826450/photo/two-veterinarians-in-hen-house.webp?a=1&b=1&s=612x612&w=0&k=20&c=8Y5Go252E_iF1HbGYdPi8aoDyy-FfsUXg0JGMDmqWQs=" alt="Poultry Diagnosis">
+                <h3 class="text-xl font-semibold mt-4">Poultry Disease Diagnosis</h3>
+                <p class="text-gray-600 mt-2">Identify and manage poultry diseases effectively.</p>
+            </div>
+            <div class="bg-gray-100 p-6 rounded-lg shadow-lg transition-colors duration-300 hover:bg-green-100">
+                <img class="w-full h-40 object-cover rounded-md" src="https://images.unsplash.com/photo-1612170153139-6f881ff067e0" alt="Breeds Management">
+                <h3 class="text-xl font-semibold mt-4">Breed Care Management</h3>
+                <p class="text-gray-600 mt-2">Learn how to care for different poultry breeds.</p>
+            </div>
+            <div class="bg-gray-100 p-6 rounded-lg shadow-lg transition-colors duration-300 hover:bg-green-100">
+                <img class="w-full h-40 object-cover rounded-md" src="https://images.unsplash.com/photo-1556316918-880f9e893822" alt="Poultry Farming Tips">
+                <h3 class="text-xl font-semibold mt-4">Poultry Farming Tips</h3>
+                <p class="text-gray-600 mt-2">Best practices for maximizing farm productivity.</p>
+            </div>
         </div>
     </section>
 
-    <section class="contact">
-        <h2>Contact Us</h2>
-        <p>Email: support@poultrycare.com</p>
+    <section class="bg-green-700 text-white text-center py-12">
+        <h2 class="text-2xl font-semibold">Contact Us</h2>
+        <p class="mt-2">Email: support@poultrycare.com</p>
         <p>Phone: +254 700 123 456</p>
         <p>Address: Nairobi, Kenya</p>
     </section>
-
 </body>
 </html>

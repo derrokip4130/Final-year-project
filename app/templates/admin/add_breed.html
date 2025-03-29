@@ -4,243 +4,176 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Breed - Poultry Care System</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 650vh;
-            background-color: #e8f5e9;
-        }
-        .form-container {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 400px;
-        }
-        h2 {
-            color: #2e7d32;
-            text-align: center;
-        }
-        label {
-            font-weight: bold;
-            color: #2e7d32;
-            display: block;
-            margin-top: 10px;
-        }
-        input, textarea, select {
-            width: 90%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #a5d6a7;
-            border-radius: 4px;
-        }
-        input:focus, textarea:focus {
-            border-color: #66bb6a;
-            outline: none;
-        }
-        button {
-            width: 100%;
-            background-color: #43a047;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            margin-top: 15px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #388e3c;
-        }
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: #1b5e20;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        .section {
-            margin-top: 15px;
-            padding: 10px;
-            border: 1px solid #a5d6a7;
-            border-radius: 5px;
-            background-color: #f1f8e9;
-        }
-        .vaccination-entry {
-            margin-bottom: 10px; /* Adds spacing between vaccinations */
-            padding: 10px;
-            border: 1px solid #a5d6a7;
-            border-radius: 5px;
-            background-color: #f1f8e9;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-green-50 flex flex-col items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
+        <h2 class="text-2xl font-semibold text-green-700 text-center mb-4">Add Breed</h2>
+        <form action="{{ url_for('main.add_breeds') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <label class="block text-green-700 font-medium">Breed Name:</label>
+            <input type="text" name="breed_name" required class="w-full p-2 border border-green-300 rounded-md focus:ring focus:ring-green-300">
+            
+            <label class="block text-green-700 font-medium">Breed Category:</label>
+            <input type="text" name="breed_category" required class="w-full p-2 border border-green-300 rounded-md focus:ring focus:ring-green-300" placeholder="Commercial or Improved Kienyeji">
 
-    <div class="form-container">
-        <h2>Add Breed</h2> 
-        <form action="{{ url_for('main.add_breeds') }}" method="POST" enctype="multipart/form-data">
-            <label for="breed_name">Breed Name:</label>
-            <input type="text" id="breed_name" name="breed_name" required>
-        
-            <div class="section">
-                <h3>Feeding & Nutrition</h3>
+            <label class="block text-green-700 font-medium">Breed Purpose:</label>
+            <input type="text" name="breed_purpose" required class="w-full p-2 border border-green-300 rounded-md focus:ring focus:ring-green-300" placeholder="Meat, Eggs or Both">
+
+            <div class="p-4 border border-green-300 rounded-lg bg-green-100">
+                <h3 class="text-lg font-medium text-green-700">Feeding & Nutrition</h3>
+                <label class="block mt-2 font-medium">Chick Feed:</label>
+                <input type="text" name="Feeding_and_Nutrition[Chick][feed_type]" placeholder="Feed Type" class="w-full p-2 border border-green-300 rounded-md">
+                <input type="text" name="Feeding_and_Nutrition[Chick][daily_quantity]" placeholder="Daily Quantity" class="w-full p-2 border border-green-300 rounded-md mt-2">
+                <input type="text" name="Feeding_and_Nutrition[Chick][schedule]" placeholder="Schedule" class="w-full p-2 border border-green-300 rounded-md mt-2">
                 
-                <label>Chick Feed:</label>
-                <input type="text" name="Feeding_and_Nutrition[Chick][feed_type]" placeholder="Feed Type">
-                <input type="text" name="Feeding_and_Nutrition[Chick][daily_quantity]" placeholder="Daily Quantity">
-                <input type="text" name="Feeding_and_Nutrition[Chick][schedule]" placeholder="Schedule">
+                <label class="block mt-2 font-medium">Grower Feed:</label>
+                <input type="text" name="Feeding_and_Nutrition[Grower][feed_type]" placeholder="Feed Type" class="w-full p-2 border border-green-300 rounded-md">
+                <input type="text" name="Feeding_and_Nutrition[Grower][daily_quantity]" placeholder="Daily Quantity" class="w-full p-2 border border-green-300 rounded-md mt-2">
+                <input type="text" name="Feeding_and_Nutrition[Grower][schedule]" placeholder="Schedule" class="w-full p-2 border border-green-300 rounded-md mt-2">
                 
-                <label>Grower Feed:</label>
-                <input type="text" name="Feeding_and_Nutrition[Grower][feed_type]" placeholder="Feed Type">
-                <input type="text" name="Feeding_and_Nutrition[Grower][daily_quantity]" placeholder="Daily Quantity">
-                <input type="text" name="Feeding_and_Nutrition[Grower][schedule]" placeholder="Schedule">
-        
-                <label>Broiler Feed:</label>
-                <input type="text" name="Feeding_and_Nutrition[Broiler][feed_type]" placeholder="Feed Type">
-                <input type="text" name="Feeding_and_Nutrition[Broiler][daily_quantity]" placeholder="Daily Quantity">
-                <input type="text" name="Feeding_and_Nutrition[Broiler][schedule]" placeholder="Schedule">
-        
-                <label>Supplementation (Comma-separated):</label>
-                <input type="text" name="Feeding_and_Nutrition[Supplementation]" placeholder="e.g. Calcium, Vitamins">
-        
-                <label>Alternative Feeds (Comma-separated):</label>
-                <input type="text" name="Feeding_and_Nutrition[Alternative_feeds]" placeholder="e.g. Groundnut cake, Fish meal">
+                <label class="block mt-2 font-medium">Broiler Feed:</label>
+                <input type="text" name="Feeding_and_Nutrition[Broiler][feed_type]" placeholder="Feed Type" class="w-full p-2 border border-green-300 rounded-md">
+                <input type="text" name="Feeding_and_Nutrition[Broiler][daily_quantity]" placeholder="Daily Quantity" class="w-full p-2 border border-green-300 rounded-md mt-2">
+                <input type="text" name="Feeding_and_Nutrition[Broiler][schedule]" placeholder="Schedule" class="w-full p-2 border border-green-300 rounded-md mt-2">
+                
+                <label class="block mt-2 font-medium">Supplementation:</label>
+                <input type="text" name="Feeding_and_Nutrition[Supplementation]" placeholder="e.g. Calcium, Vitamins" class="w-full p-2 border border-green-300 rounded-md">
             </div>
-        
-            <div class="section">
-                <h3>Housing & Environment</h3>
-                <label>Space per Bird:</label>
-                <input type="text" name="Housing_and_Environment[Space_per_bird]">
+            
+            <div class="p-4 border border-green-300 rounded-lg bg-green-100">
+                <h3 class="text-lg font-medium text-green-700">Housing & Environment</h3>
+                <label class="block mt-2 font-medium">Space per Bird:</label>
+                <input type="text" name="Housing_and_Environment[Space_per_bird]" class="w-full p-2 border border-green-300 rounded-md">
                 
-                <label>Ventilation:</label>
-                <input type="text" name="Housing_and_Environment[Ventilation]">
-        
-                <label>Temperature:</label>
-                <input type="text" name="Housing_and_Environment[Temperature]">
-        
-                <label>Humidity:</label>
-                <input type="text" name="Housing_and_Environment[Humidity]">
-        
-                <label>Biosecurity (Comma-separated):</label>
-                <input type="text" name="Housing_and_Environment[Biosecurity]" placeholder="e.g. Hygiene, Pest control">
+                <label class="block mt-2 font-medium">Ventilation:</label>
+                <input type="text" name="Housing_and_Environment[Ventilation]" class="w-full p-2 border border-green-300 rounded-md">
+                
+                <label class="block mt-2 font-medium">Temperature:</label>
+                <input type="text" name="Housing_and_Environment[Temperature]" class="w-full p-2 border border-green-300 rounded-md">
+
+                <label class="block mt-2 font-medium">Humidity:</label>
+                <input type="text" name="Housing_and_Environment[Humidity]" class="w-full p-2 border border-green-300 rounded-md">
+            
+                <label class="block mt-2 font-medium">Biosecurity measures(Comma separated values):</label>
+                <input type="text" name="Housing_and_Environment[Biosecurity]" class="w-full p-2 border border-green-300 rounded-md">
             </div>
-        
-            <div class="section">
-                <h3>Disease Prevention & Health</h3>
-                <label>Common Diseases (Comma-separated):</label>
-                <input type="text" name="Disease_Prevention_and_Health[Common_diseases]" placeholder="e.g. Newcastle Disease, Coccidiosis">
-        
-                <label>Vaccination Schedule:</label>
-                <div id="vaccination-container">
+            
+            <div class="p-4 border border-green-300 rounded-lg bg-green-100">
+                <h3 class="text-lg font-medium text-green-700">Disease Prevention & Health</h3>
+                <label class="block mt-2 font-medium">Common Diseases:</label>
+                <input type="text" name="Disease_Prevention_and_Health[Common_diseases]" placeholder="e.g. Newcastle Disease, Coccidiosis" class="w-full p-2 border border-green-300 rounded-md">
+
+                <label class="block mt-2 font-medium">Vaccination Schedule:</label>
+                <div class="vaccination-entry">
                     <div>
-                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][0][Disease]" placeholder="Disease">
-                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][0][Age]" placeholder="Age">
-                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][0][Method]" placeholder="Method">
-                    </div>
+                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][0][Disease]" placeholder="Disease" class="w-full p-2 border border-green-300 rounded-md">
+                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][0][Age]" placeholder="Age to vaccinate" class="w-full p-2 border border-green-300 rounded-md">
+                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][0][Method]" placeholder="Vaccination method" class="w-full p-2 border border-green-300 rounded-md">
+                    </div><br>
                 </div>
-                <button type="button" onclick="addVaccination()">+ Add Vaccination</button>
-        
-                <label>Signs of Illness (Comma-separated):</label>
-                <input type="text" name="Disease_Prevention_and_Health[Signs_of_illness]" placeholder="e.g. Weakness, Pale comb">
-        
-                <label>Deworming Schedule:</label>
-                <input type="text" name="Disease_Prevention_and_Health[Deworming]" placeholder="e.g. Start at 4 weeks, repeat every 8 weeks">
-            </div>
-        
-            <div class="section">
-                <h3>Breeding & Reproduction</h3>
-                <label>Best Breeding Age:</label>
-                <input type="text" name="Breeding_and_Reproduction[Best_breeding_age]" placeholder="Best age for breeding">
-                
-                <label>Egg Production:</label>
-                <input type="text" name="Breeding_and_Reproduction[Egg_production]" placeholder="Annual egg production">
-        
-                <label>Brooding Requirements:</label>
-                <input type="text" name="Breeding_and_Reproduction[Brooding_requirements]" placeholder="Special brooding needs">
-        
-                <label>Incubation Methods:</label>
-                <input type="text" name="Breeding_and_Reproduction[Incubation_methods]" placeholder="e.g. Natural or artificial">
-            </div>
-        
-            <div class="section">
-                <h3>Productivity and Economics</h3>
-                <label>Growth Rate:</label>
-                <input type="text" name="Productivity_and_Economics[Growth_rate]" placeholder="e.g. 2.8-3.5 kg in 10-12 weeks">
-                
-                <label>Egg Laying:</label>
-                <input type="text" name="Productivity_and_Economics[Egg_laying]" placeholder="High frequency">
-        
-                <label>Market Price:</label>
-                <input type="text" name="Productivity_and_Economics[Market_price]" placeholder="e.g. Good demand in local markets">
-        
-                <label>Profit Maximization (Comma-separated):</label>
-                <input type="text" name="Productivity_and_Economics[Profit_maximization]" placeholder="e.g. Efficient feeding, Disease prevention">
-            </div>
-        
-            <div class="section">
-                <h3>Breed Characteristics</h3>
-                <label>Temperament:</label>
-                <input type="text" name="Breed_Characteristics[Temperament]" placeholder="Temperament">
-        
-                <label>Farming Suitability:</label>
-                <input type="text" name="Breed_Characteristics[Farming_suitability]" placeholder="Farming Suitability">
-        
-                <label>Climate Adaptability:</label>
-                <input type="text" name="Breed_Characteristics[Climate_adaptability]" placeholder="Climate adaptability">
-        
-                <label>Special Needs:</label>
-                <input type="text" name="Breed_Characteristics[Special_needs]" placeholder="Special Needs">
+                <div id="vaccination-container"></div>
+                <button type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" onclick="addVaccination()">+Add Vaccination</button>
             </div>
 
-            <div class="section">
-                <h3>Physical Description</h3>
-            
-                <label>Body Shape:</label>
-                <input type="text" name="Physical_Description[Body_Shape]" placeholder="e.g. Medium-sized, well-proportioned body">
-            
-                <label>Feather Color & Pattern:</label>
-                <input type="text" name="Physical_Description[Feather_Color_Pattern]" placeholder="e.g. Reddish-brown with some white patches">
-            
-                <label>Comb Type:</label>
-                <input type="text" name="Physical_Description[Comb_Type]" placeholder="e.g. Single comb, medium size">
-            
-                <label>Leg Color & Features:</label>
-                <input type="text" name="Physical_Description[Leg_Color_Features]" placeholder="e.g. Yellow to light brown, sturdy legs">
-            
-                <label>Beak Shape & Color:</label>
-                <input type="text" name="Physical_Description[Beak_Shape_Color]" placeholder="e.g. Short, slightly curved, yellowish">
-            
-                <label>Wattles & Earlobes:</label>
-                <input type="text" name="Physical_Description[Wattles_Earlobes]" placeholder="e.g. Medium-sized, red">
-            
-                <label>Skin Color:</label>
-                <input type="text" name="Physical_Description[Skin_Color]" placeholder="e.g. Yellow">
-            
-                <label>Tail Shape & Size:</label>
-                <input type="text" name="Physical_Description[Tail_Shape_Size]" placeholder="e.g. Moderate length, slightly upright">
-            </div>
-            
-            <div class="section">
-                <h3>Breed Images</h3>
-                <label>Upload Images:</label>
-                <input type="file" name="breed_images" id="breed_images" multiple accept="image/*" required>
+            <div class="p-4 border border-green-300 rounded-lg bg-green-100">
+                <h3 class="text-lg font-medium text-green-700">Housing & Environment</h3>
+                <label class="block mt-2 font-medium">Space per Bird:</label>
+                <input type="text" name="Housing_and_Environment[Space_per_bird]" placeholder="e.g. 1 sq ft per bird" class="w-full p-2 border border-green-300 rounded-md">
                 
-                <div id="image-preview-container"></div>
+                <label class="block mt-2 font-medium">Ventilation:</label>
+                <input type="text" name="Housing_and_Environment[Ventilation]" placeholder="e.g. Proper airflow, mesh windows" class="w-full p-2 border border-green-300 rounded-md">
+                
+                <label class="block mt-2 font-medium">Temperature:</label>
+                <input type="text" name="Housing_and_Environment[Temperature]" placeholder="e.g. 18-24°C" class="w-full p-2 border border-green-300 rounded-md">
+            
+                <label class="block mt-2 font-medium">Humidity:</label>
+                <input type="text" name="Housing_and_Environment[Humidity]" placeholder="e.g. 50-70%" class="w-full p-2 border border-green-300 rounded-md">
+            
+                <label class="block mt-2 font-medium">Biosecurity Measures (Comma separated values):</label>
+                <input type="text" name="Housing_and_Environment[Biosecurity]" placeholder="e.g. Footbaths, restricted access, vaccination" class="w-full p-2 border border-green-300 rounded-md">
             </div>
-        
-            <button type="submit">Add Breed</button>
+            
+            <div class="p-4 border border-blue-300 rounded-lg bg-blue-100 mt-4">
+                <h3 class="text-lg font-medium text-blue-700">Breeding & Reproduction</h3>
+                <label class="block mt-2 font-medium">Best Breeding Age:</label>
+                <input type="text" name="Breeding_and_Reproduction[Best_breeding_age]" placeholder="e.g. 6-8 months" class="w-full p-2 border border-blue-300 rounded-md">
+                
+                <label class="block mt-2 font-medium">Egg Production:</label>
+                <input type="text" name="Breeding_and_Reproduction[Egg_production]" placeholder="e.g. 250 eggs per year" class="w-full p-2 border border-blue-300 rounded-md">
+            
+                <label class="block mt-2 font-medium">Brooding Requirements:</label>
+                <input type="text" name="Breeding_and_Reproduction[Brooding_requirements]" placeholder="e.g. Heat lamps needed for chicks" class="w-full p-2 border border-blue-300 rounded-md">
+            
+                <label class="block mt-2 font-medium">Incubation Methods:</label>
+                <input type="text" name="Breeding_and_Reproduction[Incubation_methods]" placeholder="e.g. Natural or artificial incubation" class="w-full p-2 border border-blue-300 rounded-md">
+            </div>
+            
+            <div class="p-4 border border-yellow-300 rounded-lg bg-yellow-100 mt-4">
+                <h3 class="text-lg font-medium text-yellow-700">Productivity & Economics</h3>
+                <label class="block mt-2 font-medium">Growth Rate:</label>
+                <input type="text" name="Productivity_and_Economics[Growth_rate]" placeholder="e.g. 2 kg in 10 weeks" class="w-full p-2 border border-yellow-300 rounded-md">
+                
+                <label class="block mt-2 font-medium">Egg Laying:</label>
+                <input type="text" name="Productivity_and_Economics[Egg_laying]" placeholder="e.g. 5 eggs per week" class="w-full p-2 border border-yellow-300 rounded-md">
+            
+                <label class="block mt-2 font-medium">Market Price:</label>
+                <input type="text" name="Productivity_and_Economics[Market_price]" placeholder="e.g. $10 per bird" class="w-full p-2 border border-yellow-300 rounded-md">
+            
+                <label class="block mt-2 font-medium">Profit Maximization (Comma-separated values):</label>
+                <input type="text" name="Productivity_and_Economics[Profit_maximization]" placeholder="e.g. Low feed cost, high yield" class="w-full p-2 border border-yellow-300 rounded-md">
+            </div>
+            
+            <div class="p-4 border border-purple-300 rounded-lg bg-purple-100 mt-4">
+                <h3 class="text-lg font-medium text-purple-700">Breed Characteristics</h3>
+                <label class="block mt-2 font-medium">Temperament:</label>
+                <input type="text" name="Breed_Characteristics[Temperament]" placeholder="e.g. Docile, aggressive" class="w-full p-2 border border-purple-300 rounded-md">
+                
+                <label class="block mt-2 font-medium">Farming Suitability:</label>
+                <input type="text" name="Breed_Characteristics[Farming_suitability]" placeholder="e.g. Free-range, commercial" class="w-full p-2 border border-purple-300 rounded-md">
+            
+                <label class="block mt-2 font-medium">Climate Adaptability:</label>
+                <input type="text" name="Breed_Characteristics[Climate_adaptability]" placeholder="e.g. Cold-resistant" class="w-full p-2 border border-purple-300 rounded-md">
+            
+                <label class="block mt-2 font-medium">Special Needs:</label>
+                <input type="text" name="Breed_Characteristics[Special_needs]" placeholder="e.g. Extra protein diet" class="w-full p-2 border border-purple-300 rounded-md">
+            </div>
+
+            <div class="p-4 border border-green-300 rounded-lg bg-green-100 mt-4">
+                <h3 class="text-lg font-medium text-green-700">Physical Description</h3>
+                <label class="block mt-2 font-medium">Body Shape:</label>
+                <input type="text" name="Physical_Description[Body_Shape]" class="w-full p-2 border border-green-300 rounded-md" placeholder="e.g. Medium-sized, well-proportioned body">
+            
+                <label class="block mt-2 font-medium">Feather Color & Pattern:</label>
+                <input type="text" name="Physical_Description[Feather_Color_Pattern]" class="w-full p-2 border border-green-300 rounded-md" placeholder="e.g. Reddish-brown with some white patches">
+            
+                <label class="block mt-2 font-medium">Comb Type:</label>
+                <input type="text" name="Physical_Description[Comb_Type]" class="w-full p-2 border border-green-300 rounded-md" placeholder="e.g. Single comb, medium size">
+            
+                <label class="block mt-2 font-medium">Leg Color & Features:</label>
+                <input type="text" name="Physical_Description[Leg_Color_Features]" class="w-full p-2 border border-green-300 rounded-md" placeholder="e.g. Yellow to light brown, sturdy legs">
+            
+                <label class="block mt-2 font-medium">Beak Shape & Color:</label>
+                <input type="text" name="Physical_Description[Beak_Shape_Color]" class="w-full p-2 border border-green-300 rounded-md" placeholder="e.g. Short, slightly curved, yellowish">
+            
+                <label class="block mt-2 font-medium">Wattles & Earlobes:</label>
+                <input type="text" name="Physical_Description[Wattles_Earlobes]" class="w-full p-2 border border-green-300 rounded-md" placeholder="e.g. Medium-sized, red">
+            
+                <label class="block mt-2 font-medium">Skin Color:</label>
+                <input type="text" name="Physical_Description[Skin_Color]" class="w-full p-2 border border-green-300 rounded-md" placeholder="e.g. Yellow">
+            
+                <label class="block mt-2 font-medium">Tail Shape & Size:</label>
+                <input type="text" name="Physical_Description[Tail_Shape_Size]" class="w-full p-2 border border-green-300 rounded-md" placeholder="e.g. Moderate length, slightly upright">
+            </div>
+            
+            <div class="p-4 border border-green-300 rounded-lg bg-green-100">
+                <h3 class="text-lg font-medium text-green-700">Breed Images</h3>
+                <label class="block mt-2 font-medium">Upload Images:</label>
+                <input type="file" name="breed_images" id="breed_images" multiple accept="image/*" required class="w-full p-2 border border-green-300 rounded-md">
+            </div>
+            
+            <button type="submit" class="w-full bg-green-600 text-white font-semibold p-3 rounded-lg hover:bg-green-700 transition">Add Breed</button>
         </form>
+    </div>
         
         <script>
             document.querySelector("form").addEventListener("submit", function(event) {
@@ -254,14 +187,15 @@
                 let container = document.getElementById("vaccination-container");
                 let index = container.children.length;
                 let div = document.createElement("div");
-                div.className = "vaccination-entry";
+                div.className = "vaccination-entry mt-2 p-2 border border-green-300 rounded-md bg-white";
                 div.innerHTML = `
-                    <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][${index}][Disease]" placeholder="Disease">
-                    <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][${index}][Age]" placeholder="Age">
-                    <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][${index}][Method]" placeholder="Method">
+                    <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][${index}][Disease]" placeholder="Disease" class="w-full p-2 border border-green-300 rounded-md">
+                    <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][${index}][Age]" placeholder="Age to vaccinate" class="w-full p-2 border border-green-300 rounded-md mt-2">
+                    <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][${index}][Method]" placeholder="Vaccination method" class="w-full p-2 border border-green-300 rounded-md mt-2">
                 `;
                 container.appendChild(div);
             }
+
             document.getElementById("breed_images").addEventListener("change", function(event) {
                 let previewContainer = document.getElementById("image-preview-container");
                 previewContainer.innerHTML = ""; // Clear previous previews

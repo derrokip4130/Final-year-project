@@ -4,83 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Poultry Care System</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #2e7d32;
-            color: white;
-            padding-top: 20px;
-            position: fixed;
-            height: 100%;
-        }
-        .sidebar a {
-            display: block;
-            color: white;
-            padding: 15px;
-            text-decoration: none;
-            font-size: 18px;
-        }
-        .sidebar a:hover {
-            background-color: #388e3c;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            width: calc(100% - 250px);
-            background: #e8f5e9;
-            height: 100vh;
-        }
-        .header {
-            background: white;
-            padding: 15px;
-            border-bottom: 2px solid #2e7d32;
-        }
-        .cards {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            flex: 1;
-            text-align: center;
-        }
-        .card h3 {
-            color: #2e7d32;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="flex h-screen bg-green-50">
+    <!-- Sidebar -->
     {% block navbar %}
-    {% include 'admin/admin_navbar.html' %}
-{% endblock %}
-    <div class="content">
-        <div class="header">
-            <h1>Welcome {{current_user.username}}</h1>
+        {% include 'admin/admin_navbar.html' %}
+    {% endblock %}
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 p-6">
+        <header class="bg-white p-4 shadow-md rounded-md mb-5 border-b-4 border-green-700">
+            <h1 class="text-xl font-semibold">Welcome {{current_user.username}}</h1>
+        </header>
+
+        <!-- Cards Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <h3 class="text-lg font-bold text-green-700">Total Users</h3>
+                <p class="text-2xl font-semibold">{{user_count}}</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <h3 class="text-lg font-bold text-green-700">Disease Reports</h3>
+                <p class="text-2xl font-semibold">{{disease_count}}</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <h3 class="text-lg font-bold text-green-700">Breeds Managed</h3>
+                <p class="text-2xl font-semibold">{{breed_count}}</p>
+            </div>
         </div>
-        <div class="cards">
-            <div class="card">
-                <h3>Total Users</h3>
-                <p>{{user_count}}</p>
-            </div>
-            <div class="card">
-                <h3>Disease Reports</h3>
-                <p>{{disease_count}}</p>
-            </div>
-            <div class="card">
-                <h3>Breeds Managed</h3>
-                <p>{{breed_count}}</p>
-            </div>
-        </div>
-    </div>
+    </main>
 </body>
 </html>

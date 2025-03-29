@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ disease.disease_name }} - Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold text-green-700 text-center">{{ disease.disease_name }}</h1>
+
+        <div class="mt-6">
+            <p class="text-gray-700 mt-2">{{ disease.disease_description or 'No known causes.' }}</p>
+        </div>
+
+        <div class="mt-6">
+            <h2 class="text-xl font-semibold text-green-700">Causes</h2>
+            <p class="text-gray-700 mt-2">{{ disease.causes or 'No known causes.' }}</p>
+        </div>
+
+        <div class="mt-6">
+            <h2 class="text-xl font-semibold text-green-700">Symptoms</h2>
+            <ul class="list-disc list-inside mt-2">
+                {% for symptom in disease.symptoms %}
+                    <li class="text-gray-700">{{ symptom.symptom_name }}</li>
+                {% else %}
+                    <li class="text-gray-500">No symptoms listed.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mt-6 text-center">
+            <a href="/" class="text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

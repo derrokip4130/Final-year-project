@@ -4,165 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
-    <style>
-         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #2e7d32;
-            color: white;
-            padding-top: 20px;
-            position: fixed;
-            height: 100%;
-        }
-        .sidebar a {
-            display: block;
-            color: white;
-            padding: 15px;
-            text-decoration: none;
-            font-size: 18px;
-        }
-        .sidebar a:hover {
-            background-color: #388e3c;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            width: calc(100% - 250px);
-            background: #e8f5e9;
-            height: 100vh;
-            transition: margin-left 0.3s ease, width 0.3s ease;
-        }
-        .sidebar.collapsed + .content {
-            margin-left: 60px;
-            width: calc(100% - 60px);
-        }
-        .header {
-            background: white;
-            padding: 15px;
-            border-bottom: 2px solid #2e7d32;
-        }
-        .cards {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            flex: 1;
-            text-align: center;
-        }
-        .card h3 {
-            color: #2e7d32;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #2e7d32;
-            color: white;
-        }
-        .no-data {
-            text-align: center;
-            font-size: 18px;
-            color: #777;
-            margin-top: 20px;
-        }
-        td a {
-            text-decoration: none;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-    <body>
-        {% block navbar %}
-            {% include 'admin/admin_navbar.html' %}
-        {% endblock %}
-        <div class="content">
-            <div class="header">
-                <h1>{{ user.username }}</h1>
-            </div>
+<body class="flex h-screen bg-green-100">
+    {% block navbar %}
+        {% include 'admin/admin_navbar.html' %}
+    {% endblock %}
     
-            <h2>User Profile</h2>
-            <table>
-                <tr>
-                    <th>Username</th>
-                    <td>{{ user.username }}</td>
+    <div class="ml-64 flex-1 p-6">
+        <div class="bg-white p-4 border-b-2 border-green-700 shadow-md">
+            <h1 class="text-xl font-semibold">{{ user.username }}</h1>
+        </div>
+
+        <h2 class="text-2xl font-bold mt-6">User Profile</h2>
+        <div class="overflow-x-auto bg-white p-6 rounded-lg shadow-md mt-4">
+            <table class="w-full border-collapse border border-gray-300">
+                <tr class="bg-green-700 text-white">
+                    <th class="p-3 border">Field</th>
+                    <th class="p-3 border">Value</th>
                 </tr>
-                <tr>
-                    <th>Email</th>
-                    <td>{{ user.email if current_user.user_id == user.user_id or current_user.user_role == 'admin' else 'Hidden' }}</td>
+                <tr class="border">
+                    <td class="p-3 border font-semibold">Username</td>
+                    <td class="p-3 border">{{ user.username }}</td>
                 </tr>
-                <tr>
-                    <th>Phone Number</th>
-                    <td>{{ user.phone_num if current_user.user_id == user.user_id or current_user.user_role == 'admin' else 'Hidden' }}</td>
+                <tr class="border">
+                    <td class="p-3 border font-semibold">Email</td>
+                    <td class="p-3 border">{{ user.email if current_user.user_id == user.user_id or current_user.user_role == 'admin' else 'Hidden' }}</td>
                 </tr>
-                <tr>
-                    <th>Location</th>
-                    <td>{{ user.location if current_user.user_id == user.user_id else 'Hidden' }}</td>
+                <tr class="border">
+                    <td class="p-3 border font-semibold">Phone Number</td>
+                    <td class="p-3 border">{{ user.phone_num if current_user.user_id == user.user_id or current_user.user_role == 'admin' else 'Hidden' }}</td>
                 </tr>
-    
-                <!-- Admin-only fields -->
+                <tr class="border">
+                    <td class="p-3 border font-semibold">Location</td>
+                    <td class="p-3 border">{{ user.location if current_user.user_id == user.user_id else 'Hidden' }}</td>
+                </tr>
                 {% if current_user.user_role == 'admin' %}
-                <tr>
-                    <th>Created At</th>
-                    <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') if user.created_at else 'N/A' }}</td>
+                <tr class="border">
+                    <td class="p-3 border font-semibold">Created At</td>
+                    <td class="p-3 border">{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') if user.created_at else 'N/A' }}</td>
                 </tr>
-                <tr>
-                    <th>Last Login</th>
-                    <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else 'Never' }}</td>
+                <tr class="border">
+                    <td class="p-3 border font-semibold">Last Login</td>
+                    <td class="p-3 border">{{ user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else 'Never' }}</td>
                 </tr>
-                <tr>
-                    <th>Active</th>
-                    <td>{{ "Yes" if user.is_active else "No" }}</td>
+                <tr class="border">
+                    <td class="p-3 border font-semibold">Active</td>
+                    <td class="p-3 border">{{ "Yes" if user.is_active else "No" }}</td>
                 </tr>
                 {% endif %}
             </table>
-    
-            <!-- Buttons Section -->
-            <div style="margin-top: 20px; margin-right: 10px;">
-                {% if current_user.user_id == user.user_id %}
-                    <a href="{{ url_for('main.update_user', user_id=user.user_id) }}">
-                       <button type="button" 
-                            style="padding: 10px 15px; background: #0288d1; color: white; border: none; border-radius: 5px; cursor: pointer;margin-right: 20px;">
-                        Update profile
-                    </button>
-                    </a>
-                {% endif %}
-                {% if current_user.user_role == 'admin' and current_user.user_id != user.user_id %}
-                <form id="delete-form" method="POST" action="{{ url_for('main.delete_user', user_id=user.user_id) }}" 
-                      style="display: inline;">
-                    <button type="button" onclick="confirmDelete()" 
-                            style="padding: 10px 15px; background: #d32f2f; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        </div>
+
+        <div class="mt-6">
+            {% if current_user.user_id == user.user_id %}
+                <a href="{{ url_for('main.update_user', user_id=user.user_id) }}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow mr-4">
+                    Update Profile
+                </a>
+            {% endif %}
+            {% if current_user.user_role == 'admin' and current_user.user_id != user.user_id %}
+                <form id="delete-form" method="POST" action="{{ url_for('main.delete_user', user_id=user.user_id) }}" class="inline">
+                    <button type="button" onclick="confirmDelete()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded shadow">
                         Delete User
-                    </button>
+                    </button><br><br>
                 </form>
             {% endif %}
-            </div>
         </div>
-        <script>
-            function confirmDelete() {
-                let confirmAction = confirm("Are you sure you want to delete this account? This action cannot be undone.");
-                if (confirmAction) {
-                    document.getElementById("delete-form").submit();
-                }
+    </div>
+
+    <script>
+        function confirmDelete() {
+            let confirmAction = confirm("Are you sure you want to delete this account? This action cannot be undone.");
+            if (confirmAction) {
+                document.getElementById("delete-form").submit();
             }
-            
-        </script>
-    </body>
+        }
+    </script>
+</body>
 </html>
