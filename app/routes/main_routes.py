@@ -118,10 +118,11 @@ def add_disease():
         )
         
         # Add symptoms if selected
+        symptom_ids = request.form.get('symptoms')
         if symptom_ids:
+            symptom_ids = symptom_ids.split(",")  # Convert the comma-separated string to a list
             symptoms = Symptom.query.filter(Symptom.symptom_id.in_(symptom_ids)).all()
             new_disease.symptoms.extend(symptoms)
-
         db.session.add(new_disease)
         db.session.commit()
 
@@ -160,10 +161,9 @@ def disease_page(disease_id):
 
     return render_template("admin/disease_page.html",disease=disease)
 
-@main_blueprint.route("/update_disease/<disease_id>",methods=["GET","POST"])
+@main_blueprint.route("/update_disease/<disease_id>", methods=["GET", "POST"])
 @login_required
 def update_disease(disease_id):
-
     disease = Disease.query.filter_by(disease_id=disease_id).first()
     symptoms = Symptom.query.all()
 
@@ -171,8 +171,12 @@ def update_disease(disease_id):
         disease.disease_name = request.form.get('disease_name')
         disease.disease_description = request.form.get('disease_description')
         disease.causes = request.form.get('causes')
-        updated_symptom_ids = request.form.getlist('symptoms')  # List of selected symptoms
-        
+
+        # Fetch symptom IDs and split into a list
+        updated_symptom_ids = request.form.get('symptoms')
+        updated_symptom_ids = updated_symptom_ids.split(",") if updated_symptom_ids else []
+
+
         # Clear existing symptoms to avoid duplicates
         disease.symptoms.clear()
 
@@ -187,7 +191,8 @@ def update_disease(disease_id):
         except:
             db.session.rollback()
 
-    return render_template("admin/update_disease.html",disease=disease,symptoms=symptoms)
+    return render_template("admin/update_disease.html", disease=disease, symptoms=symptoms)
+
 
 @main_blueprint.route("/delete_disease/<disease_id>", methods=["GET","POST"])
 @login_required
@@ -232,6 +237,8 @@ def add_breeds():
 
     if request.method == 'POST':
         breed_name = request.form.get('breed_name')
+        breed_purpose = request.form.get("breed_purpose")
+        breed_category = request.form.get("breed_category")
 
         if "breed_images" not in request.files:
             return jsonify({"error": "No file uploaded"}), 400
@@ -323,6 +330,8 @@ def add_breeds():
         new_breed = Breed(
             breed_id=Breed.generate_breed_id(),
             breed_name=breed_name,
+            breed_purpose = breed_purpose,
+            breed_category = breed_category,
             feeding_nutrition=feeding_nutrition,
             housing_environment=housing_environment,
             disease_prevention_health=disease_prevention_health,
@@ -389,6 +398,8 @@ def update_breed(breed_id):
 
     if request.method == "POST":
         breed.breed_name = request.form.get("breed_name")
+        breed.breed_purpose = request.form.get("breed_purpose")
+        breed.breed_category = request.form.get("breed_category")
 
         # Feeding and Nutrition
         breed.feeding_nutrition = {
@@ -500,11 +511,16 @@ def update_breed(breed_id):
 
     return render_template("admin/update_breeds.html", breed=breed)
 
+@main_blueprint.route('/disease_details/<disease_id>',methods=["GET"])
+@login_required
+def disease_details_page(disease_id):
+    disease = Disease.query.filter_by(disease_id=disease_id).first()
 
+    return render_template("disease_details.html",disease=disease)
 
 @main_blueprint.route("/breed_queries", methods=["GET","POST"])
 @login_required
-def breed_queries():
+def breed_queries_page():
     breeds = Breed.query.all()
     chats = Chat.query.filter_by(user_id=current_user.user_id).all()
 
@@ -512,7 +528,7 @@ def breed_queries():
 
 @main_blueprint.route("/disease_diagnosis", methods=["GET","POST"])
 @login_required
-def disease_diagnosis():
+def disease_diagnosis_page():
 
     return render_template("disease_diagnosis.html")
 
@@ -572,6 +588,36 @@ def get_breed_data(breed_name):
 
     except Exception as e:
         return jsonify({"error": "An unexpected error occurred", "details": str(e)}), 500
+
+@main_blueprint.route('/search_disease/<symptom_name>', methods=["GET"])
+def get_disease(symptom_name):
+    if not symptom_name:
+        return jsonify({'error': 'No symptom provided'}), 400
+    
+    # Search for symptoms matching the input
+    symptom = Symptom.query.filter(Symptom.symptom_name.ilike(f"%{symptom_name}%")).first()
+    
+    if not symptom:
+        return jsonify({'message': 'No diseases found for the given symptom'}), 404
+    
+    # Retrieve diseases associated with the found symptom
+    diseases = symptom.diseases.all()
+    
+    if not diseases:
+        return jsonify({'message': 'No diseases found for the given symptom'}), 404
+    
+    # Format the response
+    result = [{
+        'disease_id': disease.disease_id,
+        'disease_name': disease.disease_name,
+        'disease_description': disease.disease_description,
+        'causes': disease.causes,
+        'prevention_tips': disease.disease_prevention_tips,
+        'last_updated': disease.last_updated.strftime('%Y-%m-%d %H:%M:%S'),
+        'symptoms': [s.symptom_name for s in disease.symptoms]  # Include all symptoms linked to the disease
+    } for disease in diseases]
+    
+    return jsonify({'diseases': result}), 200
 
 @main_blueprint.route("/get_chat_response", methods=["POST"])
 @login_required
