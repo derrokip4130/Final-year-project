@@ -529,8 +529,9 @@ def breed_queries_page():
 @main_blueprint.route("/disease_diagnosis", methods=["GET","POST"])
 @login_required
 def disease_diagnosis_page():
-
-    return render_template("disease_diagnosis.html")
+    symptoms = Symptom.query.all()
+    
+    return render_template("disease_diagnosis.html",symptoms=symptoms)
 
 @main_blueprint.route("/get_breed_data/<breed_name>", methods=["GET"])
 #@login_required
