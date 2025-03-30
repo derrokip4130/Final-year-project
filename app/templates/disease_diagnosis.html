@@ -12,55 +12,72 @@
     {% endblock %}<br>
     <div class="mt-10 flex justify-start w-4/5 ml-10">
         <!-- Symptom Selection Box -->
-        <div class="bg-white p-6 rounded-lg shadow-lg w-3/4">  <!-- Increased width -->
+        <div class="bg-white p-6 rounded-lg shadow-lg w-3/4">
             <h2 class="text-center text-2xl font-bold text-green-700">Select Symptoms</h2>
             <label class="block mt-4 text-lg" for="symptom-select">Symptoms:</label>
             <select id="symptom-select" class="w-full p-2 mt-2 border rounded-md" onchange="addSymptom(this.value)">
                 <option value="" disabled selected>Select a symptom</option>
+                {% for symptom in symptoms %}
+                    <option value="{{ symptom.symptom_name }}">{{ symptom.symptom_name }}</option>
+                {% endfor %}
             </select>
             <div id="selected-symptoms" class="mt-4 hidden"></div>
             <button onclick="diagnose()" class="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-semibold">Diagnose</button>
-            <h3 class="text-center text-2xl font-bold text-green-700">Upload Image for Diagnosis</h3>
-            <input type="file" id="image-upload" accept="image/*" class="w-full border p-2 rounded-md mt-2">
-            <button onclick="analyzeImage()" class="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-semibold">Analyze Image</button>
-            <div id="image_result" class="mt-4 text-center"></div>
         </div>
-        
+    
         <!-- Diagnosis Result Box -->
-        <div id="diagnosis-box" class="bg-white p-6 rounded-lg shadow-lg w-3/4 ml-5">  <!-- Increased width -->
+        <div id="diagnosis-box" class="bg-white p-6 rounded-lg shadow-lg w-3/4 ml-5 hidden">
             <h2 class="text-center text-2xl font-bold text-green-700">Diagnosis Result</h2>
             <div id="diagnosis_result" class="mt-4 text-center"></div>
         </div>
     </div>
+    
+    <!-- Past Diagnoses Section -->
+    <div class="w-4/5 ml-10 mt-10 bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-green-700 flex justify-between items-center">
+            Past Diagnoses
+            <button onclick="togglePastDiagnoses()" class="text-green-600 font-semibold">[Toggle]</button>
+        </h2>
+        <ul id="past_diagnoses" class="mt-4"></ul>
+    </div>
+    
+    <!-- Disease Details Modal -->
+    <div id="disease-details" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-1/2 relative">
+            <button onclick="closeDiseaseDetails()" class="absolute top-2 right-2 text-red-600 font-bold text-xl">&times;</button>
+            <h2 class="text-2xl font-bold text-green-700">Disease Details</h2>
+            <p id="disease-info" class="mt-4"></p>
+        </div>
+    </div><br>
 
     <script>
-        const symptomsList = ["Coughing", "Sneezing", "Fever", "Swelling", "Lethargy", "Loss of appetite", "Diarrhea", "Watery eyes"];
         let selectedSymptoms = [];
         const diseases = [
-            { name: "Infectious Coryza", symptoms: ["Coughing", "Sneezing", "Swelling", "Watery eyes"] },
-            { name: "Avian Influenza", symptoms: ["Coughing", "Fever", "Lethargy", "Loss of appetite"] },
-            { name: "Newcastle Disease", symptoms: ["Diarrhea", "Fever", "Lethargy", "Sneezing"] }
+            { 
+                name: "Infectious Coryza", 
+                symptoms: ["coughing", "sneezing", "swelling of the face", "watery eyes"], 
+                details: "Infectious Coryza is a bacterial disease that causes swelling and nasal discharge in poultry."
+            },
+            { 
+                name: "Avian Influenza", 
+                symptoms: ["coughing", "fever", "lethargy", "Loss of appetite"], 
+                details: "Avian Influenza (Bird Flu) is a viral infection that affects multiple species, including poultry."
+            },
+            { 
+                name: "Newcastle Disease", 
+                symptoms: ["diarrhea", "fever", "lethargy", "sneezing"], 
+                details: "Newcastle Disease is a viral disease causing respiratory issues, nervous signs, and digestive disorders."
+            }
         ];
 
-        // Populate the dropdown
-        const symptomSelect = document.getElementById("symptom-select");
-        symptomsList.forEach(symptom => {
-            let option = document.createElement("option");
-            option.value = symptom;
-            option.textContent = symptom;
-            symptomSelect.appendChild(option);
-        });
+        // Load past diagnoses from local storage
+        document.addEventListener("DOMContentLoaded", loadPastDiagnoses);
 
         function addSymptom(symptom) {
             if (!selectedSymptoms.includes(symptom) && symptom !== "") {
                 selectedSymptoms.push(symptom);
                 updateSelectedSymptoms();
             }
-        }
-
-        function removeSymptom(symptom) {
-            selectedSymptoms = selectedSymptoms.filter(s => s !== symptom);
-            updateSelectedSymptoms();
         }
 
         function updateSelectedSymptoms() {
@@ -86,23 +103,71 @@
             });
         }
 
+        function removeSymptom(symptom) {
+            selectedSymptoms = selectedSymptoms.filter(s => s !== symptom);
+            updateSelectedSymptoms();
+        }
+
         function diagnose() {
             if (selectedSymptoms.length === 0) {
                 alert("Please select at least one symptom.");
                 return;
             }
+            
             document.getElementById("diagnosis-box").classList.remove("hidden");
             document.getElementById("diagnosis_result").innerHTML = "<p class='text-gray-600'>Analyzing symptoms...</p>";
+            
             setTimeout(() => {
                 let results = diseases.map(disease => {
                     const matchedSymptoms = selectedSymptoms.filter(symptom => disease.symptoms.includes(symptom));
                     const probability = (matchedSymptoms.length / disease.symptoms.length) * 100;
                     return { name: disease.name, probability: probability.toFixed(1) };
                 }).filter(result => result.probability > 0);
+                
                 document.getElementById("diagnosis_result").innerHTML = results.length > 0 
-                    ? results.map(result => `<p class='text-green-700 font-semibold'>${result.name}: ${result.probability}%</p>`).join(" ") 
+                    ? results.map(result => `<p class='text-green-700 font-semibold cursor-pointer' onclick="showDiseaseDetails('${result.name}')">${result.name}: ${result.probability}%</p>`).join(" ") 
                     : "No matching diseases found.";
+
+                saveDiagnosis(results);
+                loadPastDiagnoses();
             }, 2000);
+        }
+
+        function saveDiagnosis(results) {
+            let pastDiagnoses = JSON.parse(localStorage.getItem("past_diagnoses")) || [];
+            pastDiagnoses.push({ symptoms: [...selectedSymptoms], results, date: new Date().toLocaleString() });
+            localStorage.setItem("past_diagnoses", JSON.stringify(pastDiagnoses));
+        }
+
+        function loadPastDiagnoses() {
+            let pastDiagnoses = JSON.parse(localStorage.getItem("past_diagnoses")) || [];
+            const container = document.getElementById("past_diagnoses");
+            container.innerHTML = pastDiagnoses.length ? "" : "<p class='text-gray-500'>No past diagnoses found.</p>";
+            
+            pastDiagnoses.forEach((entry, index) => {
+                const li = document.createElement("li");
+                li.classList.add("border-b", "py-2", "text-gray-700");
+                li.innerHTML = `🕒 <strong>${entry.date}</strong> - Symptoms: ${entry.symptoms.join(", ")}<br>` +
+                    entry.results.map(res => `<span class="text-green-700 cursor-pointer" onclick="showDiseaseDetails('${res.name}')">${res.name}: ${res.probability}%</span>`).join(" ");
+                container.appendChild(li);
+            });
+        }
+
+        function togglePastDiagnoses() {
+            const section = document.getElementById("past_diagnoses");
+            section.classList.toggle("hidden");
+        }
+
+        function showDiseaseDetails(diseaseName) {
+            const disease = diseases.find(d => d.name === diseaseName);
+            if (disease) {
+                document.getElementById("disease-info").innerHTML = `<strong>${disease.name}:</strong> ${disease.details}`;
+                document.getElementById("disease-details").classList.remove("hidden");
+            }
+        }
+
+        function closeDiseaseDetails() {
+            document.getElementById("disease-details").classList.add("hidden");
         }
     </script>
 </body>
