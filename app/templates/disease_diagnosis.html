@@ -6,15 +6,13 @@
     <title>Disease Diagnosis</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-green-50 flex">
-    <div class="w-64 bg-green-700 text-white p-4 fixed h-full">
-        <a href="/home" class="block text-center text-xl font-bold py-4 bg-green-800 hover:bg-green-600 rounded">🏠 Home</a>
-        <h2 class="text-lg font-semibold text-center mt-4">Diagnosis History</h2>
-    </div>
-    
-    <div class="ml-72 mt-10 w-4/5 flex justify-between">
-        <!-- Symptom Selection -->
-        <div class="bg-white p-6 rounded-lg shadow-lg">
+<body class="bg-green-50 flex flex-col">
+    {% block navbar %}
+        {% include 'user_navbar.html' %}
+    {% endblock %}<br>
+    <div class="mt-10 flex justify-start w-4/5 ml-10">
+        <!-- Symptom Selection Box -->
+        <div class="bg-white p-6 rounded-lg shadow-lg w-3/4">  <!-- Increased width -->
             <h2 class="text-center text-2xl font-bold text-green-700">Select Symptoms</h2>
             <label class="block mt-4 text-lg" for="symptom-select">Symptoms:</label>
             <select id="symptom-select" class="w-full p-2 mt-2 border rounded-md" onchange="addSymptom(this.value)">
@@ -28,8 +26,8 @@
             <div id="image_result" class="mt-4 text-center"></div>
         </div>
         
-        <!-- Diagnosis Result (Initially Hidden) -->
-        <div id="diagnosis-box" class="bg-white p-6 rounded-lg shadow-lg w-1/2 hidden">
+        <!-- Diagnosis Result Box -->
+        <div id="diagnosis-box" class="bg-white p-6 rounded-lg shadow-lg w-3/4 ml-5">  <!-- Increased width -->
             <h2 class="text-center text-2xl font-bold text-green-700">Diagnosis Result</h2>
             <div id="diagnosis_result" class="mt-4 text-center"></div>
         </div>
