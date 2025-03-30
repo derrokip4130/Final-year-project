@@ -1,6 +1,30 @@
+<style>
+    nav a {
+        transition: background-color 0.3s ease, color 0.3s ease;
+        padding: 8px 12px;
+        border-radius: 5px;
+    }
+
+    nav a:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: #f0f0f0;
+    }
+    nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
 <nav class="bg-green-700 text-white p-4 flex justify-between items-center">
-    <a href="/home" class="text-lg font-bold">🏠 Home</a>
-    <div class="flex-1 flex justify-center space-x-4">
+    <a href="{{ url_for('main.home') }}" class="{% if request.endpoint == 'main.home' %}bg-white text-green-700{% endif %} hover:underline">🏠 Home</a>
+
+    <!-- Hamburger Menu -->
+    <button id="menu-btn" class="lg:hidden focus:outline-none">
+        ☰
+    </button>
+
+    <div id="nav-links" class="hidden lg:flex flex-1 justify-center space-x-4">
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('main.breed_queries_page') }}" class="hover:underline">Breed Query</a>
             <a href="{{ url_for('main.disease_diagnosis_page') }}" class="hover:underline">Disease Diagnosis</a>
@@ -11,3 +35,10 @@
         {% endif %}
     </div>
 </nav>
+<script>
+        document.getElementById("menu-btn").addEventListener("click", function() {
+        let navLinks = document.getElementById("nav-links");
+        navLinks.classList.toggle("hidden");
+    });
+</script>
+
