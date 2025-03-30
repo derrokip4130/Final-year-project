@@ -83,7 +83,8 @@ class Disease(db.Model):
 
     disease_id = db.Column(db.String(10), primary_key=True)
     disease_name = db.Column(db.String(50), nullable=False)
-    disease_description = db.Column(db.String(100), nullable=True)
+    disease_description = db.Column(db.Text, nullable=True)
+    disease_prevention_tips = db.Column(db.Text, nullable=True)
     causes = db.Column(db.String(255), nullable=True)  # Causes of the disease
     last_updated = db.Column(db.DateTime, default=datetime.now(eat_tz), onupdate=datetime.now(eat_tz))
     created_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
@@ -111,8 +112,8 @@ class Breed(db.Model):
     breed_images = db.relationship('Image', backref='breed', lazy=True, cascade="all, delete-orphan")
     breed_physical_description = db.Column(JSONB, nullable=True)
     breed_characteristics = db.Column(JSONB)
-    breed_purpose = db.Column(db.String(10))
-    breed_category = db.Column(db.String(10))
+    breed_purpose = db.Column(db.String(50))
+    breed_category = db.Column(db.String(50))
     feeding_nutrition = db.Column(JSONB)
     housing_environment = db.Column(JSONB)
     disease_prevention_health = db.Column(JSONB)
