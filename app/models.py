@@ -184,22 +184,82 @@ class Chat(db.Model):
     
 class Image(db.Model):
 
-     image_id = db.Column(db.String(10), primary_key=True)
-     image_url = db.Column(db.String(255))
-     uploaded_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
+    image_id = db.Column(db.String(10), primary_key=True)
+    image_url = db.Column(db.String(255))
+    uploaded_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
 
-     breed_id = db.Column(db.String(5), db.ForeignKey('breed.breed_id'), nullable=False)
+    breed_id = db.Column(db.String(5), db.ForeignKey('breed.breed_id'), nullable=True)
+    disease_id = db.Column(db.String(5), db.ForeignKey('diseases.disease_id'), nullable=True)
+    diagnosis_id = db.Column(db.String(5), db.ForeignKey('diagnosis.diagnosis_id'), nullable=True)
+    
+    def __repr__(self):
+        if self.breed_id:
+            foreign_id = self.breed_id
+        elif self.disease_id:
+            foreign_id = self.disease_id 
+        else:
+            foreign_id = self.diagnosis_id
+        return f"{self.image_id} - {foreign_id}"
  
-     def __repr__(self):
-         return self.image_id
- 
-     @staticmethod
-     def generate_image_id():
-         last_image = Image.query.order_by(Image.image_id.desc()).first()
-         if last_image:
-             last_image_id = int(last_image.image_id.split("-")[1])
-             new_id = f"I-{last_image_id + 1:03d}"
-         else:
-             new_id = "I-001"
+    @staticmethod
+    def generate_image_id():
+        last_image = Image.query.order_by(Image.image_id.desc()).first()
+        if last_image:
+            last_image_id = int(last_image.image_id.split("-")[1])
+            new_id = f"I-{last_image_id + 1:03d}"
+        else:
+            new_id = "I-001"
+        
+        return new_id
+     
+class Diagnosis(db.Model):
+    __tablename__ = 'diagnosis'
+
+    diagnosis_id = db.Column(db.String(10), primary_key=True)
+    symptoms_input = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.String(10), db.ForeignKey('user.user_id'), nullable=False)
+    diagnosis_time = db.Column(db.DateTime, default=datetime.now(eat_tz))
+
+    # Relationship to diseases diagnosed
+    diseases_diagnosed = db.relationship('DiseasesDiagnosed', backref='diagnosis', cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return self.diagnosis_id
+
+    @staticmethod
+    def generate_diagnosis_id():
+        last_diagnosis = Diagnosis.query.order_by(Diagnosis.diagnosis_id.desc()).first()
+        if last_diagnosis:
+            last_diagnosis_id = int(last_diagnosis.diagnosis_id.split("-")[1])
+            new_id = f"DIAG-{last_diagnosis_id + 1:03d}"
+        else:
+            new_id = "DIAG-001"
          
-         return new_id
+        return new_id
+
+
+class DiseasesDiagnosed(db.Model):
+    __tablename__ = 'diseases_diagnosed'
+
+    diseases_diagnosed_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    diagnosis_id = db.Column(db.String(10), db.ForeignKey('diagnosis.diagnosis_id'), nullable=False)
+    disease_id = db.Column(db.String(10), db.ForeignKey('diseases.disease_id'), nullable=False)
+    probability = db.Column(db.Float, nullable=False)
+
+    # Optional relationship for easy access to disease data
+    disease = db.relationship('Disease', backref='diagnosed_cases')
+
+    def __repr__(self):
+        return self.diseases_diagnosed_id
+
+    @staticmethod
+    def generate_diseases_diagnosed_id():
+        last_diseases_diagnosed = DiseasesDiagnosed.query.order_by(DiseasesDiagnosed.diseases_diagnosed_id.desc()).first()
+        if last_diseases_diagnosed:
+            last_diseases_diagnosed_id = int(last_diseases_diagnosed.diseases_diagnosed_id.split("-")[1])
+            new_id = f"DDIAGG-{last_diseases_diagnosed_id + 1:03d}"
+        else:
+            new_id = "DDIAGG-001"
+         
+        return new_id
+
