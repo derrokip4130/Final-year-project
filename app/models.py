@@ -188,9 +188,9 @@ class Image(db.Model):
     image_url = db.Column(db.String(255))
     uploaded_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
 
-    breed_id = db.Column(db.String(5), db.ForeignKey('breed.breed_id'), nullable=True)
-    disease_id = db.Column(db.String(5), db.ForeignKey('diseases.disease_id'), nullable=True)
-    diagnosis_id = db.Column(db.String(5), db.ForeignKey('diagnosis.diagnosis_id'), nullable=True)
+    breed_id = db.Column(db.String(15), db.ForeignKey('breed.breed_id'), nullable=True)
+    disease_id = db.Column(db.String(15), db.ForeignKey('diseases.disease_id'), nullable=True)
+    diagnosis_id = db.Column(db.String(15), db.ForeignKey('diagnosis.diagnosis_id'), nullable=True)
     
     def __repr__(self):
         if self.breed_id:
@@ -215,9 +215,9 @@ class Image(db.Model):
 class Diagnosis(db.Model):
     __tablename__ = 'diagnosis'
 
-    diagnosis_id = db.Column(db.String(10), primary_key=True)
+    diagnosis_id = db.Column(db.String(15), primary_key=True)
     symptoms_input = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.String(10), db.ForeignKey('user.user_id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('user.user_id'), nullable=False)
     diagnosis_time = db.Column(db.DateTime, default=datetime.now(eat_tz))
 
     # Relationship to diseases diagnosed
@@ -241,7 +241,7 @@ class Diagnosis(db.Model):
 class DiseasesDiagnosed(db.Model):
     __tablename__ = 'diseases_diagnosed'
 
-    diseases_diagnosed_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    diseases_diagnosed_id = db.Column(db.String(15), primary_key=True)
     diagnosis_id = db.Column(db.String(10), db.ForeignKey('diagnosis.diagnosis_id'), nullable=False)
     disease_id = db.Column(db.String(10), db.ForeignKey('diseases.disease_id'), nullable=False)
     probability = db.Column(db.Float, nullable=False)
