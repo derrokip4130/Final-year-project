@@ -50,9 +50,17 @@
 
             <!-- Breed Images -->
             <div class="flex justify-center gap-4 mt-5">
-                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg">
-                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg">
-                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg">
+                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg cursor-pointer" onclick="openModal(this)">
+                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg cursor-pointer" onclick="openModal(this)">
+                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg cursor-pointer" onclick="openModal(this)">
+            </div>
+
+            <!-- Modal -->
+            <div id="image-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 hidden justify-center items-center z-50">
+                <div class="bg-white p-4 rounded-lg">
+                    <img id="modal-image" class="max-w-full max-h-full">
+                    <button onclick="closeModal()" class="absolute top-2 right-2 text-white bg-black rounded-full p-2">X</button>
+                </div>
             </div>
 
             <!-- Chat Box -->
@@ -235,6 +243,21 @@
                     }
                 });
             }
+        }
+
+        function openModal(imgElement) {
+            const modal = document.getElementById("image-modal");
+            const modalImage = document.getElementById("modal-image");
+
+            modal.style.display = "flex";
+            modalImage.src = imgElement.src; // Set the image source of the modal to the clicked image
+
+            // Optionally, you can also add a fade-in effect to the modal here if needed
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("image-modal");
+            modal.style.display = "none";
         }
 
         function renameChat(chatId) {
