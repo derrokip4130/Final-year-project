@@ -14,6 +14,8 @@
         <!-- Symptom Selection Box -->
         <div class="bg-white p-6 rounded-lg shadow-lg w-3/4">
             <h2 class="text-center text-2xl font-bold text-green-700">Select Symptoms</h2>
+
+            <!-- Symptom Dropdown -->
             <label class="block mt-4 text-lg" for="symptom-select">Symptoms:</label>
             <select id="symptom-select" class="w-full p-2 mt-2 border rounded-md" onchange="addSymptom(this.value)">
                 <option value="" disabled selected>Select a symptom</option>
@@ -22,7 +24,20 @@
                 {% endfor %}
             </select>
             <div id="selected-symptoms" class="mt-4 hidden"></div>
-            <button onclick="diagnose()" class="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-semibold">Diagnose</button>
+            <input type="hidden" name="symptoms">
+
+            <!-- Upload Image Section -->
+            <h3 class="mt-6 text-lg font-semibold text-green-700">Or Upload an Image</h3>
+            <input type="file" id="image-upload" accept="image/*" class="mt-2 w-full p-2 border rounded-md" onchange="previewImage()">
+            <div id="image-preview-container" class="mt-4 hidden">
+                <p class="text-gray-600">Selected Image:</p>
+                <img id="image-preview" class="mt-2 rounded-md shadow-md w-40 h-40 object-cover">
+            </div>
+
+            <!-- Diagnose Button -->
+            <button onclick="diagnose()" class="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-semibold">
+                Diagnose
+            </button>
         </div>
     
         <!-- Diagnosis Result Box -->
@@ -42,33 +57,17 @@
     </div>
     
     <!-- Disease Details Modal -->
-    <div id="disease-details" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-1/2 relative">
+    <div id="disease-details" class="hidden fixed inset-0 flex items-start justify-center overflow-y-auto bg-black bg-opacity-50 z-50 transition-all duration-300 ease-in-out">
+        <div class="relative bg-white rounded-lg shadow-lg mt-20 max-h-[80vh] w-full max-w-2xl overflow-y-auto p-6">
             <button onclick="closeDiseaseDetails()" class="absolute top-2 right-2 text-red-600 font-bold text-xl">&times;</button>
             <h2 class="text-2xl font-bold text-green-700">Disease Details</h2>
-            <p id="disease-info" class="mt-4"></p>
+            <div id="disease-info" class="mt-4"></div>
         </div>
-    </div><br>
+    </div>
+    <br>
 
     <script>
         let selectedSymptoms = [];
-        const diseases = [
-            { 
-                name: "Infectious Coryza", 
-                symptoms: ["coughing", "sneezing", "swelling of the face", "watery eyes"], 
-                details: "Infectious Coryza is a bacterial disease that causes swelling and nasal discharge in poultry."
-            },
-            { 
-                name: "Avian Influenza", 
-                symptoms: ["coughing", "fever", "lethargy", "Loss of appetite"], 
-                details: "Avian Influenza (Bird Flu) is a viral infection that affects multiple species, including poultry."
-            },
-            { 
-                name: "Newcastle Disease", 
-                symptoms: ["diarrhea", "fever", "lethargy", "sneezing"], 
-                details: "Newcastle Disease is a viral disease causing respiratory issues, nervous signs, and digestive disorders."
-            }
-        ];
 
         // Load past diagnoses from local storage
         document.addEventListener("DOMContentLoaded", loadPastDiagnoses);
@@ -83,24 +82,30 @@
         function updateSelectedSymptoms() {
             const container = document.getElementById("selected-symptoms");
             container.innerHTML = "";
+
             if (selectedSymptoms.length === 0) {
                 container.classList.add("hidden");
-                return;
-            }
-            container.classList.remove("hidden");
-            selectedSymptoms.forEach(symptom => {
-                const div = document.createElement("div");
-                div.classList.add("bg-green-100", "p-2", "rounded-md", "mr-2", "mt-2", "inline-flex", "items-center");
-                div.textContent = symptom;
-                
-                const button = document.createElement("button");
-                button.classList.add("ml-2", "bg-red-500", "text-white", "rounded", "px-2", "py-1");
-                button.innerHTML = "&times;";
-                button.onclick = () => removeSymptom(symptom);
+            } else {
+                container.classList.remove("hidden");
 
-                div.appendChild(button);
-                container.appendChild(div);
-            });
+                selectedSymptoms.forEach(symptom => {
+                    const div = document.createElement("div");
+                    div.classList.add("bg-green-100", "p-2", "rounded-md", "mr-2", "mt-2", "inline-flex", "items-center");
+                    div.textContent = symptom;
+
+                    const button = document.createElement("button");
+                    button.classList.add("ml-2", "bg-red-500", "text-white", "rounded", "px-2", "py-1");
+                    button.innerHTML = "&times;";
+                    button.onclick = () => removeSymptom(symptom);
+
+                    div.appendChild(button);
+                    container.appendChild(div);
+                });
+            }
+
+            // 👇 Update the hidden input here
+            const hiddenInput = document.getElementById("hidden-symptoms");
+            hiddenInput.value = selectedSymptoms.join(",");
         }
 
         function removeSymptom(symptom) {
@@ -113,24 +118,51 @@
                 alert("Please select at least one symptom.");
                 return;
             }
-            
+
             document.getElementById("diagnosis-box").classList.remove("hidden");
             document.getElementById("diagnosis_result").innerHTML = "<p class='text-gray-600'>Analyzing symptoms...</p>";
-            
-            setTimeout(() => {
-                let results = diseases.map(disease => {
-                    const matchedSymptoms = selectedSymptoms.filter(symptom => disease.symptoms.includes(symptom));
-                    const probability = (matchedSymptoms.length / disease.symptoms.length) * 100;
-                    return { name: disease.name, probability: probability.toFixed(1) };
-                }).filter(result => result.probability > 0);
-                
-                document.getElementById("diagnosis_result").innerHTML = results.length > 0 
-                    ? results.map(result => `<p class='text-green-700 font-semibold cursor-pointer' onclick="showDiseaseDetails('${result.name}')">${result.name}: ${result.probability}%</p>`).join(" ") 
-                    : "No matching diseases found.";
 
-                saveDiagnosis(results);
-                loadPastDiagnoses();
-            }, 2000);
+            let formData = new FormData();
+            formData.append("symptoms", selectedSymptoms.join(","));
+
+            // Get the selected image file
+            const imageInput = document.getElementById("image-upload");
+            if (imageInput.files.length > 0) {
+                formData.append("image", imageInput.files[0]); // Append image to FormData
+            }
+
+            fetch("/diagnose_diseases", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json()) // Expecting JSON response from Flask
+            .then(data => {
+                if (data.predicted_disease && data.results) {
+                    let diagnosisHtml = `<p class='text-lg font-bold text-green-700'>Predicted Disease: <span class='text-red-600'>${data.predicted_disease}</span></p>`;
+
+                    diagnosisHtml += "<p class='text-lg mt-2 font-semibold'>Probability Breakdown:</p>";
+                    diagnosisHtml += "<ul class='mt-2'>";
+
+                    // Loop through results and display probabilities
+                    for (let disease in data.results) {
+                        diagnosisHtml += `
+                            <li class='text-green-700 font-semibold cursor-pointer' onclick="showDiseaseDetails('${disease}')">
+                                ${disease}: ${data.results[disease]}%
+                            </li>
+                        `;
+                    }
+
+                    diagnosisHtml += "</ul>";
+
+                    document.getElementById("diagnosis_result").innerHTML = diagnosisHtml;
+                } else {
+                    document.getElementById("diagnosis_result").innerHTML = "<p class='text-red-600'>No matching diseases found.</p>";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("diagnosis_result").innerHTML = "<p class='text-red-600'>Error processing diagnosis. Try again.</p>";
+            });
         }
 
         function saveDiagnosis(results) {
@@ -159,15 +191,54 @@
         }
 
         function showDiseaseDetails(diseaseName) {
-            const disease = diseases.find(d => d.name === diseaseName);
-            if (disease) {
-                document.getElementById("disease-info").innerHTML = `<strong>${disease.name}:</strong> ${disease.details}`;
-                document.getElementById("disease-details").classList.remove("hidden");
-            }
+            fetch(`/get_disease_details/${encodeURIComponent(diseaseName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("disease-info").innerHTML = `<strong>Error:</strong> ${data.error}`;
+                    } else {
+                        let symptomsList = data.symptoms.length > 0
+                            ? data.symptoms.map(symptom => `<li class="text-gray-700">✅ ${symptom}</li>`).join("")
+                            : "<li class='text-gray-500'>No symptoms available.</li>";
+
+                        document.getElementById("disease-info").innerHTML = `
+                            <p class='text-lg font-bold text-red-600'>${data.disease_name}</p>
+                            <p><strong>Description:</strong> ${data.description || "No description available."}</p>
+                            <p><strong>Causes:</strong> ${data.causes || "Unknown"}</p>
+                            <p><strong>Prevention Tips:</strong> ${data.prevention_tips || "No prevention tips available."}</p>
+                            <p><strong>Symptoms:</strong></p>
+                            <ul class="ml-4 list-disc">${symptomsList}</ul>
+                            <p class="text-gray-500 text-sm">Last Updated: ${data.last_updated}</p>
+                        `;
+                    }
+                    document.getElementById("disease-details").classList.remove("hidden");
+                })
+                .catch(error => {
+                    console.error("Error fetching disease details:", error);
+                    document.getElementById("disease-info").innerHTML = "<p class='text-red-600'>Error retrieving disease details.</p>";
+                });
         }
+
 
         function closeDiseaseDetails() {
             document.getElementById("disease-details").classList.add("hidden");
+        }
+        function previewImage() {
+            const fileInput = document.getElementById("image-upload");
+            const previewContainer = document.getElementById("image-preview-container");
+            const previewImage = document.getElementById("image-preview");
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.classList.remove("hidden");
+                };
+
+                reader.readAsDataURL(file);
+            }
         }
     </script>
 </body>
