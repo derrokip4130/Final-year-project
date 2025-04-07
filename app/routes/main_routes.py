@@ -1,9 +1,10 @@
 import requests,  pytz, cloudinary, cloudinary.uploader, cloudinary.api
 from flask import Blueprint, jsonify, request, render_template, redirect, url_for, abort
-from app.models import User, Disease, Symptom, Breed, BreedQuery, Chat, Image
+from app.models import User, Disease, Symptom, Breed, BreedQuery, Chat, Image, Diagnosis, DiseasesDiagnosed
 from app.extensions import db
 from flask_login import login_required, current_user
 from app.scripts.breed_queries import get_response
+from app.scripts.disease_diagnosis import process_diagnosis
 from datetime import datetime
 from app.config import Config
 
@@ -511,12 +512,28 @@ def update_breed(breed_id):
 
     return render_template("admin/update_breeds.html", breed=breed)
 
-@main_blueprint.route('/disease_details/<disease_id>',methods=["GET"])
+@main_blueprint.route("/get_disease_details/<disease_name>", methods=["GET"])
 @login_required
-def disease_details_page(disease_id):
-    disease = Disease.query.filter_by(disease_id=disease_id).first()
+def get_disease_details(disease_name):
+    # Query the disease from the database
+    disease = Disease.query.filter_by(disease_name=disease_name).first()
 
-    return render_template("disease_details.html",disease=disease)
+    if not disease:
+        return jsonify({"error": "Disease not found"}), 404
+
+    # Get symptoms associated with the disease
+    symptoms = [symptom.symptom_name for symptom in disease.symptoms]  # Assuming 'symptom_name' exists
+
+    # Return disease details as JSON
+    return jsonify({
+        "disease_name": disease.disease_name,
+        "description": disease.disease_description,
+        "prevention_tips": disease.disease_prevention_tips,
+        "causes": disease.causes,
+        "symptoms": symptoms,  # Include symptoms here
+        "last_updated": disease.last_updated.strftime("%Y-%m-%d %H:%M:%S")
+    })
+
 
 @main_blueprint.route("/breed_queries", methods=["GET","POST"])
 @login_required
@@ -532,6 +549,52 @@ def disease_diagnosis_page():
     symptoms = Symptom.query.all()
     
     return render_template("disease_diagnosis.html",symptoms=symptoms)
+
+@main_blueprint.route("/diagnose_diseases",methods=["POST"])
+@login_required
+def diagnose_diseases():
+    diagnosis = None
+    selected_symptoms, image_path = None, None
+    new_image= None
+    diagnosis_id = Diagnosis.generate_diagnosis_id()
+    if request.method == "POST":
+        raw = request.form.get("symptoms", "")
+        selected_symptoms = [s.strip() for s in raw.split(",") if s.strip()]
+        if "image" in request.files:
+            file = request.files["image"]
+            if file and file.filename:  # Ensure the file is not empty
+                upload_result = cloudinary.uploader.upload(file)
+                new_image = Image(image_id=Image.generate_image_id(),image_url=upload_result["secure_url"])
+                db.session.add(new_image)
+                image_path = new_image.image_url
+        diagnosis = process_diagnosis(selected_symptoms,image_path)
+        new_diagnosis = Diagnosis(
+            diagnosis_id = Diagnosis.generate_diagnosis_id(),
+            symptoms_input = selected_symptoms,
+            user_id = current_user.user_id
+        )
+        db.session.add(new_diagnosis)
+        db.session.commit()
+
+        if new_image:
+            new_image.diagnosis_id = diagnosis_id
+        
+        for disease_diagnosed, probability in diagnosis['results'].items():
+            disease_diagnosed_id = DiseasesDiagnosed.generate_diseases_diagnosed_id()
+            disease_diagnosis_id = diagnosis_id
+            disease = Disease.query.filter_by(disease_name=disease_diagnosed).first()
+            disease_id = disease.disease_id
+            new_disease_diagnosed = DiseasesDiagnosed(
+                diseases_diagnosed_id=disease_diagnosed_id,
+                diagnosis_id=diagnosis_id,
+                disease_id=disease_id,
+                probability=probability)
+                        
+            db.session.add(new_disease_diagnosed)
+
+    db.session.commit()
+
+    return diagnosis
 
 @main_blueprint.route("/get_breed_data/<breed_name>", methods=["GET"])
 #@login_required
