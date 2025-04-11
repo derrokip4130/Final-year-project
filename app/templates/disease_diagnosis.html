@@ -36,14 +36,20 @@
 
             <!-- Symptom Dropdown -->
             <label class="block mt-4 text-lg" for="symptom-select">Symptoms:</label>
-            <select id="symptom-select" class="w-full p-2 mt-2 border rounded-md" onchange="addSymptom(this.value)">
-                <option value="" disabled selected>Select a symptom</option>
-                {% for symptom in symptoms %}
-                    <option value="{{ symptom.symptom_name }}">{{ symptom.symptom_name }}</option>
-                {% endfor %}
-            </select>
+            <div class="relative mt-2 flex">
+                <input list="symptom-suggestions" id="symptom-input" class="w-full p-2 border rounded-l-md" placeholder="Type or select a symptom"/>
+                <datalist id="symptom-suggestions">
+                    {% for symptom in symptoms %}
+                        <option value="{{ symptom.symptom_name }}">
+                    {% endfor %}
+                </datalist>
+                <button onclick="addTypedSymptom()" class="bg-green-600 hover:bg-green-700 text-white px-4 rounded-r-md"> Add </button>
+            </div>
+            
+            
             <div id="selected-symptoms" class="mt-4 hidden"></div>
-            <input type="hidden" name="symptoms">
+            <input type="hidden" id="hidden-symptoms" name="symptoms">
+            <button onclick="clearSymptoms()" class="mt-2 text-sm text-red-600 hover:underline">Clear Symptoms</button>
 
             <!-- Upload Image Section -->
             <h3 class="mt-6 text-lg font-semibold text-green-700">Or Upload an Image</h3>
@@ -52,6 +58,7 @@
                 <p class="text-gray-600">Selected Image:</p>
                 <img id="image-preview" class="mt-2 rounded-md shadow-md w-40 h-40 object-cover">
             </div>
+            <button type="button" onclick="clearImage()" class="mt-2 text-sm text-red-600 hover:underline block">Remove Image</button>
 
             <!-- Diagnose Button -->
             <button onclick="diagnose()" class="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 font-semibold">
@@ -96,10 +103,36 @@
         // Load past diagnoses from local storage
         document.addEventListener("DOMContentLoaded", loadPastDiagnoses);
 
-        function addSymptom(symptom) {
-            if (!selectedSymptoms.includes(symptom) && symptom !== "") {
-                selectedSymptoms.push(symptom);
+        function addTypedSymptom() {
+            const symptoms_input = document.getElementById("symptom-input");
+            const value = symptoms_input.value.trim();
+            if (value !== "" && !selectedSymptoms.includes(value)) {
+                selectedSymptoms.push(value);
                 updateSelectedSymptoms();
+            }
+            symptoms_input.value = "";
+        }
+
+        function addSymptom(value) {
+            if (value && !selectedSymptoms.includes(value)) {
+                selectedSymptoms.push(value);
+                updateSelectedSymptoms();
+            }
+
+            // Reset select box to placeholder (assuming the first option is placeholder)
+            const select = document.getElementById("symptom-select");
+            select.selectedIndex = 0;
+        }
+
+        function handleSymptomInput(event) {
+            if (event.key === "Enter") {
+                const input = event.target;
+                const value = input.value.trim();
+                if (value && !selectedSymptoms.includes(value)) {
+                    selectedSymptoms.push(value);
+                    updateSelectedSymptoms();
+                    input.value = "";
+                }
             }
         }
 
@@ -348,6 +381,22 @@
                 reader.readAsDataURL(file);
             }
         }
+
+        function clearSymptoms() {
+            selectedSymptoms = [];
+            updateSelectedSymptoms();
+        }
+
+        function clearImage() {
+            const fileInput = document.getElementById("image-upload");
+            const previewImage = document.getElementById("image-preview");
+            const previewContainer = document.getElementById("image-preview-container");
+
+            fileInput.value = "";
+            previewImage.src = "";
+            previewContainer.classList.add("hidden");
+        }
+
     </script>
 </body>
 </html>
