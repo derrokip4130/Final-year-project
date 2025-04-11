@@ -48,11 +48,16 @@
                 {% endfor %}
             </select>
 
+            <!-- Toggle Button -->
+            <button id="toggle-images-btn" onclick="toggleImages()" class="mt-5 text-green-700 underline hover:text-green-900 transition">
+                📷 Show Breed Images
+            </button>
+
             <!-- Breed Images -->
-            <div class="flex justify-center gap-4 mt-5">
-                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg cursor-pointer" onclick="openModal(this)">
-                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg cursor-pointer" onclick="openModal(this)">
-                <img class="breed-image hidden rounded-lg w-24 h-24 shadow-lg cursor-pointer" onclick="openModal(this)">
+            <div id="breed-images-container" class="hidden flex justify-center gap-4 mt-3">
+                <img class="breed-image rounded-lg w-24 h-24 shadow-lg cursor-pointer" onclick="openModal(this)">
+                <img class="breed-image rounded-lg w-24 h-24 shadow-lg cursor-pointer" onclick="openModal(this)">
+                <img class="breed-image rounded-lg w-24 h-24 shadow-lg cursor-pointer" onclick="openModal(this)">
             </div>
 
             <!-- Modal -->
@@ -315,6 +320,19 @@
             .catch(() => alert("Error deleting chat."));
         }
 
+        function toggleImages() {
+            const container = document.getElementById("breed-images-container");
+            const button = document.getElementById("toggle-images-btn");
+
+            if (container.classList.contains("hidden")) {
+                container.classList.remove("hidden");
+                button.textContent = "🙈 Hide Breed Images";
+                updateBreedImage(); // Load images when first shown
+            } else {
+                container.classList.add("hidden");
+                button.textContent = "📷 Show Breed Images";
+            }
+        }
 
         window.onload = updateBreedImage;
     </script>
