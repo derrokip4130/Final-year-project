@@ -1,10 +1,15 @@
-import torch, requests
+import torch, requests, os
 import torchvision.transforms as transforms
 from PIL import Image
 import torchvision.models as models
 import torch.nn as nn
 from io import BytesIO
 from collections import defaultdict
+from dotenv import load_dotenv
+
+load_dotenv()
+
+system_public_url = os.getenv("PUBLIC_URL")
 
 def analyze_image(image_url, class_names=["Infectious Coryza", "Fowl Pox", "Newcastle Disease"]):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -63,7 +68,7 @@ def diagnose_symptoms(symptoms_input):
 
     # Step 1: Fetch diseases for each symptom
     for symptom in symptoms_input:
-        response = requests.get(f'http://127.0.0.1:5000/search_disease/{symptom}')
+        response = requests.get(f'{system_public_url}/search_disease/{symptom}')
         if response.status_code == 200:
             diseases = response.json().get("diseases", [])
 

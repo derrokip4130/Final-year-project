@@ -5,6 +5,8 @@ load_dotenv()
 
 co = cohere.Client(os.getenv("COHERE_API_KEY"))
 
+system_public_url = os.getenv("PUBLIC_URL")
+
 valid_categories = {
     "Feeding and Nutrition": ["Chick", "Grower", "Broiler", "Layer", "Supplementation", "Alternative_feeds"],
     "Housing and Environment": ["Space_per_bird", "Ventilation", "Temperature", "Humidity", "Biosecurity"],
@@ -42,7 +44,7 @@ def get_response(selected_breed, user_input, chat_history):
             query["role"] = "Chatbot"
 
     # Fetch breed data dynamically
-    response = requests.get(f"http://127.0.0.1:5000/get_breed_data/{selected_breed}")
+    response = requests.get(f"{system_public_url}/get_breed_data/{selected_breed}")
 
     if response.status_code != 200:
         return f"Error: No data available for the breed '{selected_breed}'. Please check the breed name."
