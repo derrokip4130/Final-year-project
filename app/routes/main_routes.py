@@ -596,6 +596,32 @@ def diagnose_diseases():
 
     return diagnosis
 
+@main_blueprint.route("/get_diagnosis_data")
+@login_required
+def get_all_diagnoses_with_diseases():
+    diagnoses = Diagnosis.query.filter_by(user_id=current_user.user_id).all()
+    result = []
+
+    for diag in diagnoses:
+        diagnosed_diseases = []
+        for dd in diag.diseases_diagnosed:
+            diagnosed_diseases.append({
+                'diseases_diagnosed_id': dd.diseases_diagnosed_id,
+                'disease_id': dd.disease_id,
+                'disease_name': dd.disease.disease_name if dd.disease else None,
+                'probability': dd.probability
+            })
+
+        result.append({
+            'diagnosis_id': diag.diagnosis_id,
+            'symptoms_input': diag.symptoms_input,
+            'user_id': diag.user_id,
+            'diagnosis_time': diag.diagnosis_time.strftime("%Y-%m-%d %H:%M:%S"),
+            'diseases_diagnosed': diagnosed_diseases
+        })
+
+    return jsonify(result), 200
+
 @main_blueprint.route("/get_breed_data/<breed_name>", methods=["GET"])
 #@login_required
 def get_breed_data(breed_name):
