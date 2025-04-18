@@ -1,7 +1,12 @@
 services:
   - type: web
-    name: flask-app
+    name: your-app-name
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
-    preDeployCommand: python run.py
+    startCommand: gunicorn wsgi:app
+    plan: free
+    envVars:
+      - key: FLASK_ENV
+        value: production
+    build:
+      cwd: .
