@@ -46,7 +46,6 @@
                 <button onclick="addTypedSymptom()" class="bg-green-600 hover:bg-green-700 text-white px-4 rounded-r-md"> Add </button>
             </div>
             
-            
             <div id="selected-symptoms" class="mt-4 hidden"></div>
             <input type="hidden" id="hidden-symptoms" name="symptoms">
             <button onclick="clearSymptoms()" class="mt-2 text-sm text-red-600 hover:underline">Clear Symptoms</button>
@@ -97,8 +96,24 @@
     <button id="modal-toggle-btn" onclick="toggleModal()" class="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 z-50">🕒</button>
     <br>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="confirmDeleteModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">Confirm Deletion</h3>
+            <p class="mb-6">Are you sure you want to delete this diagnosis? This action cannot be undone.</p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancelDeleteBtn" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancel</button>
+                <button id="confirmDeleteBtn" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let selectedSymptoms = [];
+        let deleteTarget = {
+            id: null,
+            buttonElement: null
+        };
 
         // Load past diagnoses from local storage
         document.addEventListener("DOMContentLoaded", loadPastDiagnoses);
@@ -272,11 +287,18 @@
 
 
                         const imageHTML = entry.image_url ? `<img src="${entry.image_url}" alt="Diagnosis Image" class="mt-2 w-full max-w-xs rounded border" />` : "";
-
-                        li.innerHTML = `
-                            <button class="text-left w-full font-semibold text-blue-700" onclick="toggleDetails('details-${index}')">
-                                🕒 ${dateFormatted}
+                        const deleteButtonHTML = `
+                            <button onclick="deleteDiagnosis('${entry.diagnosis_id}', this)" class="text-red-500 text-xs ml-2 hover:underline">
+                                Delete
                             </button>
+                        `;
+                        li.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <button class="text-left w-full font-semibold text-blue-700" onclick="toggleDetails('details-${index}')">
+                                    🕒 ${dateFormatted}
+                                </button>
+                                ${deleteButtonHTML}
+                            </div>
                             <div id="details-${index}" class="hidden mt-2 pl-4 text-sm">
                                 <div><strong>Symptoms:</strong> ${symptomsHTML}</div>
                                 ${imageHTML}
@@ -319,6 +341,38 @@
                 }, 300); // match animation duration
             }
         }
+
+        function deleteDiagnosis(id, buttonElement) {
+            deleteTarget.id = id;
+            deleteTarget.buttonElement = buttonElement;
+            document.getElementById("confirmDeleteModal").classList.remove("hidden");
+        }
+
+        document.getElementById("cancelDeleteBtn").addEventListener("click", () => {
+            document.getElementById("confirmDeleteModal").classList.add("hidden");
+            deleteTarget.id = null;
+            deleteTarget.buttonElement = null;
+        });
+
+        document.getElementById("confirmDeleteBtn").addEventListener("click", () => {
+            const { id, buttonElement } = deleteTarget;
+
+            fetch(`/delete_diagnosis/${id}`, { method: 'DELETE' })
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to delete');
+                    const listItem = buttonElement.closest("li");
+                    listItem.remove();
+                })
+                .catch(err => {
+                    console.error("Error deleting diagnosis:", err);
+                    alert("Failed to delete diagnosis. Try again.");
+                })
+                .finally(() => {
+                    document.getElementById("confirmDeleteModal").classList.add("hidden");
+                    deleteTarget.id = null;
+                    deleteTarget.buttonElement = null;
+                });
+        });
 
         function showDiseaseDetails(diseaseName) {
             fetch(`/get_disease_details/${encodeURIComponent(diseaseName)}`)

@@ -622,6 +622,16 @@ def get_all_diagnoses_with_diseases():
 
     return jsonify(result), 200
 
+@main_blueprint.route("/delete_diagnosis/<diagnosis_id>", methods=["DELETE"])
+@login_required
+def delete_diagnosis(diagnosis_id):
+    Image.query.filter_by(diagnosis_id=diagnosis_id).delete()
+    result = Diagnosis.query.filter_by(diagnosis_id=diagnosis_id).delete()
+    db.session.commit()
+    if result:
+        return jsonify({"success": True})
+    return jsonify({"error": "Diagnosis not found"}), 404
+
 @main_blueprint.route("/get_breed_data/<breed_name>", methods=["GET"])
 #@login_required
 def get_breed_data(breed_name):
