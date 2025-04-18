@@ -21,6 +21,9 @@ farmer_breed = db.Table(
 )
 
 class User(db.Model, UserMixin):
+
+    __tablename__ = 'users'
+    
     ADMIN = "admin"
     FARMER = "farmer"
 

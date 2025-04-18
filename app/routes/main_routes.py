@@ -19,12 +19,6 @@ cloudinary.config(
     api_secret=Config.CLOUDINARY_API_SECRET
 )
 
-@main_blueprint.route("/db_init)", methods=['GET'])
-def init_db():
-    from app.extensions import db
-    db.create_all()
-    return "Database initialized!"
-
 @main_blueprint.route("/")
 def blank():
     if current_user.is_authenticated:
