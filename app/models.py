@@ -249,6 +249,9 @@ class DiseasesDiagnosed(db.Model):
     # Optional relationship for easy access to disease data
     disease = db.relationship('Disease', backref='diagnosed_cases')
 
+    diagnosis_id = db.Column(db.String, db.ForeignKey("diagnosis.diagnosis_id", ondelete="CASCADE"))
+
+
     def __repr__(self):
         return self.diseases_diagnosed_id
 
