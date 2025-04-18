@@ -1,13 +1,12 @@
 services:
   - type: web
-    name: app
+    name: poultry-diagnosis
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn wsgi:app
     preDeployCommand: python run.py
-    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.wsgi:app
     envVars:
       - key: FLASK_ENV
         value: production
-    build:
-      cwd: .
+    workingDir: .
+    
