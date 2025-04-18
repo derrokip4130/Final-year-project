@@ -1,3 +1,3 @@
-from run import app  # Replace 'app' with the module where your Flask app instance is defined
+from app import create_app
 
-application = app
+app = create_app()
