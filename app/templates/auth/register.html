@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex justify-center items-center h-screen bg-green-100">
-    <div class="bg-white p-6 rounded-lg shadow-md w-96">
+    <div class="bg-white p-6 rounded-lg shadow-md w-80">
         <h1 class="text-2xl font-bold text-green-700 mb-4">Register</h1>
         
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -20,111 +20,31 @@
             {% endif %}
         {% endwith %}
 
-        <form action="{{ url_for('auth.register') }}" id="registerForm" class="space-y-4">
-            <input type="text" id="username" name="username" placeholder="Username" required class="w-full p-2 border border-green-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500">
-            <input type="email" id="email" name="email" placeholder="Email" required class="w-full p-2 border border-green-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500">
-            <input type="text" id="phone_num" name="phone_num" placeholder="Phone Number (optional)" class="w-full p-2 border border-green-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500">
-            <input type="text" id="location" name="location" placeholder="Location (optional)" class="w-full p-2 border border-green-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+        <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-3">
+            <input type="text" name="username" placeholder="Username" required class="w-full p-2 border border-green-300 rounded">
+            <input type="email" name="email" placeholder="Email" required class="w-full p-2 border border-green-300 rounded">
+            <input type="text" name="phone_num" placeholder="Phone Number (optional)" class="w-full p-2 border border-green-300 rounded">
+            <input type="text" name="location" placeholder="Location (optional)" class="w-full p-2 border border-green-300 rounded">
             
             <div class="relative">
-                <!-- Password Input -->
-                <input type="password" id="password" name="password" placeholder="Password" required class="w-full p-2 border border-green-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500">
-                
-                <!-- Confirm Password Input -->
-                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required class="w-full p-2 border border-green-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500">
-                
-                <!-- Password Strength Message -->
-                <div id="password-strength" class="text-sm text-gray-600 mt-1"></div>
+                <input type="password" id="password" name="password" placeholder="Password" required class="w-full p-2 border border-green-300 rounded">
+                <div class="flex items-center mt-2">
+                    <input type="checkbox" id="showPassword" class="mr-2">
+                    <label for="showPassword" class="text-sm text-gray-600">Show Password</label>
+                </div>
             </div>
             
-            <!-- Checkbox for Show Password -->
-            <div class="flex items-center space-x-2">
-                <input type="checkbox" id="show-password" class="text-green-600" />
-                <label for="show-password" class="text-sm text-gray-600">Show Password</label>
-            </div>
-            
-            <button type="submit" class="w-full p-2 bg-green-600 text-white font-bold rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">Register</button>
+            <button type="submit" class="w-full p-2 bg-green-600 text-white font-bold rounded hover:bg-green-700">Register</button>
         </form>
         
         <p class="mt-3 text-sm text-gray-600">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-green-600 font-bold">Login</a></p>
     </div>
     
-    <!-- Modal for Missing Fields Alert -->
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 class="text-xl font-bold text-red-600">Missing Information</h2>
-            <p id="modal-message" class="text-gray-700">Please fill in all the required fields.</p>
-            <div class="mt-4 flex justify-end">
-                <button id="closeModal" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Close</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Show Password Toggle
-        document.getElementById('show-password').addEventListener('change', function() {
+        document.getElementById('showPassword').addEventListener('change', function() {
             let passwordField = document.getElementById('password');
-            let confirmPasswordField = document.getElementById('confirm_password');
-            
-            if (this.checked) {
-                passwordField.type = 'text';
-                confirmPasswordField.type = 'text';
-            } else {
-                passwordField.type = 'password';
-                confirmPasswordField.type = 'password';
-            }
+            passwordField.type = this.checked ? 'text' : 'password';
         });
-
-        // Password Strength Validator
-        document.getElementById('password').addEventListener('input', function() {
-            const password = this.value;
-            const strengthMessage = document.getElementById('password-strength');
-            let message = '';
-            let color = 'text-gray-600';
-            
-            if (password.length < 8) {
-                message = "Password is too weak. Must be at least 8 characters.";
-                color = 'text-red-500';
-            } else if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-                message = "Password should contain at least one uppercase letter and one number.";
-                color = 'text-yellow-500';
-            } else {
-                message = "Password is strong.";
-                color = 'text-green-500';
-            }
-            
-            strengthMessage.textContent = message;
-            strengthMessage.className = `text-sm mt-1 ${color}`;
-        });
-
-        // Submit Form and Check for Missing Fields
-        document.getElementById('registerForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
-            
-            let missingFields = [];
-            const fields = ['username', 'email', 'password', 'confirm_password'];
-            
-            fields.forEach(function(field) {
-                const input = document.getElementById(field);
-                if (input && !input.value) {
-                    missingFields.push(input.placeholder);
-                }
-            });
-
-            if (missingFields.length > 0) {
-                // Show modal with the missing fields
-                document.getElementById('modal-message').textContent = `Please fill in the following fields: ${missingFields.join(', ')}`;
-                document.getElementById('modal').classList.remove('hidden');
-            } else {
-                // Submit form if all fields are filled
-                this.submit();
-            }
-        });
-
-        // Close Modal
-        document.getElementById('closeModal').addEventListener('click', function() {
-            document.getElementById('modal').classList.add('hidden');
-        });
-    </script>
+        </script>
 </body>
 </html>
