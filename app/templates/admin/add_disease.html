@@ -9,7 +9,7 @@
 <body class="flex flex-col items-center justify-center min-h-screen bg-green-100">
     <div class="bg-white p-6 rounded-lg shadow-md w-96">
         <h2 class="text-center text-green-700 text-xl font-bold">Add Disease</h2>
-        <form action="{{ url_for('main.add_disease') }}" method="POST" class="mt-4">
+        <form action="{{ url_for('main.add_disease') }}" method="POST" enctype="multipart/form-data" class="mt-4">
             <label for="disease_name" class="block text-green-700 font-semibold">Disease Name:</label>
             <input type="text" id="disease_name" name="disease_name" required class="w-full p-2 border border-green-300 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-green-500">
         
@@ -31,9 +31,24 @@
 
             <input type="hidden" id="selected_symptoms_input" name="symptoms">
 
-        
             <label for="selected_symptoms" class="block text-green-700 font-semibold mt-3">Selected Symptoms:</label>
             <select id="selected_symptoms" size="5" multiple class="w-full p-2 border border-green-300 rounded mt-1"></select>
+
+            <label class="block text-green-700 font-semibold mt-3">Upload Disease Images:</label>
+
+            <div id="drop_area" 
+                class="w-full p-4 border-2 border-dashed border-green-300 rounded text-center cursor-pointer hover:bg-green-50"
+                onclick="document.getElementById('disease_images').click()"
+                ondragover="event.preventDefault()" 
+                ondrop="handleDrop(event)">
+                <p class="text-green-700">Drag & drop images here or click to select</p>
+                <input type="file" id="disease_images" name="disease_images" accept="image/*" multiple 
+                    onchange="previewMultipleImages(event)" class="hidden">
+            </div>
+
+            <div id="image_preview_container" class="mt-3 overflow-x-auto flex gap-2 p-2 border border-green-300 rounded max-w-full">
+                <!-- Previews go here -->
+            </div>
         
             <div class="flex justify-between items-center mt-4">
                 <button type="button" onclick="openSymptomModal()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">Add Symptom</button>
@@ -163,6 +178,36 @@
             }
 
             hiddenInput.value = symptomIds.join(",");  // Ensure it's a comma-separated list
+        }
+
+        function previewMultipleImages(event) {
+            const files = event.target.files;
+            displayImages(files);
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            const files = event.dataTransfer.files;
+            document.getElementById('disease_images').files = files;
+            displayImages(files);
+        }
+
+        function displayImages(files) {
+            const container = document.getElementById('image_preview_container');
+            container.innerHTML = '';
+
+            for (const file of files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'h-32 rounded shadow border border-green-300';
+                        container.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
         }
     
         document.getElementById("available_symptoms").ondblclick = selectSymptom;

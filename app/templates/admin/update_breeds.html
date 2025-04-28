@@ -12,149 +12,165 @@
         <form action="{{ url_for('main.update_breed', breed_id=breed.breed_id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             <label class="block text-green-700 font-medium">Breed Name:</label>
             <input type="text" name="breed_name" required class="w-full p-2 border border-green-300 rounded-md focus:ring focus:ring-green-300" value="{{ breed.breed_name }}">
-
+        
             <label class="block text-green-700 font-medium">Breed Category:</label>
             <input type="text" name="breed_category" required class="w-full p-2 border border-green-300 rounded-md focus:ring focus:ring-green-300" value="{{ breed.breed_category }}">
-
+        
             <label class="block text-green-700 font-medium">Breed Purpose:</label>
             <input type="text" name="breed_purpose" required class="w-full p-2 border border-green-300 rounded-md focus:ring focus:ring-green-300" value="{{ breed.breed_purpose }}">
-            
+        
             <div class="p-4 border border-green-300 rounded-lg bg-green-100">
                 <h3 class="text-lg font-medium text-green-700">Feeding & Nutrition</h3>
                 <label class="block mt-2 font-medium">Chick Feed:</label>
-                <input type="text" name="Feeding_and_Nutrition[Chick][feed_type]" value="{{ breed.feeding_nutrition['Chick']['feed_type'] }}" class="w-full p-2 border border-green-300 rounded-md">
-                <input type="text" name="Feeding_and_Nutrition[Chick][daily_quantity]" value="{{ breed.feeding_nutrition['Chick']['daily_quantity'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
-                <input type="text" name="Feeding_and_Nutrition[Chick][schedule]" value="{{ breed.feeding_nutrition['Chick']['schedule'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
-                
+                <input type="text" name="Feeding_and_Nutrition[Chick][feed_type]" value="{{ breed.feeding_nutrition['chick']['feed_type'] }}" class="w-full p-2 border border-green-300 rounded-md">
+                <input type="text" name="Feeding_and_Nutrition[Chick][daily_quantity]" value="{{ breed.feeding_nutrition['chick']['daily_quantity'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
+                <input type="text" name="Feeding_and_Nutrition[Chick][schedule]" value="{{ breed.feeding_nutrition['chick']['schedule'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
+        
                 <label class="block mt-2 font-medium">Grower Feed:</label>
-                <input type="text" name="Feeding_and_Nutrition[Grower][feed_type]" value="{{ breed.feeding_nutrition['Grower']['feed_type'] }}" class="w-full p-2 border border-green-300 rounded-md">
-                <input type="text" name="Feeding_and_Nutrition[Grower][daily_quantity]" value="{{ breed.feeding_nutrition['Grower']['daily_quantity'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
-                <input type="text" name="Feeding_and_Nutrition[Grower][schedule]" value="{{ breed.feeding_nutrition['Grower']['schedule'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
-                
-                <label class="block mt-2 font-medium">Broiler Feed:</label>
-                <input type="text" name="Feeding_and_Nutrition[Broiler][feed_type]" value="{{ breed.feeding_nutrition['Broiler']['feed_type'] }}" class="w-full p-2 border border-green-300 rounded-md">
-                <input type="text" name="Feeding_and_Nutrition[Broiler][daily_quantity]" value="{{ breed.feeding_nutrition['Broiler']['daily_quantity'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
-                <input type="text" name="Feeding_and_Nutrition[Broiler][schedule]" value="{{ breed.feeding_nutrition['Broiler']['schedule'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
-                
+                <input type="text" name="Feeding_and_Nutrition[Grower][feed_type]" value="{{ breed.feeding_nutrition['grower']['feed_type'] }}" class="w-full p-2 border border-green-300 rounded-md">
+                <input type="text" name="Feeding_and_Nutrition[Grower][daily_quantity]" value="{{ breed.feeding_nutrition['grower']['daily_quantity'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
+                <input type="text" name="Feeding_and_Nutrition[Grower][schedule]" value="{{ breed.feeding_nutrition['grower']['schedule'] }}" class="w-full p-2 border border-green-300 rounded-md mt-2">
+        
+                {% for category in ['broiler', 'layer', 'kienyeji'] %}
+                    {% if category in breed.feeding_nutrition %}
+                        <div class="mt-4">
+                            <h3 class="font-semibold text-green-700">{{ category }} Feed:</h3>
+                            <input type="text" 
+                                name="Feeding_and_Nutrition[{{ category }}][feed_type]" 
+                                value="{{ breed.feeding_nutrition[category]['feed_type'] }}" 
+                                class="w-full p-2 border border-green-300 rounded-md mt-2">
+                            <input type="text" 
+                                name="Feeding_and_Nutrition[{{ category }}][daily_quantity]" 
+                                value="{{ breed.feeding_nutrition[category]['daily_quantity'] }}" 
+                                class="w-full p-2 border border-green-300 rounded-md mt-2">
+                            <input type="text" 
+                                name="Feeding_and_Nutrition[{{ category }}][schedule]" 
+                                value="{{ breed.feeding_nutrition[category]['schedule'] }}" 
+                                class="w-full p-2 border border-green-300 rounded-md mt-2">
+                        </div>
+                    {% endif %}
+                {% endfor %}
+        
                 <label class="block mt-2 font-medium">Supplementation:</label>
-                <input type="text" name="Feeding_and_Nutrition[Supplementation]" value="{{ ','.join(breed.feeding_nutrition['Supplementation']) }}" class="w-full p-2 border border-green-300 rounded-md">
+                <input type="text" name="Feeding_and_Nutrition[Supplementation]" value="{{ ','.join(breed.feeding_nutrition['supplementation']) }}" class="w-full p-2 border border-green-300 rounded-md">
             </div>
-            
+        
             <div class="p-4 border border-green-300 rounded-lg bg-green-100">
                 <h3 class="text-lg font-medium text-green-700">Housing & Environment</h3>
                 <label class="block mt-2 font-medium">Space per Bird:</label>
-                <input type="text" name="Housing_and_Environment[Space_per_bird]" value="{{ breed.housing_environment['Space_per_bird'] }}" class="w-full p-2 border border-green-300 rounded-md">
-                
+                <input type="text" name="Housing_and_Environment[Space_per_bird]" value="{{ breed.housing_environment['space_per_bird'] }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Ventilation:</label>
-                <input type="text" name="Housing_and_Environment[Ventilation]" value="{{ breed.housing_environment['Ventilation'] }}" class="w-full p-2 border border-green-300 rounded-md">
-                
+                <input type="text" name="Housing_and_Environment[Ventilation]" value="{{ breed.housing_environment['ventilation'] }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Temperature:</label>
-                <input type="text" name="Housing_and_Environment[Temperature]" value="{{ breed.housing_environment['Temperature'] }}" class="w-full p-2 border border-green-300 rounded-md">
-            
+                <input type="text" name="Housing_and_Environment[Temperature]" value="{{ breed.housing_environment['temperature'] }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Humidity:</label>
-                <input type="text" name="Housing_and_Environment[Humidity]" value="{{ breed.housing_environment['Humidity'] }}" class="w-full p-2 border border-green-300 rounded-md">
-            
+                <input type="text" name="Housing_and_Environment[Humidity]" value="{{ breed.housing_environment['humidity'] }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Biosecurity Measures (Comma separated values):</label>
-                <input type="text" name="Housing_and_Environment[Biosecurity]" value="{{ ','.join(breed.housing_environment['Biosecurity']) }}" class="w-full p-2 border border-green-300 rounded-md">
+                <input type="text" name="Housing_and_Environment[Biosecurity]" value="{{ ','.join(breed.housing_environment['biosecurity']) }}" class="w-full p-2 border border-green-300 rounded-md">
             </div>
-            
+        
             <div class="p-4 border border-green-300 rounded-lg bg-green-100">
                 <h3 class="text-lg font-medium text-green-700">Disease Prevention & Health</h3>
                 <label class="block mt-2 font-medium">Common Diseases:</label>
                 <input type="text" name="Disease_Prevention_and_Health[Common_diseases]" value="{{ ','.join(breed.disease_prevention_health['common_diseases']) }}" class="w-full p-2 border border-green-300 rounded-md">
-
+        
                 <label class="block mt-2 font-medium">Vaccination Schedule:</label>
                 {% for vaccine in breed.disease_prevention_health['vaccination_schedule'] %}
                     <div class="vaccination-entry">
-                            <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][{{ loop.index0 }}][Disease]" value="{{ vaccine['Disease'] }}" class="w-full p-2 border border-green-300 rounded-md">
-                            <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][{{ loop.index0 }}][Age]" value="{{ vaccine['Age'] }}" class="w-full p-2 border border-green-300 rounded-md">
-                            <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][{{ loop.index0 }}][Method]" value="{{ vaccine['Method'] }}" class="w-full p-2 border border-green-300 rounded-md">
+                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][{{ loop.index0 }}][Disease]" value="{{ vaccine['disease'] }}" class="w-full p-2 border border-green-300 rounded-md">
+                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][{{ loop.index0 }}][Age]" value="{{ vaccine['age'] }}" class="w-full p-2 border border-green-300 rounded-md">
+                        <input type="text" name="Disease_Prevention_and_Health[Vaccination_schedule][{{ loop.index0 }}][Method]" value="{{ vaccine['method'] }}" class="w-full p-2 border border-green-300 rounded-md">
                     </div><br>
                 {% endfor %}
                 <div id="vaccination-container"></div>
-                <button type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" onclick="addVaccination()">+Add Vaccination</button>
+                <button type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2" onclick="addVaccination()">+Add Vaccination</button>
             </div>
-            
+        
             <div class="p-4 border border-blue-300 rounded-lg bg-blue-100 mt-4">
                 <h3 class="text-lg font-medium text-blue-700">Breeding & Reproduction</h3>
                 <label class="block mt-2 font-medium">Best Breeding Age:</label>
                 <input type="text" name="Breeding_and_Reproduction[Best_breeding_age]" value="{{ breed.breeding_reproduction['best_breeding_age'] }}" class="w-full p-2 border border-blue-300 rounded-md">
-                
+        
                 <label class="block mt-2 font-medium">Egg Production:</label>
                 <input type="text" name="Breeding_and_Reproduction[Egg_production]" value="{{ breed.breeding_reproduction['egg_production'] }}" class="w-full p-2 border border-blue-300 rounded-md">
-            
+        
                 <label class="block mt-2 font-medium">Brooding Requirements:</label>
                 <input type="text" name="Breeding_and_Reproduction[Brooding_requirements]" value="{{ breed.breeding_reproduction['brooding_requirements'] }}" class="w-full p-2 border border-blue-300 rounded-md">
-            
+        
                 <label class="block mt-2 font-medium">Incubation Methods:</label>
                 <input type="text" name="Breeding_and_Reproduction[Incubation_methods]" value="{{ breed.breeding_reproduction['incubation_methods'] }}" class="w-full p-2 border border-blue-300 rounded-md">
             </div>
-            
+        
             <div class="p-4 border border-yellow-300 rounded-lg bg-yellow-100 mt-4">
                 <h3 class="text-lg font-medium text-yellow-700">Productivity & Economics</h3>
                 <label class="block mt-2 font-medium">Growth Rate:</label>
                 <input type="text" name="Productivity_and_Economics[Growth_rate]" value="{{ breed.productivity_economics['growth_rate'] }}" class="w-full p-2 border border-yellow-300 rounded-md">
-                
+        
                 <label class="block mt-2 font-medium">Egg Laying:</label>
                 <input type="text" name="Productivity_and_Economics[Egg_laying]" value="{{ breed.productivity_economics['egg_laying'] }}" class="w-full p-2 border border-yellow-300 rounded-md">
-            
+        
                 <label class="block mt-2 font-medium">Market Price:</label>
                 <input type="text" name="Productivity_and_Economics[Market_price]" value="{{ breed.productivity_economics['market_price'] }}" class="w-full p-2 border border-yellow-300 rounded-md">
-            
-                <label class="block mt-2 font-medium">Profit Maximization (Comma-separated values):</label>
+        
+                <label class="block mt-2 font-medium">Profit Maximization:</label>
                 <input type="text" name="Productivity_and_Economics[Profit_maximization]" value="{{ ','.join(breed.productivity_economics['profit_maximization']) }}" class="w-full p-2 border border-yellow-300 rounded-md">
             </div>
-            
+        
             <div class="p-4 border border-purple-300 rounded-lg bg-purple-100 mt-4">
                 <h3 class="text-lg font-medium text-purple-700">Breed Characteristics</h3>
                 <label class="block mt-2 font-medium">Temperament:</label>
                 <input type="text" name="Breed_Characteristics[Temperament]" value="{{ breed.breed_characteristics['temperament'] }}" class="w-full p-2 border border-purple-300 rounded-md">
-                
+        
                 <label class="block mt-2 font-medium">Farming Suitability:</label>
                 <input type="text" name="Breed_Characteristics[Farming_suitability]" value="{{ breed.breed_characteristics['farming_suitability'] }}" class="w-full p-2 border border-purple-300 rounded-md">
-            
+        
                 <label class="block mt-2 font-medium">Climate Adaptability:</label>
                 <input type="text" name="Breed_Characteristics[Climate_adaptability]" value="{{ breed.breed_characteristics['climate_adaptability'] }}" class="w-full p-2 border border-purple-300 rounded-md">
-            
+        
                 <label class="block mt-2 font-medium">Special Needs:</label>
                 <input type="text" name="Breed_Characteristics[Special_needs]" value="{{ breed.breed_characteristics['special_needs'] }}" class="w-full p-2 border border-purple-300 rounded-md">
             </div>
-
-            <div class="p-4 border border-green-300 rounded-lg bg-green-100 mt-4">
+        
+            <div class="p-4 border border-green-300 rounded-lg bg-green-100">
                 <h3 class="text-lg font-medium text-green-700">Physical Description</h3>
                 <label class="block mt-2 font-medium">Body Shape:</label>
-                <input type="text" name="Physical_Description[Body_Shape]" class="w-full p-2 border border-green-300 rounded-md" value="{{ breed.breed_physical_description.body_shape if breed else '' }}">
-            
+                <input type="text" name="Physical_Description[Body_shape]" value="{{ breed.breed_physical_description.body_shape }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Feather Color & Pattern:</label>
-                <input type="text" name="Physical_Description[Feather_Color_Pattern]" class="w-full p-2 border border-green-300 rounded-md" value="{{ breed.breed_physical_description.feather_color_pattern if breed else '' }}">
-            
+                <input type="text" name="Physical_Description[Feather_color_pattern]" value="{{ breed.breed_physical_description.feather_color_pattern }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Comb Type:</label>
-                <input type="text" name="Physical_Description[Comb_Type]" class="w-full p-2 border border-green-300 rounded-md" value="{{ breed.breed_physical_description.comb_type if breed else '' }}">
-            
+                <input type="text" name="Physical_Description[Comb_type]" value="{{ breed.breed_physical_description.comb_type }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Leg Color & Features:</label>
-                <input type="text" name="Physical_Description[Leg_Color_Features]" class="w-full p-2 border border-green-300 rounded-md" value="{{ breed.breed_physical_description.leg_color_features if breed else '' }}">
-            
+                <input type="text" name="Physical_Description[Leg_color_features]" value="{{ breed.breed_physical_description.leg_color_features }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Beak Shape & Color:</label>
-                <input type="text" name="Physical_Description[Beak_Shape_Color]" class="w-full p-2 border border-green-300 rounded-md" value="{{ breed.breed_physical_description.beak_shape_color if breed else '' }}">
-            
+                <input type="text" name="Physical_Description[Beak_shape_color]" value="{{ breed.breed_physical_description.beak_shape_color }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Wattles & Earlobes:</label>
-                <input type="text" name="Physical_Description[Wattles_Earlobes]" class="w-full p-2 border border-green-300 rounded-md" value="{{ breed.breed_physical_description.wattles_earlobes if breed else '' }}">
-            
+                <input type="text" name="Physical_Description[Wattles_earlobes]" value="{{ breed.breed_physical_description.wattles_earlobes }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Skin Color:</label>
-                <input type="text" name="Physical_Description[Skin_Color]" class="w-full p-2 border border-green-300 rounded-md" value="{{ breed.breed_physical_description.skin_color if breed else '' }}">
-            
+                <input type="text" name="Physical_Description[Skin_color]" value="{{ breed.breed_physical_description.skin_color }}" class="w-full p-2 border border-green-300 rounded-md">
+        
                 <label class="block mt-2 font-medium">Tail Shape & Size:</label>
-                <input type="text" name="Physical_Description[Tail_Shape_Size]" class="w-full p-2 border border-green-300 rounded-md" value="{{ breed.breed_physical_description.tail_shape_size if breed else '' }}">
+                <input type="text" name="Physical_Description[Tail_shape_size]" value="{{ breed.breed_physical_description.tail_shape_size }}" class="w-full p-2 border border-green-300 rounded-md">
             </div>
-            
+        
             <div class="p-4 border border-green-300 rounded-lg bg-green-100">
                 <h3 class="text-lg font-medium text-green-700">Breed Images</h3>
                 <label class="block mt-2 font-medium">Upload Images:</label>
                 <input type="file" name="breed_images" id="breed_images" multiple accept="image/*" class="w-full p-2 border border-green-300 rounded-md">
             </div>
-            
+        
             <button type="submit" class="w-full bg-green-600 text-white font-semibold p-3 rounded-lg hover:bg-green-700 transition">Update Breed</button>
         </form>
+        
     </div>
         
         <script>

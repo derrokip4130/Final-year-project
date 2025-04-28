@@ -121,6 +121,21 @@
                 <strong>You:</strong> (${selectedBreed}) ${userMessage} 
             </div><br>`);
 
+            // Before fetch
+            let typingIndicator = document.createElement("div");
+            typingIndicator.className = "typing-indicator text-sm italic text-green-700";
+            typingIndicator.textContent = "Bot is typing...";
+            chatBox.appendChild(typingIndicator);
+
+            // Optional fancy dots
+            let dotCount = 0;
+            let typingInterval = setInterval(() => {
+                dotCount = (dotCount + 1) % 4;
+                typingIndicator.textContent = "Bot is typing" + ".".repeat(dotCount);
+            }, 500);
+
+            // Scroll down
+            chatBox.scrollTop = chatBox.scrollHeight;
 
             fetch("/get_chat_response", {
                 method: "POST",
@@ -130,13 +145,20 @@
                     breed: selectedBreed,
                     message: userMessage
                 }),
+                
             })
             .then(response => response.json())
+            
             .then(data => {
+                clearInterval(typingInterval);
+                typingIndicator.remove();
+
                 let formattedResponse = formatResponse(data.response);
-                chatBox.insertAdjacentHTML("beforeend", `<div class="chat-message bot-message bg-white p-3 rounded-lg max-w-full shadow-md"> 
-                    ${formattedResponse} 
-                </div><br>`);
+                let botMessageDiv = document.createElement("div");
+                botMessageDiv.className = "chat-message bot-message bg-white p-3 rounded-lg max-w-full shadow-md";
+                chatBox.appendChild(botMessageDiv);
+
+                typeWriterEffectHTML(botMessageDiv, formattedResponse);
 
                 chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -379,6 +401,30 @@
                 container.classList.add("hidden");
                 button.textContent = "📷 Show Breed Images";
             }
+        }
+
+        function typeWriterEffectHTML(element, html, speed = 20) {
+            let tempDiv = document.createElement("div");
+            tempDiv.innerHTML = html;
+
+            const children = Array.from(tempDiv.childNodes);
+            let i = 0;
+
+            function appendNext() {
+                if (i < children.length) {
+                    let node = children[i].cloneNode(true);
+                    element.appendChild(node);
+
+                    i++;
+                    setTimeout(appendNext, speed * 5); // You can fine-tune speed here
+                } else {
+                    // Scroll to bottom after last element
+                    const chatBox = document.querySelector(".chat-box");
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }
+
+            appendNext();
         }
 
         window.onload = updateBreedImage;

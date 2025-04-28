@@ -4,47 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error {{ error_code }}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 50px;
-        }
-        .error-box {
-            max-width: 500px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            margin: auto;
-        }
-        .error-box h1 {
-            font-size: 48px;
-        }
-        .error-box p {
-            font-size: 18px;
-        }
-        .home-button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #721c24;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="error-box">
-        <h1>Error {{ error_code }}</h1>
-        <p>{{ error_message }}</p>
-        {% if current_user.user_role =='farmer' %}
-        <a href="{{ url_for('main.home') }}" class="home-button">Go Back Home</a>
+<body class="bg-red-100 text-red-800 flex items-center justify-center min-h-screen">
+    <div class="bg-white max-w-md w-full p-8 rounded-lg shadow-lg text-center">
+        <h1 class="text-5xl font-bold mb-4">Error {{ error_code }}</h1>
+        <p class="text-lg mb-6">{{ error_message }}</p>
+        {% if current_user.user_role == 'farmer' %}
+            <a href="{{ url_for('main.home') }}" class="inline-block bg-red-800 text-white px-6 py-2 rounded hover:bg-red-900 transition">Go Back Home</a>
         {% else %}
-        <a href="{{ url_for('main.admin_dashboard') }}" class="home-button">Go to Admin Dashboard</a>
+            <a href="{{ url_for('main.admin_dashboard') }}" class="inline-block bg-red-800 text-white px-6 py-2 rounded hover:bg-red-900 transition">Go to Admin Dashboard</a>
         {% endif %}
     </div>
 </body>

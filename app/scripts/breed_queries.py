@@ -8,22 +8,23 @@ co = cohere.Client(os.getenv("COHERE_API_KEY"))
 system_public_url = os.getenv("PUBLIC_URL")
 
 valid_categories = {
-    "Feeding and Nutrition": ["Chick", "Grower", "Broiler", "Layer", "Supplementation", "Alternative_feeds"],
-    "Housing and Environment": ["Space_per_bird", "Ventilation", "Temperature", "Humidity", "Biosecurity"],
-    "Disease Prevention and Health": ["Common_diseases", "Vaccination_schedule", "Signs_of_illness", "Deworming"],
-    "Breed Characteristics": ["Temperament", "Farming_suitability", "Climate_adaptability", "Special_needs"],
-    "General Poultry Care": ["Injection_types", "Biosecurity_measures", "Common_treatments"],
+    "feeding_and_nutrition": ["chick", "grower", "broiler", "layer", "supplementation", "alternative_feeds"],
+    "housing_and_environment": ["space_per_bird", "ventilation", "temperature", "humidity", "biosecurity"],
+    "disease_prevention_and_health": ["common_diseases", "vaccination_schedule", "signs_of_illness", "deworming"],
+    "breed_characteristics": ["temperament", "farming_suitability", "climate_adaptability", "special_needs"],
+    "general_poultry_care": ["injection_types", "biosecurity_measures", "common_treatments"],
     
-    "Breed Physical Description": ["Body_Shape", "Feather_Color_Pattern", "Comb_Type", "Leg_Color_Features", 
-                                   "Beak_Shape_Color", "Wattles_Earlobes", "Skin_Color", "Tail_Shape_Size"],
+    "breed_physical_description": [
+        "body_shape", "feather_color_pattern", "comb_type", "leg_color_features", 
+        "beak_shape_color", "wattles_earlobes", "skin_color", "tail_shape_size"
+    ],
 
-    "Breeding and Reproduction": ["Best_breeding_age", "Egg_production", "Brooding_requirements", "Incubation_methods"],
-    "Productivity and Economics": ["Growth_rate", "Egg_laying", "Market_price", "Profit_maximization"],
+    "breeding_and_reproduction": ["best_breeding_age", "egg_production", "brooding_requirements", "incubation_methods"],
+    "productivity_and_economics": ["growth_rate", "egg_laying", "market_price", "profit_maximization"],
 
-    "Purpose": [],
-    "Category": []
+    "purpose": [],
+    "category": []
 }
-
 
 def format_vaccination_schedule(vaccination_data):
     """Format vaccination details as a structured list."""
@@ -31,7 +32,7 @@ def format_vaccination_schedule(vaccination_data):
         return "No vaccination data available."
 
     formatted_schedule = "\n".join(
-        f"- **Age:** {entry['Age']}, **Disease:** {entry['Disease']}, **Method:** {entry['Method']}"
+        f"- **Age:** {entry['age']}, **Disease:** {entry['disease']}, **Method:** {entry['method']}"
         for entry in vaccination_data
     )
     return formatted_schedule
@@ -115,7 +116,7 @@ def get_response(selected_breed, user_input, chat_history):
             vaccination_data = dataset.get(intent, {}).get("vaccination_schedule", [])
 
             # Extract possible disease name from user input
-            known_diseases = [entry["Disease"].lower() for entry in vaccination_data]
+            known_diseases = [entry["disease"].lower() for entry in vaccination_data]
             disease_queried = None
 
             for disease in known_diseases:
@@ -126,7 +127,7 @@ def get_response(selected_breed, user_input, chat_history):
             if disease_queried:
                 # Filter vaccination schedule for the specific disease
                 filtered_schedule = [
-                    entry for entry in vaccination_data if entry["Disease"].lower() == disease_queried
+                    entry for entry in vaccination_data if entry["disease"].lower() == disease_queried
                 ]
                 if filtered_schedule:
                     formatted_result = format_vaccination_schedule(filtered_schedule)

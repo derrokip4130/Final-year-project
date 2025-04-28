@@ -1,0 +1,222 @@
+{
+  "Kari Improved Kienyeji": {
+    "feeding_and_nutrition": {
+      "chick": {"feed_type": "Starter feed (20-22% protein)", "daily_quantity": "25-40g", "schedule": "4 times a day"},
+      "grower": {"feed_type": "Grower feed (16-18% protein)", "daily_quantity": "90-110g", "schedule": "3 times a day"},
+      "layer": {"feed_type": "Layer feed (15-17% protein, high calcium)", "daily_quantity": "120-140g", "schedule": "2 times a day"},
+      "supplementation": ["Calcium", "Vitamins A, D, E", "Probiotics"],
+      "alternative_feeds": ["Maize bran", "Cottonseed cake", "Fish meal"]
+    },
+    "housing_and_environment": {
+      "space_per_bird": "0.2-0.3 m²",
+      "ventilation": "Natural with open-sided housing",
+      "temperature": "28-32°C (chicks), 18-24°C (adults)",
+      "humidity": "50-75%",
+      "biosecurity": ["Footbaths", "Vaccination protocols", "Regular disinfection"]
+    },
+    "disease_prevention_and_health": {
+      "common_diseases": ["Newcastle Disease", "Gumboro", "Coccidiosis"],
+      "vaccination_schedule": [
+        {"disease": "Newcastle Disease", "age": "Day 1", "method": "Eye drop or drinking water"},
+        {"disease": "Gumboro", "age": "Day 14", "method": "Drinking water"},
+        {"disease": "Fowl Pox", "age": "Week 6", "method": "Wing stab"},
+        {"disease": "Coccidiosis", "age": "Week 3", "method": "Drinking water"}
+      ],
+      "signs_of_illness": ["Diarrhea", "Weakness", "Reduced egg production"],
+      "deworming": "Start at 4 weeks, repeat every 6 weeks"
+    },
+    "breeding_and_reproduction": {
+      "best_breeding_age": "5-6 months",
+      "egg_production": "200-250 eggs per year",
+      "brooding_requirements": "Artificial heating for 3 weeks",
+      "incubation_methods": "Natural brooding or incubator"
+    },
+    "productivity_and_economics": {
+      "growth_rate": "1.5-2 kg in 5-6 months",
+      "egg_laying": "Consistent for 2 years",
+      "market_price": "Moderate, varies with season",
+      "profit_maximization": ["Cost-effective feeding", "Disease management", "Direct market sales"]
+    },
+    "breed_characteristics": {
+      "temperament": "Docile, adaptable",
+      "farming_suitability": "Best for free-range and semi-intensive farming",
+      "climate_adaptability": "Highly adaptable",
+      "special_needs": "Moderate protein and calcium intake"
+    },
+    "physical_description": {
+      "body_shape": "Medium-sized, well-proportioned body",
+      "feather_color_pattern": "Reddish-brown with some white patches",
+      "comb_type": "Single comb, medium size",
+      "leg_color_features": "Yellow to light brown, sturdy legs",
+      "beak_shape_color": "Short, slightly curved, yellowish",
+      "wattles_earlobes": "Medium-sized, red",
+      "skin_color": "Yellow",
+      "tail_shape_size": "Moderate length, slightly upright"
+    }
+  },
+  "Kuroiler": {
+    "feeding_and_nutrition": {
+      "chick": {"feed_type": "Starter feed (22% protein)", "daily_quantity": "30-50g", "schedule": "4-5 times a day"},
+      "grower": {"feed_type": "Grower feed (18-20% protein)", "daily_quantity": "100-120g", "schedule": "3 times a day"},
+      "layer": {"feed_type": "Layer feed (16% protein, high calcium)", "daily_quantity": "140-160g", "schedule": "2 times a day"},
+      "supplementation": ["Vitamins", "Minerals", "Probiotics"],
+      "alternative_feeds": ["Sunflower meal", "Fish meal", "Rice bran"]
+    },
+    "housing_and_environment": {
+      "space_per_bird": "0.2-0.4 m²",
+      "ventilation": "Cross-ventilation with raised roofing",
+      "temperature": "30-32°C (chicks), 18-24°C (adults)",
+      "humidity": "50-70%",
+      "biosecurity": ["Foot dips", "Quarantine new birds", "Vaccination"]
+    },
+    "disease_prevention_and_health": {
+      "common_diseases": ["Newcastle Disease", "Marek’s Disease", "Fowl Cholera"],
+      "vaccination_schedule": [
+        {"disease": "Newcastle Disease", "age": "Day 1", "method": "Eye drop or drinking water"},
+        {"disease": "Marek’s Disease", "age": "Day 1", "method": "Injection"},
+        {"disease": "Gumboro", "age": "Day 14", "method": "Drinking water"},
+        {"disease": "Fowl Cholera", "age": "Week 8", "method": "Injection"}
+      ],
+      "signs_of_illness": ["Loss of appetite", "Lethargy", "Swollen eyes"],
+      "deworming": "Start at 4 weeks, repeat every 6 weeks"
+    },
+    "breeding_and_reproduction": {
+      "best_breeding_age": "5-6 months",
+      "egg_production": "180-200 eggs per year",
+      "brooding_requirements": "Artificial brooding recommended",
+      "incubation_methods": "Artificial incubation or natural brooding"
+    },
+    "productivity_and_economics": {
+      "growth_rate": "2-3 kg in 6 months",
+      "egg_laying": "Consistent for 2 years",
+      "market_price": "Moderate, high demand in rural areas",
+      "profit_maximization": ["Proper feeding", "Vaccination", "Good housing"]
+    },
+    "breed_characteristics": {
+      "temperament": "Active, hardy",
+      "farming_suitability": "Best for free-range and semi-intensive farming",
+      "climate_adaptability": "Highly adaptable to different climates",
+      "special_needs": "High-energy diet for faster growth"
+    },
+    "physical_description": {
+      "body_shape": "Large, well-muscled body with broad chest",
+      "feather_color_pattern": "Varied colors—brown, black, white, and speckled",
+      "comb_type": "Single comb, moderately sized",
+      "leg_color_features": "Dark yellow, thick and strong legs",
+      "beak_shape_color": "Short, curved, yellowish-brown",
+      "wattles_earlobes": "Medium to large, deep red",
+      "skin_color": "Pale yellow to light pink",
+      "tail_shape_size": "Medium to long, slightly fanned out"
+    }
+  },
+  "Sasso": {
+    "feeding_and_nutrition": {
+      "chick": {"feed_type": "Starter feed (20-22% protein)", "daily_quantity": "25-45g", "schedule": "4-5 times a day"},
+      "grower": {"feed_type": "Grower feed (16-18% protein)", "daily_quantity": "90-110g", "schedule": "3 times a day"},
+      "broiler": {"feed_type": "Finisher feed (15-17% protein)", "daily_quantity": "130-160g", "schedule": "2 times a day"},
+      "supplementation": ["Calcium", "Amino acids", "Vitamin D3"],
+      "alternative_feeds": ["Sunflower cake", "Cottonseed meal", "Fish meal"]
+    },
+    "housing_and_environment": {
+      "space_per_bird": "0.12-0.22 m²",
+      "ventilation": "Natural airflow with supplemental fans",
+      "temperature": "30-32°C (chicks), 18-22°C (adults)",
+      "humidity": "55-75%",
+      "biosecurity": ["Footbaths", "Strict sanitation", "Quarantine for new birds"]
+    },
+    "disease_prevention_and_health": {
+      "common_diseases": ["Newcastle Disease", "Fowl Pox", "Coccidiosis"],
+      "vaccination_schedule": [
+        {"disease": "Newcastle Disease", "age": "Day 1", "method": "Eye drop"},
+        {"disease": "Gumboro", "age": "Day 10", "method": "Drinking water"},
+        {"disease": "Fowl Pox", "age": "Week 4", "method": "Wing stab"},
+        {"disease": "Coccidiosis", "age": "Week 3", "method": "Drinking water"}
+      ],
+      "signs_of_illness": ["Reduced activity", "Loss of appetite", "Swollen eyes"],
+      "deworming": "Start at 4 weeks, repeat every 8 weeks"
+    },
+    "breeding_and_reproduction": {
+      "best_breeding_age": "6-7 months",
+      "egg_production": "200-250 eggs per year",
+      "brooding_requirements": "Brooder at 30-32°C for first 2 weeks",
+      "incubation_methods": "Natural or artificial"
+    },
+    "productivity_and_economics": {
+      "growth_rate": "2.5-3.5 kg in 8-10 weeks",
+      "egg_laying": "Medium frequency",
+      "market_price": "Stable market demand",
+      "profit_maximization": ["Optimal feeding program", "Biosecurity", "Proper disease management"]
+    },
+    "breed_characteristics": {
+      "temperament": "Docile, adaptable",
+      "farming_suitability": "Ideal for free-range and semi-intensive farming",
+      "climate_adaptability": "Highly adaptable to various climates",
+      "special_needs": "Good access to forage, calcium supplementation for layers"
+    },
+    "physical_description": {
+      "body_shape": "Muscular and well-built",
+      "feather_color_pattern": "Reddish-brown with occasional black streaks",
+      "comb_type": "Single comb",
+      "leg_color_features": "Yellow, strong legs with thick shanks",
+      "beak_shape_color": "Short, curved, yellowish beak",
+      "wattles_earlobes": "Medium-sized, red",
+      "skin_color": "Yellow",
+      "tail_shape_size": "Moderate, slightly upright"
+    }
+  },
+  "Kenbro": {
+    "feeding_and_nutrition": {
+      "chick": {"feed_type": "Starter feed (20-22% protein)", "daily_quantity": "30-50g", "schedule": "4-5 times a day"},
+      "grower": {"feed_type": "Grower feed (16-18% protein)", "daily_quantity": "100-120g", "schedule": "3 times a day"},
+      "broiler": {"feed_type": "Finisher feed (15-17% protein)", "daily_quantity": "150-180g", "schedule": "2 times a day"},
+      "supplementation": ["Calcium", "Vitamins", "Minerals"],
+      "alternative_feeds": ["Groundnut cake", "Sesame meal", "Fish meal"]
+    },
+    "housing_and_environment": {
+      "space_per_bird": "0.1-0.2 m²",
+      "ventilation": "Good cross-ventilation required",
+      "temperature": "28-32°C (chicks), 18-22°C (adults)",
+      "humidity": "50-70%",
+      "biosecurity": ["Strict hygiene", "Quarantine measures", "Pest control"]
+    },
+    "disease_prevention_and_health": {
+      "common_diseases": ["Newcastle Disease", "Gumboro", "Coccidiosis"],
+      "vaccination_schedule": [
+        {"disease": "Newcastle Disease", "age": "Day 1", "method": "Eye drop"},
+        {"disease": "Gumboro", "age": "Day 14", "method": "Drinking water"},
+        {"disease": "Marek’s Disease", "age": "Day 1", "method": "Injection"},
+        {"disease": "Fowl Typhoid", "age": "Week 6", "method": "Injection"}
+      ],
+      "signs_of_illness": ["Weakness", "Pale comb", "Diarrhea"],
+      "deworming": "Start at 4 weeks, repeat every 8 weeks"
+    },
+    "breeding_and_reproduction": {
+      "best_breeding_age": "5-6 months",
+      "egg_production": "220-280 eggs per year",
+      "brooding_requirements": "Heated brooder at 30-32°C for first 2 weeks",
+      "incubation_methods": "Natural or artificial"
+    },
+    "productivity_and_economics": {
+      "growth_rate": "2.8-3.5 kg in 10-12 weeks",
+      "egg_laying": "High frequency",
+      "market_price": "Good demand in local markets",
+      "profit_maximization": ["Efficient feeding", "Biosecurity", "Disease prevention"]
+    },
+    "breed_characteristics": {
+      "temperament": "Active, social",
+      "farming_suitability": "Best for free-range and semi-intensive systems",
+      "climate_adaptability": "Tolerant to different climates",
+      "special_needs": "Well-balanced nutrition, proper brooding conditions"
+    },
+    "physical_description": {
+      "body_shape": "Stout, compact build",
+      "feather_color_pattern": "Reddish-brown with speckled white markings",
+      "comb_type": "Single comb",
+      "leg_color_features": "Dark yellow, thick legs",
+      "beak_shape_color": "Medium-sized, slightly curved, yellowish-brown",
+      "wattles_earlobes": "Small to medium, bright red",
+      "skin_color": "Pale yellow",
+      "tail_shape_size": "Short and slightly drooping"
+    }
+  }
+}

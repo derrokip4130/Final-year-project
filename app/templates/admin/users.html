@@ -7,11 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex h-screen bg-green-100">
-    <div class="w-64 bg-green-700 text-white p-5 fixed h-full">
         {% block navbar %}
             {% include 'admin/admin_navbar.html' %}
         {% endblock %}
-    </div>
     
     <div class="ml-64 flex-1 p-6 overflow-auto">
         <div class="bg-white shadow-md p-4 border-b-2 border-green-700">

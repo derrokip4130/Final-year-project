@@ -10,8 +10,6 @@ from app.config import Config
 
 main_blueprint = Blueprint('main', __name__)
 
-eat_tz = pytz.timezone("Africa/Nairobi")
-
 # Configure Cloudinary using Flask app config
 cloudinary.config(
     cloud_name=Config.CLOUDINARY_CLOUD_NAME,
@@ -126,6 +124,19 @@ def add_disease():
             new_disease.symptoms.extend(symptoms)
         db.session.add(new_disease)
         db.session.commit()
+        db.session.flush()
+
+        if "disease_images" in request.files:
+            files = request.files.getlist("disease_images")
+            for file in files:
+                upload_result = cloudinary.uploader.upload(file)
+                new_image = Image(
+                        image_id=Image.generate_image_id(),
+                        image_url=upload_result["secure_url"],
+                        disease_id=new_disease.disease_id  # Link image to breed
+                    )
+                db.session.add(new_image)
+                db.session.commit()
 
         return redirect(url_for('main.diseases_page'))
 
@@ -186,6 +197,18 @@ def update_disease(disease_id):
             selected_symptoms = Symptom.query.filter(Symptom.symptom_id.in_(updated_symptom_ids)).all()
             disease.symptoms.extend(selected_symptoms)
 
+        if "disease_images" in request.files:
+            files = request.files.getlist("disease_images")
+            for file in files:
+                if file and file.filename != "":
+                    upload_result = cloudinary.uploader.upload(file)
+                    new_image = Image(
+                        image_id=Image.generate_image_id(),
+                        image_url=upload_result["secure_url"],
+                        disease_id=disease.disease_id  # Link image to breed
+                        )
+                    db.session.add(new_image)
+
         try:
             db.session.commit()
             return redirect(url_for('main.disease_page', disease_id=disease.disease_id))
@@ -201,7 +224,7 @@ def delete_disease(disease_id):
     if not current_user.is_admin:
         abort(403)
     disease = Disease.query.filter_by(disease_id=disease_id).first()
-    
+    Image.query.filter_by(disease_id=disease_id).delete()    
     if request.method =="POST":
         db.session.delete(disease)
         db.session.commit()
@@ -404,32 +427,32 @@ def update_breed(breed_id):
 
         # Feeding and Nutrition
         breed.feeding_nutrition = {
-            "Chick": {
+            "chick": {
                 "feed_type": request.form.get("Feeding_and_Nutrition[Chick][feed_type]"),
                 "daily_quantity": request.form.get("Feeding_and_Nutrition[Chick][daily_quantity]"),
                 "schedule": request.form.get("Feeding_and_Nutrition[Chick][schedule]"),
             },
-            "Grower": {
+            "grower": {
                 "feed_type": request.form.get("Feeding_and_Nutrition[Grower][feed_type]"),
                 "daily_quantity": request.form.get("Feeding_and_Nutrition[Grower][daily_quantity]"),
                 "schedule": request.form.get("Feeding_and_Nutrition[Grower][schedule]"),
             },
-            "Broiler": {
+            "broiler": {
                 "feed_type": request.form.get("Feeding_and_Nutrition[Broiler][feed_type]"),
                 "daily_quantity": request.form.get("Feeding_and_Nutrition[Broiler][daily_quantity]"),
                 "schedule": request.form.get("Feeding_and_Nutrition[Broiler][schedule]"),
             },
-            "Supplementation": request.form.get("Feeding_and_Nutrition[Supplementation]", "").split(","),
-            "Alternative_feeds": request.form.get("Feeding_and_Nutrition[Alternative_feeds]", "").split(","),
+            "supplementation": request.form.get("Feeding_and_Nutrition[Supplementation]", "").split(","),
+            "alternative_feeds": request.form.get("Feeding_and_Nutrition[Alternative_feeds]", "").split(","),
         }
 
         # Housing and Environment
         breed.housing_environment = {
-            "Space_per_bird": request.form.get("Housing_and_Environment[Space_per_bird]"),
-            "Ventilation": request.form.get("Housing_and_Environment[Ventilation]"),
-            "Temperature": request.form.get("Housing_and_Environment[Temperature]"),
-            "Humidity": request.form.get("Housing_and_Environment[Humidity]"),
-            "Biosecurity": request.form.get("Housing_and_Environment[Biosecurity]", "").split(","),
+            "space_per_bird": request.form.get("Housing_and_Environment[Space_per_bird]"),
+            "ventilation": request.form.get("Housing_and_Environment[Ventilation]"),
+            "temperature": request.form.get("Housing_and_Environment[Temperature]"),
+            "humidity": request.form.get("Housing_and_Environment[Humidity]"),
+            "biosecurity": request.form.get("Housing_and_Environment[Biosecurity]", "").split(","),
         }
 
         # Disease Prevention and Health
@@ -443,13 +466,13 @@ def update_breed(breed_id):
         index = 0
         while request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Disease]"):
             disease_prevention_health["vaccination_schedule"].append({
-                "Disease": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Disease]"),
-                "Age": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Age]"),
-                "Method": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Method]"),
+                "disease": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Disease]"),
+                "age": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Age]"),
+                "method": request.form.get(f"Disease_Prevention_and_Health[Vaccination_schedule][{index}][Method]"),
             })
             index += 1
 
-        disease_prevention_health["Signs_of_illness"] = request.form.get(
+        disease_prevention_health["signs_of_illness"] = request.form.get(
             "Disease_Prevention_and_Health[Signs_of_illness]", "").split(",")
 
         breed.disease_prevention_health = disease_prevention_health
@@ -479,14 +502,14 @@ def update_breed(breed_id):
         }
 
         breed.breed_physical_description = {
-            "body_shape": request.form.get("Physical_Description[Body_Shape]"),
-            "feather_color_pattern": request.form.get("Physical_Description[Feather_Color_Pattern]"),
-            "comb_type": request.form.get("Physical_Description[Comb_Type]"),
-            "leg_color_features": request.form.get("Physical_Description[Leg_Color_Features]"),
-            "beak_shape_color": request.form.get("Physical_Description[Beak_Shape_Color]"),
-            "wattles_earlobes": request.form.get("Physical_Description[Wattles_Earlobes]"),
-            "skin_color": request.form.get("Physical_Description[Skin_Color]"),
-            "tail_shape_size": request.form.get("Physical_Description[Tail_Shape_Size]"),
+            "body_shape": request.form.get("Physical_Description[Body_shape]"),
+            "feather_color_pattern": request.form.get("Physical_Description[Feather_color_pattern]"),
+            "comb_type": request.form.get("Physical_Description[Comb_type]"),
+            "leg_color_features": request.form.get("Physical_Description[Leg_color_features]"),
+            "beak_shape_color": request.form.get("Physical_Description[Beak_shape_color]"),
+            "wattles_earlobes": request.form.get("Physical_Description[Wattles_earlobes]"),
+            "skin_color": request.form.get("Physical_Description[Skin_color]"),
+            "tail_shape_size": request.form.get("Physical_Description[Tail_shape_size]"),
         }
 
         # Process images only if the user uploaded them
@@ -517,7 +540,9 @@ def update_breed(breed_id):
 def get_disease_details(disease_name):
     # Query the disease from the database
     disease = Disease.query.filter_by(disease_name=disease_name).first()
-
+    disease_images = Image.query.filter_by(disease_id=disease.disease_id).all()
+    image_urls = [disease_image.image_url for disease_image in disease_images] if disease_images else None
+    
     if not disease:
         return jsonify({"error": "Disease not found"}), 404
 
@@ -531,6 +556,7 @@ def get_disease_details(disease_name):
         "prevention_tips": disease.disease_prevention_tips,
         "causes": disease.causes,
         "symptoms": symptoms,  # Include symptoms here
+        "disease_images": image_urls,
         "last_updated": disease.last_updated.strftime("%Y-%m-%d %H:%M:%S")
     })
 
@@ -547,8 +573,15 @@ def breed_queries_page():
 @login_required
 def disease_diagnosis_page():
     symptoms = Symptom.query.all()
-    
-    return render_template("disease_diagnosis.html",symptoms=symptoms)
+    symptom_list = [{"symptom_name": s.symptom_name} for s in symptoms]
+    return render_template("disease_diagnosis.html", symptoms=symptom_list)
+
+@main_blueprint.route("/get_all_symptoms")
+def get_symptoms():
+    symptoms = Symptom.query.all()
+    symptom_list = [{"symptom_id": s.symptom_id, "symptom_name": s.symptom_name} for s in symptoms]
+    return jsonify(symptom_list)
+
 
 @main_blueprint.route("/diagnose_diseases",methods=["POST"])
 @login_required
@@ -612,12 +645,16 @@ def get_all_diagnoses_with_diseases():
                 'probability': dd.probability
             })
 
+        diagnosis_image = Image.query.filter_by(diagnosis_id=diag.diagnosis_id).first()
+        image_url = diagnosis_image.image_url if diagnosis_image else None
+
         result.append({
             'diagnosis_id': diag.diagnosis_id,
             'symptoms_input': diag.symptoms_input,
             'user_id': diag.user_id,
             'diagnosis_time': diag.diagnosis_time.strftime("%Y-%m-%d %H:%M:%S"),
-            'diseases_diagnosed': diagnosed_diseases
+            'diseases_diagnosed': diagnosed_diseases,
+            'image_url': image_url
         })
 
     return jsonify(result), 200
@@ -640,46 +677,59 @@ def get_breed_data(breed_name):
 
         if not breed:
             return jsonify({"error": "Breed not found"}), 404
+        
+        # Define base stages
+        stages = ["chick", "grower"]
+
+        # Extend based on category
+        category = breed.breed_category.lower()
+        if category == "broiler":
+            stages += ["broiler"]
+        elif category == "layer":
+            stages += ["layer"]
+        elif category == "kienyeji":
+            stages += ["grower_2", "mature"]
 
         dataset = {
             "breed_name": breed.breed_name,
-            "Purpose": breed.breed_purpose,
-            "Category": breed.breed_category,
-            "Feeding and Nutrition": {
+            "purpose": breed.breed_purpose,
+            "category": breed.breed_category,
+            "feeding_and_nutrition": {
                 stage: {
                     "feed_type": breed.feeding_nutrition.get(stage, {}).get("feed_type", "N/A"),
                     "daily_quantity": breed.feeding_nutrition.get(stage, {}).get("daily_quantity", "N/A"),
                     "schedule": breed.feeding_nutrition.get(stage, {}).get("schedule", "N/A"),
-                } for stage in ["Chick", "Grower"]
+                } for stage in stages
             },
-            "Housing and Environment": {
-                key: breed.housing_environment.get(key, "N/A") for key in [
+            "housing_and_environment": {
+                key.lower(): breed.housing_environment.get(key, "N/A") for key in [
                     "Space_per_bird", "Ventilation", "Temperature", "Humidity", "Biosecurity"
                 ]
             },
-            "Disease Prevention and Health": {
+            "disease_prevention_and_health": {
                 key: breed.disease_prevention_health.get(key, "N/A") for key in [
                     "common_diseases", "vaccination_schedule", "deworming"
                 ]
             },
-            "Breeding and Reproduction": {
+            "breeding_and_reproduction": {
                 key: breed.breeding_reproduction.get(key, "N/A") for key in [
                     "best_breeding_age", "egg_production", "brooding_requirements", "incubation_period"
                 ]
             },
-            "Productivity and Economics": {
+            "productivity_and_economics": {
                 key: breed.productivity_economics.get(key, "N/A") for key in [
                     "growth_rate", "egg_laying", "market_price"
                 ]
             },
-            "Breed Characteristics": {
+            "breed_characteristics": {
                 key: breed.breed_characteristics.get(key, "N/A") for key in [
                     "temperament", "farming_suitability", "climate_suitability", "special_needs"
                 ]
             },
-            "Breed Physical Description": {
+            "breed_physical_description": {
                 key: breed.breed_physical_description.get(key, "N/A") for key in [
-                    "body_shape", "feather_color_pattern", "comb_type", "leg_color_features", "beak_shape_color", "wattles_earlobes", "skin_color", "tail_shape_size"
+                    "body_shape", "feather_color_pattern", "comb_type", "leg_color_features",
+                    "beak_shape_color", "wattles_earlobes", "skin_color", "tail_shape_size"
                 ]
             }
         }
@@ -688,6 +738,7 @@ def get_breed_data(breed_name):
 
     except Exception as e:
         return jsonify({"error": "An unexpected error occurred", "details": str(e)}), 500
+
 
 @main_blueprint.route('/search_disease/<symptom_name>', methods=["GET"])
 def get_disease(symptom_name):
@@ -745,7 +796,7 @@ def get_chat_response():
             chat_id=Chat.generate_chat_id(),
             chat_title=chat_title,
             user_id=user_id,
-            created_at=datetime.now(eat_tz)
+            created_at=datetime.now()
         )
         db.session.add(chat)
         db.session.commit()
@@ -762,7 +813,7 @@ def get_chat_response():
         breed_name=breed,
         user_query=message,
         bot_response=response_text,
-        timestamp=datetime.now(eat_tz)
+        timestamp=datetime.now()
     )
 
     db.session.add(new_query)

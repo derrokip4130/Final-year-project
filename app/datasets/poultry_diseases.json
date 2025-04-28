@@ -1,0 +1,124 @@
+{
+  "poultry_diseases": [
+    {
+      "disease_name": "Newcastle Disease",
+      "description": "Newcastle Disease is a highly contagious viral disease that affects the respiratory, nervous, and digestive systems of poultry. It can cause severe economic losses due to high mortality, reduced egg production, and trade restrictions.",
+      "symptoms": ["Sneezing", "Nasal discharge", "Difficulty breathing", "Twisted neck", "Paralysis"],
+      "causes": ["Newcastle disease virus (NDV)"],
+      "preventive_measures": ["Vaccination", "Biosecurity", "Avoiding contact with wild birds"],
+      "treatments": ["No specific treatment; supportive care and culling of affected birds"]
+    },
+    {
+      "disease_name": "Avian Influenza",
+      "description": "Avian Influenza, or bird flu, is a viral infection that can spread rapidly among poultry flocks. Certain strains can be zoonotic, posing a threat to human health. It is often associated with high mortality and significant trade impact.",
+      "symptoms": ["Coughing", "Swelling of the head", "Purple discoloration of wattles", "Drop in egg production"],
+      "causes": ["Avian influenza virus"],
+      "preventive_measures": ["Vaccination", "Strict biosecurity", "Avoiding exposure to wild birds"],
+      "treatments": ["No specific treatment; culling of infected flocks"]
+    },
+    {
+      "disease_name": "Marek's Disease",
+      "description": "Marek's Disease is a viral disease caused by a herpesvirus that leads to tumors and paralysis in chickens. It is a major concern in layer and broiler flocks and is usually prevented by early vaccination.",
+      "symptoms": ["Paralysis", "Weight loss", "Vision impairment"],
+      "causes": ["Marek's disease virus (MDV)"],
+      "preventive_measures": ["Vaccination at hatch"],
+      "treatments": ["No treatment; focus on prevention through vaccination"]
+    },
+    {
+      "disease_name": "Coccidiosis",
+      "description": "Coccidiosis is a parasitic disease of the intestinal tract caused by protozoa of the genus Eimeria. It is common in poultry raised under intensive conditions and leads to poor growth, feed inefficiency, and mortality if untreated.",
+      "symptoms": ["Diarrhea", "Bloody droppings", "Loss of appetite", "Dehydration"],
+      "causes": ["Eimeria protozoa"],
+      "preventive_measures": ["Good sanitation", "Use of medicated feed"],
+      "treatments": ["Anticoccidial medications"]
+    },
+    {
+      "disease_name": "Infectious Bronchitis",
+      "description": "Infectious Bronchitis is a highly contagious viral disease that affects the respiratory tract, kidneys, and reproductive systems in poultry, especially chickens. It causes major economic losses in egg production and bird growth.",
+      "symptoms": ["Coughing", "Sneezing", "Drop in egg production"],
+      "causes": ["Infectious bronchitis virus"],
+      "preventive_measures": ["Vaccination", "Good ventilation"],
+      "treatments": ["No specific treatment; supportive care"]
+    },
+    {
+      "disease_name": "Fowl Cholera",
+      "description": "Fowl Cholera is a bacterial infection that can become acute and cause sudden death in poultry. It primarily affects older birds and is often seen in poorly managed flocks or those exposed to wild animals.",
+      "symptoms": ["Swelling of wattles", "Difficulty breathing", "Sudden death"],
+      "causes": ["Pasteurella multocida"],
+      "preventive_measures": ["Vaccination", "Good hygiene"],
+      "treatments": ["Antibiotics such as sulfonamides"]
+    },
+    {
+      "disease_name": "Infectious Bursal Disease (IBD)",
+      "description": "IBD, also known as Gumboro disease, is a highly contagious viral infection affecting the immune system of young chickens, especially the bursa of Fabricius. It increases the birds' susceptibility to other infections.",
+      "symptoms": ["Diarrhea", "Dehydration", "Ruffled feathers"],
+      "causes": ["Infectious bursal disease virus"],
+      "preventive_measures": ["Vaccination", "Clean housing"],
+      "treatments": ["No specific treatment; supportive care"]
+    },
+    {
+      "disease_name": "Fowl Pox",
+      "description": "Fowl Pox is a slow-spreading viral disease that causes lesions on the skin and in the upper respiratory tract. It exists in both a dry (cutaneous) and wet (diphtheritic) form, and is transmitted by biting insects or through wounds.",
+      "symptoms": ["Scabs on comb, wattles, and feet", "Drop in egg production"],
+      "causes": ["Fowl pox virus"],
+      "preventive_measures": ["Vaccination"],
+      "treatments": ["No specific treatment; supportive care"]
+    },
+    {
+      "disease_name": "Pullorum Disease",
+      "description": "Pullorum Disease is a bacterial infection that affects primarily young chicks, leading to high mortality. It is transmitted vertically from infected hens to eggs and is targeted for eradication in many countries.",
+      "symptoms": ["White diarrhea", "Weakness", "High chick mortality"],
+      "causes": ["Salmonella pullorum"],
+      "preventive_measures": ["Testing and culling carriers"],
+      "treatments": ["Antibiotics; eradication programs"]
+    },
+    {
+      "disease_name": "Colibacillosis",
+      "description": "Colibacillosis is a bacterial infection caused by E. coli that often follows respiratory diseases or poor hygiene. It leads to systemic infection, affecting multiple organs and causing mortality and production losses.",
+      "symptoms": ["Respiratory distress", "Swollen joints", "Diarrhea"],
+      "causes": ["Escherichia coli"],
+      "preventive_measures": ["Good hygiene", "Biosecurity"],
+      "treatments": ["Antibiotics"]
+    },
+    {
+      "disease_name": "Aspergillosis",
+      "description": "Aspergillosis is a fungal respiratory infection that typically affects chicks and birds raised in damp environments. It can cause significant mortality in young flocks due to severe respiratory distress.",
+      "symptoms": ["Gasping", "Weight loss", "Nasal discharge"],
+      "causes": ["Aspergillus fungi"],
+      "preventive_measures": ["Good ventilation", "Dry litter"],
+      "treatments": ["Antifungal medications"]
+    },
+    {
+      "disease_name": "Mycoplasmosis",
+      "description": "Mycoplasmosis is a chronic respiratory disease in poultry caused by Mycoplasma bacteria. It spreads through direct contact and contaminated equipment and can become endemic in flocks if not managed.",
+      "symptoms": ["Coughing", "Sneezing", "Swelling of sinuses"],
+      "causes": ["Mycoplasma bacteria"],
+      "preventive_measures": ["Biosecurity", "Testing flocks"],
+      "treatments": ["Antibiotics such as Tylosin"]
+    },
+    {
+      "disease_name": "Infectious Coryza",
+      "description": "Infectious Coryza is an acute respiratory disease in chickens caused by the bacterium *Avibacterium paragallinarum*. It is characterized by facial swelling, nasal discharge, and conjunctivitis. The disease spreads rapidly through direct contact or contaminated equipment and is especially problematic in layer flocks due to reduced egg production.",
+      "symptoms": ["Swelling of the face", "Nasal discharge", "Foul-smelling odor", "Conjunctivitis", "Reduced egg production"],
+      "causes": ["Avibacterium paragallinarum"],
+      "preventive_measures": ["Vaccination", "Strict biosecurity", "Avoiding introduction of new birds without quarantine"],
+      "treatments": ["Antibiotics such as sulfonamides or tetracyclines", "Supportive care to reduce stress and secondary infections"]
+    },
+    {
+      "disease_name": "Egg Drop Syndrome",
+      "description": "Egg Drop Syndrome is a viral disease that affects laying hens, resulting in reduced egg production and abnormal eggs. It spreads mainly through contaminated eggs or equipment.",
+      "symptoms": ["Soft-shelled eggs", "Drop in egg production"],
+      "causes": ["Egg drop syndrome virus"],
+      "preventive_measures": ["Vaccination", "Avoid contact with infected birds"],
+      "treatments": ["No specific treatment; supportive care"]
+    },
+    {
+      "disease_name": "Botulism",
+      "description": "Botulism is a potentially fatal disease in poultry caused by toxins produced by the bacterium Clostridium botulinum. Birds typically ingest the toxin through contaminated feed or carcasses in the environment.",
+      "symptoms": ["Paralysis", "Weakness", "Sudden death"],
+      "causes": ["Clostridium botulinum toxin"],
+      "preventive_measures": ["Removing decaying organic matter", "Good hygiene"],
+      "treatments": ["Antitoxins and supportive care"]
+    }
+  ]
+}

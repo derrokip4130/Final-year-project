@@ -6,18 +6,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSONB
 
-eat_tz = pytz.timezone("Africa/Nairobi")
-
 disease_symptom = db.Table(
     'disease_symptom',
     db.Column('disease_id', db.String(10), db.ForeignKey('diseases.disease_id'), primary_key=True),
     db.Column('symptom_id', db.String(10), db.ForeignKey('symptom.symptom_id'), primary_key=True)
-)
-
-farmer_breed = db.Table(
-    "farmer_breed",
-    db.Column("user_id", db.String, db.ForeignKey("user.user_id"), primary_key=True),
-    db.Column("breed_id", db.String(5), db.ForeignKey("breed.breed_id"), primary_key=True),
 )
 
 class User(db.Model, UserMixin):
@@ -38,7 +30,6 @@ class User(db.Model, UserMixin):
     last_login = db.Column(db.DateTime(timezone=True), nullable=True)
     is_active = db.Column(db.Boolean, default=True)
 
-    breeds = db.relationship("Breed", secondary=farmer_breed, back_populates="farmers")
     chats = db.relationship('Chat', backref='user', lazy=True)
 
     def __repr__(self):
@@ -88,9 +79,10 @@ class Disease(db.Model):
     disease_name = db.Column(db.String(50), nullable=False)
     disease_description = db.Column(db.Text, nullable=True)
     disease_prevention_tips = db.Column(db.Text, nullable=True)
-    causes = db.Column(db.String(255), nullable=True)  # Causes of the disease
-    last_updated = db.Column(db.DateTime, default=datetime.now(eat_tz), onupdate=datetime.now(eat_tz))
-    created_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
+    causes = db.Column(db.String(255), nullable=True)
+    disease_treatment_options = db.Column(db.String(255), nullable=True)
+    last_updated = db.Column(db.DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.now())
 
     symptoms = db.relationship('Symptom', secondary=disease_symptom, backref=db.backref('diseases', lazy='dynamic'))
 
@@ -123,8 +115,6 @@ class Breed(db.Model):
     breeding_reproduction = db.Column(JSONB)
     productivity_economics = db.Column(JSONB)
 
-    farmers = db.relationship("User", secondary=farmer_breed, back_populates="breeds")
-
     def __repr__(self):
         return self.breed_name
 
@@ -146,7 +136,7 @@ class BreedQuery(db.Model):
     breed_name = db.Column(db.String(100), nullable=False)
     user_query = db.Column(db.Text, nullable=False)
     bot_response = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.now(eat_tz))
+    timestamp = db.Column(db.DateTime, default=datetime.now())
 
     def __repr__(self):
         return f"<Query {self.query_id} for {self.breed_name}>"
@@ -166,8 +156,8 @@ class Chat(db.Model):
 
     chat_id = db.Column(db.String(10), primary_key=True)
     chat_title = db.Column(db.String(150))
-    user_id = db.Column(db.String(36), db.ForeignKey('user.user_id'), nullable=False)  # Foreign Key
-    created_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)  # Foreign Key
+    created_at = db.Column(db.DateTime, default=datetime.now())
 
     breed_queries = db.relationship('BreedQuery', backref='chat', cascade="all, delete-orphan")
 
@@ -189,7 +179,7 @@ class Image(db.Model):
 
     image_id = db.Column(db.String(10), primary_key=True)
     image_url = db.Column(db.String(255))
-    uploaded_at = db.Column(db.DateTime, default=datetime.now(eat_tz))
+    uploaded_at = db.Column(db.DateTime, default=datetime.now())
 
     breed_id = db.Column(db.String(15), db.ForeignKey('breed.breed_id'), nullable=True)
     disease_id = db.Column(db.String(15), db.ForeignKey('diseases.disease_id'), nullable=True)
@@ -220,8 +210,8 @@ class Diagnosis(db.Model):
 
     diagnosis_id = db.Column(db.String(15), primary_key=True)
     symptoms_input = db.Column(db.Text, nullable=False)
-    user_id = db.Column(db.String(36), db.ForeignKey('user.user_id'), nullable=False)
-    diagnosis_time = db.Column(db.DateTime, default=datetime.now(eat_tz))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
+    diagnosis_time = db.Column(db.DateTime, default=datetime.now())
 
     # Relationship to diseases diagnosed
     diseases_diagnosed = db.relationship('DiseasesDiagnosed', backref='diagnosis', cascade='all, delete-orphan')
@@ -268,4 +258,3 @@ class DiseasesDiagnosed(db.Model):
             new_id = "DDIAGG-001"
          
         return new_id
-

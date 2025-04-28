@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex justify-center items-center h-screen bg-green-100">
+    <div class="bg-white p-6 rounded-lg shadow-md w-80">
+        <h1 class="text-2xl font-bold text-green-700 mb-4">Register</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-2 mb-2 text-white rounded {{ 'bg-green-500' if category == 'success' else 'bg-red-500' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.admin_registration') }}" method="POST" class="space-y-3">
+            <input type="text" name="username" placeholder="Username" required class="w-full p-2 border border-green-300 rounded">
+            <input type="email" name="email" placeholder="Email" required class="w-full p-2 border border-green-300 rounded">
+            <input type="text" name="phone_num" placeholder="Phone Number (optional)" class="w-full p-2 border border-green-300 rounded">
+            <input type="text" name="location" placeholder="Location (optional)" class="w-full p-2 border border-green-300 rounded">
+            
+            <div class="relative">
+                <input type="password" id="password" name="password" placeholder="Password" required class="w-full p-2 border border-green-300 rounded">
+                <span id="togglePassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer">👁️</span>
+            </div>
+            
+            <button type="submit" class="w-full p-2 bg-green-600 text-white font-bold rounded hover:bg-green-700">Register</button>
+        </form>
+        
+        <p class="mt-3 text-sm text-gray-600">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-green-600 font-bold">Login</a></p>
+    </div>
+    
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            let passwordField = document.getElementById('password');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        });
+    </script>
+</body>
+</html>
